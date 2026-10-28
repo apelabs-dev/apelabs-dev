@@ -7,8 +7,8 @@ interface Props {
 }
 
 const {
-  title = "Arsenii Peskovatskov — Solutions Engineer & AI Builder | Portfolio",
-  description = "Solutions Engineer in Los Angeles with 3 production AI systems shipped in fintech. RAG pipelines, agentic automation, vector search, Stripe Connect, and SOC 2 compliance.",
+  title = "apeLabs — business system repair",
+  description = "apeLabs fixes and builds the business systems small teams run on. New site in progress.",
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
@@ -27,51 +27,15 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="https://apelabs.dev/og-image.png?v=3" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="apeLabs" />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://apelabs.dev/og-image.png?v=3" />
-
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Arsenii Peskovatskov",
-      "jobTitle": "Solutions Engineer",
-      "url": "https://apelabs.dev",
-      "image": "https://apelabs.dev/assets/headshot.jpg",
-      "email": "arspesk@gmail.com",
-      "telephone": "+1-323-760-2801",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Los Angeles",
-        "addressRegion": "CA",
-        "addressCountry": "US"
-      },
-      "sameAs": [
-        "https://www.linkedin.com/in/arsenii-peskovatskov-757991217/",
-        "https://github.com/arspesk"
-      ],
-      "knowsAbout": ["AI/ML", "RAG Architecture", "LLM Integration", "Solutions Engineering", "Fintech", "Python", "TypeScript"]
-    })} />
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P3TDFKX6HC"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P3TDFKX6HC');
-    </script>
 
     <!-- Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -81,7 +45,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
       rel="stylesheet"
     />
   </head>
-  <body class="min-h-screen antialiased">
+  <body class="min-h-screen antialiased" style="background:#111318">
     <!-- Skip to content -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-lg focus:bg-brand-500 focus:px-4 focus:py-2 focus:text-white">
       Skip to content

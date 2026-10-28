@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Personal portfolio website for Arsenii Peskovatskov at **apelabs.dev**. Static site deployed to Cloudflare Pages.
+apeLabs holding page at **apelabs.dev**. Static site deployed to Cloudflare Pages.
 
 ## Commands
 
@@ -16,13 +16,7 @@ Personal portfolio website for Arsenii Peskovatskov at **apelabs.dev**. Static s
 
 **Stack:** Astro 6 (static output) + Tailwind CSS 4 + TypeScript
 
-**Layout:** Single-page site with anchor navigation. All sections compose in `src/pages/index.astro`. A 404 page exists at `src/pages/404.astro`.
-
-**Content data lives in `src/data/`:**
-- `projects.ts` — Typed project arrays (aiProjects + infraProjects), merged and sorted by date in Projects.astro
-- `skills.ts` — Skill categories with items
-
-**Component flow:** `BaseLayout.astro` wraps everything (head, SEO, GA4, JSON-LD, scroll observer). `index.astro` composes: Header → Hero → About → Projects → Skills → Education → Contact → Footer.
+**Layout:** One holding page (`src/pages/index.astro`, scoped styles) plus `src/pages/404.astro`. `BaseLayout.astro` holds head/SEO, GA4 and the scroll observer. The full apeLabs site replaces this in a later build.
 
 **Styling:** Tailwind 4 via `@tailwindcss/vite` plugin (no tailwind.config — theme defined in `src/styles/global.css` using `@theme` directive). Brand colors: `--color-brand-400` (#A78BFA), `--color-brand-500` (#8B5CF6), `--color-brand-600` (#7C3AED). Dark theme only.
 
@@ -30,13 +24,10 @@ Personal portfolio website for Arsenii Peskovatskov at **apelabs.dev**. Static s
 
 ## Key Conventions
 
-- Project images go in `public/projects/` at 800x450px. Source originals in `assets/` (gitignored).
-- Resume PDF and headshot in `public/assets/`.
-- Logo/favicon PNGs in `public/` root.
-- Projects have optional `imagePosition` field for CSS `object-position` override on card images.
+- Favicon PNG in `public/` root.
 - Sitemap auto-generated via `@astrojs/sitemap` integration.
 - GA4 tracking ID: `G-P3TDFKX6HC` (in BaseLayout head).
 
 ## Deployment
 
-Static build on Cloudflare Pages connected to GitHub repo `arspesk/apelabs-dev`. Build command: `npm run build`, output dir: `dist`. Domain: apelabs.dev (DNS on Cloudflare).
+Static build on Cloudflare Pages connected to GitHub repo `apelabs-dev/apelabs-dev`. Build command: `npm run build`, output dir: `dist`. Domain: apelabs.dev (DNS on Cloudflare).
