@@ -1,24 +1,42 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Header from "../components/Header.astro";
-import Hero from "../components/Hero.astro";
-import About from "../components/About.astro";
-import Skills from "../components/Skills.astro";
-import Projects from "../components/Projects.astro";
-import Education from "../components/Education.astro";
-import Contact from "../components/Contact.astro";
-import Footer from "../components/Footer.astro";
 ---
 
 <BaseLayout>
-  <Header />
-  <main>
-    <Hero />
-    <About />
-    <Projects />
-    <Skills />
-    <Education />
-    <Contact />
+  <main id="main-content" class="holding">
+    <p class="eyebrow">apeLabs / business system repair</p>
+    <h1>apeLabs</h1>
+    <p class="lede">We fix (and build) the business systems small teams run on. New site in progress.</p>
   </main>
-  <Footer />
 </BaseLayout>
+
+<style>
+  .holding {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8vw;
+    max-width: 960px;
+  }
+  .eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8b8f98;
+  }
+  h1 {
+    margin: 0.75rem 0 1rem;
+    font-size: clamp(3rem, 9vw, 6rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #f3f1ea;
+  }
+  .lede {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: #b9bcc3;
+    max-width: 36rem;
+  }
+</style>
