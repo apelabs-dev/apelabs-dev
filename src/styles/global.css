@@ -171,6 +171,11 @@ a {
   padding-block: var(--section-y);
   border-top: 1px solid var(--color-rule);
 }
+/* A section that opens an inner page sits closer to the header and needs no rule above it. */
+main > .section:first-child {
+  padding-top: clamp(56px, 7vw, 104px);
+  border-top: 0;
+}
 
 /* Section index row: "[01] Repair" set as a report header with a rule to the edge. */
 .section-index {

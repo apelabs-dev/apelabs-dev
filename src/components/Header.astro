@@ -1,13 +1,15 @@
 ---
 import Logo from './Logo.astro';
 import Arrow from './Arrow.astro';
-import { NAV, DIAGNOSTIC, CTA_LABEL, EMAIL, navHref } from '../lib/site';
+import { NAV, CTA_LABEL, EMAIL, navHref, ctaHref as ctaFor } from '../lib/site';
 
 interface Props {
   onHome: boolean;
 }
 const { onHome } = Astro.props;
-const ctaHref = navHref(DIAGNOSTIC, onHome);
+const path = Astro.url.pathname;
+const ctaHref = ctaFor(path);
+const current = (page: string) => (path === page ? 'page' : undefined);
 ---
 
 <header class="site-header" data-site-header>
@@ -19,7 +21,7 @@ const ctaHref = navHref(DIAGNOSTIC, onHome);
     <nav class="primary" aria-label="Main">
       <ul>
         {NAV.map((item) => (
-          <li><a href={navHref(item, onHome)}>{item.label}</a></li>
+          <li><a href={navHref(item, onHome)} aria-current={current(item.page)}>{item.label}</a></li>
         ))}
       </ul>
     </nav>
@@ -47,7 +49,7 @@ const ctaHref = navHref(DIAGNOSTIC, onHome);
     <ol>
       {NAV.map((item, i) => (
         <li>
-          <a href={navHref(item, onHome)} data-menu-link>
+          <a href={navHref(item, onHome)} aria-current={current(item.page)} data-menu-link>
             <span class="mono menu-idx">{String(i + 1).padStart(2, '0')}</span>
             <span>{item.label}</span>
           </a>
@@ -171,8 +173,14 @@ const ctaHref = navHref(DIAGNOSTIC, onHome);
     transition: color var(--dur-fast) var(--ease-out-dock);
   }
   .primary a:hover,
-  .primary a:focus-visible {
+  .primary a:focus-visible,
+  .primary a[aria-current="page"] {
     color: var(--color-ink);
+  }
+  .primary a[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.5em;
   }
   .primary a:active {
     color: var(--color-accent);

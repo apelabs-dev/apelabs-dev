@@ -1,0 +1,18 @@
+---
+// Deck section 8: one focused column; the CTA leads to the form on /diagnostic/.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Contact from '../../components/sections/Contact.astro';
+import { PAGES, breadcrumbLd } from '../../lib/seo';
+
+const page = PAGES.contact;
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[breadcrumbLd(page)]}
+>
+  <Contact pageHeading />
+</BaseLayout>

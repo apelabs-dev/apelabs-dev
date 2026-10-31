@@ -12,6 +12,8 @@ interface Props {
   /** Fixed brand-asset slot; a file drop in public/og/ replaces it. */
   ogImage?: string;
   noindex?: boolean;
+  /** The 404 page has no URL of its own to canonicalize. */
+  canonical?: boolean;
   /** JSON-LD objects rendered as application/ld+json. */
   jsonLd?: object[];
 }
@@ -23,6 +25,7 @@ const {
   ogDescription = description,
   ogImage = '/og/og-image.png',
   noindex = false,
+  canonical = true,
   jsonLd = [],
 } = Astro.props;
 
@@ -41,7 +44,7 @@ const cfAnalyticsToken = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
     <script is:inline>document.documentElement.classList.add('js');</script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalUrl} />
+    {canonical && <link rel="canonical" href={canonicalUrl} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0B0B0C" />
 
@@ -58,7 +61,7 @@ const cfAnalyticsToken = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="apeLabs" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:url" content={canonicalUrl} />
+    {canonical && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:title" content={ogTitle} />
     <meta property="og:description" content={ogDescription} />
     <meta property="og:image" content={ogImageUrl} />

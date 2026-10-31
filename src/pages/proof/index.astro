@@ -1,0 +1,21 @@
+---
+// Deck section 5: the labeled sample finding and the two own builds, then the closing contact
+// block. The header nav carries the link to /repair/ that seo.md asks for.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Proof from '../../components/sections/Proof.astro';
+import Contact from '../../components/sections/Contact.astro';
+import { PAGES, breadcrumbLd } from '../../lib/seo';
+
+const page = PAGES.proof;
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[breadcrumbLd(page)]}
+>
+  <Proof pageHeading />
+  <Contact />
+</BaseLayout>
