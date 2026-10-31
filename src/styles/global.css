@@ -358,6 +358,21 @@ a {
   fill-opacity: 0.13;
 }
 
+/* Diagram reveal: in a [data-reveal] figure the break is drawn first, then the fix and the
+   rerun marks fade in once it is in view (src/scripts/reveal.ts adds .is-in). Only aria-hidden
+   graphics are held back, never text a reader needs, and only with JS and motion allowed. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] :is(.blk--fix, .ok, .note) {
+    transition: opacity 360ms var(--ease-smoothstep) 200ms;
+  }
+  .js [data-reveal] :is(.ok, .note) {
+    transition-delay: 520ms;
+  }
+  .js [data-reveal]:not(.is-in) :is(.blk--fix, .ok, .note) {
+    opacity: 0;
+  }
+}
+
 /* ------------------------------------------------------------------
    Reduced motion: transitions collapse, no spatial movement.
    ------------------------------------------------------------------ */

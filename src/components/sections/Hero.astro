@@ -137,6 +137,7 @@ const sampleHref = path === '/' ? '#sample' : '/proof/#sample';
   .chapter {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr);
+    align-content: start;
     gap: 12px;
     padding: 16px 0;
     border-bottom: 1px solid var(--color-rule);
@@ -179,4 +180,72 @@ const sampleHref = path === '/' ? '#sample' : '/proof/#sample';
       border-bottom: 0;
     }
   }
+
+  /* Pinned replay (desktop, JS, motion allowed, and a viewport tall enough to hold the whole
+     trace). The chapters stack under the copy and scroll past the sticky trace; the reader's own
+     scroll is the only input. The same query gates the script (REPLAY_QUERY). */
+  @media (min-width: 1024px) and (min-height: 760px) and (prefers-reduced-motion: no-preference) {
+    :global(.js) .hero-grid {
+      grid-template-areas:
+        "copy stage"
+        "chapters stage";
+      grid-template-rows: auto 1fr;
+      row-gap: 56px;
+    }
+    :global(.js) .stage {
+      align-self: stretch;
+    }
+    :global(.js) .stage > :global(.trace) {
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+    }
+    :global(.js) .chapters {
+      position: relative;
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 420px;
+      padding-bottom: 34vh;
+      padding-left: 24px;
+      border-top: 0;
+    }
+    /* Progress rule: the track, then the read part (scroll progress, linear). */
+    :global(.js) .chapters::before,
+    :global(.js) .chapters::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 34vh;
+      width: 1px;
+      background: var(--color-rule-strong);
+    }
+    :global(.js) .chapters::after {
+      background: var(--color-ink);
+      transform: scaleY(calc(var(--p, 6) / 6));
+      transform-origin: top;
+    }
+    :global(.js) .chapter {
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 12px;
+      align-content: start;
+      min-height: 40vh;
+      padding: 0;
+      font-size: var(--text-body);
+      transition: color var(--dur) var(--ease-smoothstep);
+    }
+    :global(.js) .chapter strong {
+      color: var(--color-muted);
+      transition: color var(--dur) var(--ease-smoothstep);
+    }
+    :global(.js) .chapter .num {
+      line-height: 26px;
+    }
+    :global(.js) .chapter.is-active,
+    :global(.js) .chapter.is-active strong {
+      color: var(--color-ink);
+    }
+  }
 </style>
+
+<script>
+  import '../../scripts/hero-replay';
+</script>
