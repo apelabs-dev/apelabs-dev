@@ -333,6 +333,32 @@ a {
 }
 
 /* ------------------------------------------------------------------
+   Diagram motif (brand kit "C"): block lines, orange only on the fix.
+   ------------------------------------------------------------------ */
+.blk--ink {
+  fill: var(--color-ink);
+}
+.blk--dim {
+  fill: var(--color-ink);
+  fill-opacity: 0.28;
+}
+.blk--fix {
+  fill: var(--color-accent);
+}
+.blk--frag1 {
+  fill: var(--color-ink);
+  fill-opacity: 0.38;
+}
+.blk--frag2 {
+  fill: var(--color-ink);
+  fill-opacity: 0.22;
+}
+.dots {
+  fill: var(--color-ink);
+  fill-opacity: 0.13;
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: transitions collapse, no spatial movement.
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
