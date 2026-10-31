@@ -1,0 +1,305 @@
+---
+import Logo from './Logo.astro';
+import Arrow from './Arrow.astro';
+import { NAV, DIAGNOSTIC, CTA_LABEL, EMAIL, navHref } from '../lib/site';
+
+interface Props {
+  onHome: boolean;
+}
+const { onHome } = Astro.props;
+const ctaHref = navHref(DIAGNOSTIC, onHome);
+---
+
+<header class="site-header" data-site-header>
+  <div class="wrap bar">
+    <a class="brand" href="/" aria-label="apeLabs home">
+      <Logo height={22} />
+    </a>
+
+    <nav class="primary" aria-label="Main">
+      <ul>
+        {NAV.map((item) => (
+          <li><a href={navHref(item, onHome)}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <a class="btn btn-sm header-cta" href={ctaHref}>{CTA_LABEL}</a>
+      <button class="menu-btn" type="button" aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open>
+        <span>Menu</span>
+        <svg viewBox="0 0 20 12" aria-hidden="true" focusable="false"><path d="M0 1h20M0 11h20" stroke="currentColor" stroke-width="1.5" /></svg>
+      </button>
+      <a class="menu-btn menu-nojs" href="#site-footer">Menu</a>
+    </div>
+  </div>
+</header>
+
+<dialog id="site-menu" class="menu" aria-label="Menu" data-menu>
+  <div class="wrap menu-bar">
+    <a class="brand" href="/" aria-label="apeLabs home"><Logo height={22} /></a>
+    <button class="menu-btn" type="button" data-menu-close>
+      <span>Close</span>
+      <svg viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" /></svg>
+    </button>
+  </div>
+  <nav class="wrap menu-nav" aria-label="Menu">
+    <ol>
+      {NAV.map((item, i) => (
+        <li>
+          <a href={navHref(item, onHome)} data-menu-link>
+            <span class="mono menu-idx">{String(i + 1).padStart(2, '0')}</span>
+            <span>{item.label}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <a class="btn menu-cta" href={ctaHref} data-menu-link>{CTA_LABEL}<Arrow /></a>
+    <p class="menu-mail"><a class="link" href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
+  </nav>
+</dialog>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  if (header) {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      header.toggleAttribute('data-docked', window.scrollY > 16);
+    };
+    update();
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+  }
+
+  const menu = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  if (menu && openBtn) {
+    const setExpanded = (open: boolean) => openBtn.setAttribute('aria-expanded', String(open));
+    openBtn.addEventListener('click', () => {
+      menu.showModal();
+      setExpanded(true);
+      menu.querySelector<HTMLElement>('[data-menu-close]')?.focus();
+    });
+    menu.querySelector('[data-menu-close]')?.addEventListener('click', () => menu.close());
+    menu.addEventListener('close', () => {
+      setExpanded(false);
+      openBtn.focus();
+    });
+    // A click on the backdrop area outside the panel content closes too.
+    menu.addEventListener('click', (event) => {
+      if (event.target === menu) menu.close();
+    });
+    menu.querySelectorAll('[data-menu-link]').forEach((link) =>
+      link.addEventListener('click', () => menu.close()),
+    );
+    // Showing the desktop nav while the menu is open (rotate, resize) closes the menu.
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (mq) => {
+      if (mq.matches && menu.open) menu.close();
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: var(--header-h);
+  }
+  /* The bar surface docks in once the page scrolls. Without JS it is always docked. */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(11 11 12 / 0.94);
+    border-bottom: 1px solid var(--color-rule);
+    transition:
+      opacity var(--dur) var(--ease-out-dock),
+      transform var(--dur) var(--ease-out-dock);
+  }
+  :global(.js) .site-header:not([data-docked])::before {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 100%;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-right: auto;
+    color: var(--color-ink);
+  }
+  .brand :global(svg) {
+    display: block;
+  }
+
+  .primary {
+    display: none;
+  }
+  .primary ul {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .primary a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out-dock);
+  }
+  .primary a:hover,
+  .primary a:focus-visible {
+    color: var(--color-ink);
+  }
+  .primary a:active {
+    color: var(--color-accent);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-cta {
+    display: none;
+  }
+
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--color-ink);
+    font: 500 14px/1 var(--font-sans);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-out-dock);
+  }
+  .menu-btn:hover {
+    border-color: var(--color-ink);
+  }
+  .menu-btn:active {
+    background: var(--color-surface);
+  }
+  .menu-btn svg {
+    width: 16px;
+    height: 12px;
+  }
+  .menu-nojs {
+    display: none;
+  }
+  :global(html:not(.js)) [data-menu-open] {
+    display: none;
+  }
+  :global(html:not(.js)) .menu-nojs {
+    display: inline-flex;
+  }
+
+  @media (min-width: 640px) {
+    .header-cta {
+      display: inline-flex;
+    }
+  }
+  @media (min-width: 1024px) {
+    .primary {
+      display: block;
+    }
+    .bar .menu-btn {
+      display: none !important;
+    }
+    .actions {
+      margin-left: 8px;
+    }
+  }
+
+  /* Mobile menu: native modal dialog (focus stays inside, Esc closes). */
+  .menu {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+  }
+  .menu[open] {
+    animation: menu-in var(--dur) var(--ease-out-dock);
+  }
+  .menu::backdrop {
+    background: var(--color-bg);
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+  .menu-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .menu-nav ol {
+    list-style: none;
+    margin: 24px 0 32px;
+    padding: 0;
+    border-top: 1px solid var(--color-rule);
+  }
+  .menu-nav li a {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    min-height: 64px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-rule);
+    font-size: 28px;
+    font-weight: 520;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+  .menu-nav li a:active {
+    color: var(--color-accent);
+  }
+  .menu-idx {
+    font-size: var(--text-data);
+    color: var(--color-muted);
+  }
+  .menu-cta {
+    width: 100%;
+  }
+  .menu-mail {
+    margin-top: 16px;
+  }
+</style>

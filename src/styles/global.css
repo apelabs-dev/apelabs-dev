@@ -1,79 +1,347 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-surface: #141414;
-  --color-surface-hover: #1a1a1a;
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-border-hover: rgba(139, 92, 246, 0.4);
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+/* ------------------------------------------------------------------
+   Fonts: Geist + Geist Mono, variable, Latin subset, self-hosted.
+   Fallback faces are metric-adjusted so the swap does not shift layout.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/geist-latin-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/geist-mono-latin-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  ascent-override: 95.94%;
+  descent-override: 28.16%;
+  line-gap-override: 0%;
+  size-adjust: 104.76%;
+}
+@font-face {
+  font-family: "Geist Mono Fallback";
+  src: local("Menlo"), local("Consolas"), local("Courier New");
+  ascent-override: 100.5%;
+  descent-override: 29.5%;
+  line-gap-override: 0%;
+  size-adjust: 99.7%;
 }
 
+/* ------------------------------------------------------------------
+   Tokens (palette P1). Tailwind exposes each as a utility and a CSS var.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #0b0b0c;
+  --color-surface: #171614;
+  --color-surface-2: #1f1e1b;
+  --color-ink: #f3f1ea;
+  --color-muted: #9a968c;
+  --color-accent: #ff6b35;
+  --color-accent-ink: #0b0b0c;
+  --color-status: #4cc38a;
+  /* Rules are ink at fixed alpha, never a separate grey. */
+  --color-rule: rgb(243 241 234 / 0.1);
+  --color-rule-strong: rgb(243 241 234 / 0.22);
+
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+
+  --ease-out-dock: cubic-bezier(0.16, 0.84, 0.32, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* cubic-bezier(1/3, 0, 2/3, 1) is exactly smoothstep x*x*(3-2x). */
+  --ease-smoothstep: cubic-bezier(0.3333, 0, 0.6667, 1);
+}
+
+:root {
+  --container: 1200px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --grid-gap: 24px;
+  --header-h: 72px;
+  --section-y: clamp(96px, 11vw, 160px);
+
+  /* Type scale (px values at 1280 wide noted for DESIGN.md). */
+  --text-label: 11px; /* mono, 14px line, 500 */
+  --text-data: 13px; /* mono, 20px line */
+  --text-small: 15px;
+  --text-body: 17px;
+  --text-lead: 19px; /* 27.5px line */
+  --text-h3: clamp(20px, 1.1rem + 0.5vw, 24px);
+  --text-h2: clamp(32px, 1.4rem + 1.9vw, 48px);
+  --text-display: clamp(40px, 1.6rem + 2.6vw, 60px);
+
+  --radius: 4px;
+  --dur-fast: 160ms;
+  --dur: 220ms;
+
+  color-scheme: dark;
+  accent-color: var(--color-accent);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
 html {
-  scroll-behavior: smooth;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  scrollbar-color: var(--color-rule-strong) var(--color-bg);
 }
 
 body {
-  background-color: #0a0a0a;
-  color: #e5e7eb;
-  font-family: var(--font-sans);
+  min-height: 100vh;
+  font-size: var(--text-body);
+  line-height: 1.55;
+  font-feature-settings: "kern", "calt";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
 }
 
-/* Dot grid background */
-.dot-grid {
-  background-image: radial-gradient(circle, rgba(139, 92, 246, 0.15) 1px, transparent 1px);
-  background-size: 32px 32px;
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #a78bfa, #8b5cf6, #c4b5fd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
 }
 
-/* Fade-in animation */
-.fade-in {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+p,
+li,
+dd {
+  text-wrap: pretty;
 }
 
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
 }
 
-/* Gradient line divider */
-.gradient-divider {
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Glow effect for buttons */
-.glow-btn {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-.glow-btn:hover {
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-  transform: translateY(-2px);
+/* ------------------------------------------------------------------
+   Layout primitives
+   ------------------------------------------------------------------ */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
-/* Reduced motion */
+.section {
+  position: relative;
+  padding-block: var(--section-y);
+  border-top: 1px solid var(--color-rule);
+}
+
+/* Section index row: "[01] Repair" set as a report header with a rule to the edge. */
+.section-index {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: clamp(40px, 5vw, 64px);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.section-index::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-rule);
+}
+.section-index b {
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum", "zero";
+}
+
+.h2 {
+  font-size: var(--text-h2);
+  max-width: 20ch;
+}
+.h3 {
+  font-size: var(--text-h3);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.lead {
+  font-size: var(--text-lead);
+  line-height: 1.45;
+  color: var(--color-ink);
+  max-width: 60ch;
+}
+.body-muted {
+  color: var(--color-muted);
+}
+.prose-measure {
+  max-width: 68ch;
+}
+
+/* ------------------------------------------------------------------
+   Buttons and links
+   ------------------------------------------------------------------ */
+.btn {
+  --btn-bg: var(--color-accent);
+  --btn-ink: var(--color-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-size: 16px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid var(--btn-bg);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-dock),
+    color var(--dur-fast) var(--ease-out-dock),
+    transform 40ms linear;
+}
+.btn:hover {
+  --btn-bg: #ff8255;
+}
+.btn:active {
+  transform: translateY(1px);
+  --btn-bg: #e85a27;
+}
+.btn .btn-arrow {
+  width: 16px;
+  height: 10px;
+  flex: none;
+  transition: transform var(--dur) var(--ease-out-expo);
+}
+.btn:hover .btn-arrow,
+.btn:focus-visible .btn-arrow {
+  transform: translateX(3px);
+}
+.btn-sm {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 8px;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-strong);
+  transition: text-decoration-color var(--dur-fast) var(--ease-out-dock);
+}
+.link:hover,
+.link:focus-visible {
+  text-decoration-color: var(--color-accent);
+}
+.link:active {
+  color: var(--color-muted);
+}
+
+/* ------------------------------------------------------------------
+   Report rows: the shared "ledger" rule system used by repair rows,
+   FAQ, menu, proof and process. Hover and focus-within share one cue.
+   ------------------------------------------------------------------ */
+.rows {
+  border-top: 1px solid var(--color-rule-strong);
+}
+.row {
+  position: relative;
+  border-bottom: 1px solid var(--color-rule);
+  transition: background-color var(--dur) var(--ease-out-dock);
+}
+.row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: 1px;
+  width: 100%;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease-out-expo);
+}
+.row:hover::before,
+.row:focus-within::before {
+  transform: scaleX(1);
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion: transitions collapse, no spatial movement.
+   ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .fade-in { opacity: 1; transform: none; transition: none; }
-  .glow-btn { transition: none; }
-  .glow-btn:hover { transform: none; }
-}
-
-/* Focus styles for keyboard navigation */
-:focus-visible {
-  outline: 2px solid #8b5cf6;
-  outline-offset: 2px;
-  border-radius: 4px;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

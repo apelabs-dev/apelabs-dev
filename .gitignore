@@ -32,3 +32,14 @@ graphify-out/
 
 # claude worktrees
 .claude/worktrees/
+
+# local Cloudflare dev state and secrets
+.wrangler/
+.dev.vars
+workers/*/.dev.vars
+
+# dispatch run inputs and scratch (deliverables in .dispatch/shots, lighthouse, *.md stay tracked)
+.dispatch/ref/
+.dispatch/tmp/
+.dispatch/prompt.md
+.dispatch/tools/node_modules/
