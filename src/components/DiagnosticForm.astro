@@ -163,6 +163,10 @@ const text = [
   </details>
 </div>
 
+<script>
+  import '../scripts/diagnostic-form';
+</script>
+
 <style>
   .form-shell {
     background: var(--color-surface);
@@ -327,7 +331,8 @@ const text = [
   .turnstile {
     min-height: 0;
   }
-  .ts-slot:not(:empty) {
+  /* Room for the widget is reserved before it loads, so nothing shifts when it appears. */
+  :global(.js) [data-site-key]:not([data-site-key='']) .ts-slot {
     margin-top: 10px;
     min-height: 65px;
   }

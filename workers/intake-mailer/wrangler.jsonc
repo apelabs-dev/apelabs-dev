@@ -1,0 +1,25 @@
+// intake-mailer Worker. Deploy separately from the Pages site (see workers/intake-mailer/README.md).
+// Not deployed by this repo's build; nothing here changes DNS or the apex MX (Google Workspace).
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "apelabs-intake-mailer",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  // Only the Pages project calls this, over a service binding. No public URL.
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_email": [
+    {
+      "name": "SEND",
+      // The binding can only ever deliver here.
+      "destination_address": "hello@apelabs.dev"
+    }
+  ],
+  "vars": {
+    // Must be on a domain onboarded to Cloudflare Email Sending. Onboarding puts its records on
+    // cf-bounce.apelabs.dev and leaves the apex Google Workspace MX alone (README, option A).
+    "MAIL_FROM": "intake@apelabs.dev",
+    "MAIL_TO": "hello@apelabs.dev"
+  },
+  "observability": { "enabled": true }
+}

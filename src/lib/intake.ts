@@ -2,6 +2,7 @@
 // response. Pure and platform-free (fetch and the mail transport are injected), so the same
 // module runs in the Pages Function and under `node --test`. Nothing here stores anything.
 import { FORM_COPY } from './copy.ts';
+import { isEmail, MAX_EMAIL } from './email.ts';
 
 export const HONEYPOT_FIELD = 'company_website';
 export const TURNSTILE_FIELD = 'cf-turnstile-response';
@@ -11,7 +12,7 @@ export const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/si
 export const MAX_BODY_BYTES = 16 * 1024;
 export const LIMITS = {
   name: 120,
-  email: 254,
+  email: MAX_EMAIL,
   business: 200,
   toolsOther: 200,
   problem: 4000,
@@ -90,6 +91,34 @@ export function parseBody(contentType: string, body: string): RawFields | null {
   return null;
 }
 
+/**
+ * Read a request body as UTF-8, giving up as soon as it passes `max` bytes, so an oversized or
+ * endless chunked post is never buffered whole. Returns null when the cap is exceeded.
+ */
+export async function readBodyLimited(stream: ReadableStream<Uint8Array> | null, max = MAX_BODY_BYTES) {
+  if (!stream) return '';
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    chunks.push(value);
+  }
+  const all = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) {
+    all.set(c, at);
+    at += c.byteLength;
+  }
+  return new TextDecoder().decode(all);
+}
+
 // ---------------------------------------------------------------------------
 // Validation
 // ---------------------------------------------------------------------------
@@ -100,9 +129,7 @@ const clean = (s: string) => s.replace(/\r\n?/g, '\n').replace(CONTROL, '').trim
 /** Single-line fields cannot carry newlines (they end up in mail headers or subject lines). */
 const oneLine = (s: string) => clean(s).replace(/\s+/g, ' ');
 
-// Deliberately plain: one @, no spaces or header-significant characters, a dotted domain.
-const EMAIL = /^[^\s@<>()[\],;:"\\]+@[^\s@<>()[\],;:"\\]+\.[^\s@<>()[\],;:"\\]{2,}$/;
-export const isEmail = (s: string) => s.length <= LIMITS.email && EMAIL.test(s);
+export { isEmail };
 
 export function honeypotTripped(raw: RawFields): boolean {
   return (raw.get(HONEYPOT_FIELD) ?? []).some((v) => v.trim() !== '');
@@ -195,7 +222,10 @@ export interface IntakeMessage {
   replyTo: string;
 }
 
-export function formatMessage(s: Submission, receivedAt: Date): IntakeMessage {
+/** Subject prefix for a no-JS post accepted without a Turnstile check (NOJS_FALLBACK). */
+export const UNVERIFIED_PREFIX = '[no spam check] ';
+
+export function formatMessage(s: Submission, receivedAt: Date, verified = true): IntakeMessage {
   const tools = [...s.tools, ...(s.toolsOther ? [`Other: ${s.toolsOther}`] : [])].join(', ');
   const lines = [
     'New free diagnostic request from apelabs.dev',
@@ -211,10 +241,11 @@ export function formatMessage(s: Submission, receivedAt: Date): IntakeMessage {
     s.problem,
     '',
     `Received: ${receivedAt.toISOString()}`,
+    ...(verified ? [] : ['Spam check: none (sent without JavaScript, so Turnstile could not run).']),
     'Retention: delete after 90 days unless we work together (privacy note).',
   ];
   return {
-    subject: `Diagnostic request: ${s.business}`.slice(0, 160),
+    subject: `${verified ? '' : UNVERIFIED_PREFIX}Diagnostic request: ${s.business}`.slice(0, 160),
     text: lines.join('\n'),
     replyTo: s.email,
   };
@@ -234,6 +265,12 @@ export interface IntakeRequest {
   remoteip?: string;
   idempotencyKey?: string;
   turnstileSecret?: string;
+  /**
+   * Accept a post that carries no Turnstile token at all (a browser without JavaScript cannot run
+   * the widget). Off unless the owner turns on NOJS_FALLBACK; a token that is present but fails is
+   * still refused either way.
+   */
+  allowTokenless?: boolean;
   transport: Transport;
   fetchImpl?: typeof fetch;
   now?: Date;
@@ -253,17 +290,21 @@ export async function processIntake(req: IntakeRequest): Promise<Outcome> {
     return 'fields' in checked ? { kind: 'invalid', fields: checked.fields } : { kind: 'error', error: checked.error };
   }
 
-  const human = await verifyTurnstile({
-    token: (raw.get(TURNSTILE_FIELD) ?? [])[0] ?? '',
-    secret: req.turnstileSecret ?? '',
-    remoteip: req.remoteip,
-    idempotencyKey: req.idempotencyKey,
-    fetchImpl: req.fetchImpl,
-  });
-  if (!human) return { kind: 'error', error: 'spam' };
+  const token = ((raw.get(TURNSTILE_FIELD) ?? [])[0] ?? '').trim();
+  const tokenless = token === '' && req.allowTokenless === true;
+  if (!tokenless) {
+    const human = await verifyTurnstile({
+      token,
+      secret: req.turnstileSecret ?? '',
+      remoteip: req.remoteip,
+      idempotencyKey: req.idempotencyKey,
+      fetchImpl: req.fetchImpl,
+    });
+    if (!human) return { kind: 'error', error: 'spam' };
+  }
 
   try {
-    await req.transport(formatMessage(checked.value, req.now ?? new Date()));
+    await req.transport(formatMessage(checked.value, req.now ?? new Date(), !tokenless));
   } catch {
     return { kind: 'error', error: 'send' };
   }
@@ -307,6 +348,73 @@ export function redirectFor(o: Outcome): string {
     return `${FORM_PATH}?error=fields&fields=${list.join(',')}#diagnostic`;
   }
   return `${FORM_PATH}?error=${visibleError(o.error)}#diagnostic`;
+}
+
+// ---------------------------------------------------------------------------
+// HTTP: one handler for the Pages Function (and the tests)
+// ---------------------------------------------------------------------------
+
+export interface HandlerDeps {
+  turnstileSecret?: string;
+  /** NOJS_FALLBACK: let native (no-JS) form posts through without a token. Never applies to JSON. */
+  noJsFallback?: boolean;
+  transport: Transport;
+  fetchImpl?: typeof fetch;
+  now?: Date;
+}
+
+const BASE_HEADERS = {
+  'Cache-Control': 'no-store',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'same-origin',
+};
+
+/** Script clients ask for JSON; a native form post gets a 303 to a page. */
+export function wantsJson(request: Request): boolean {
+  const accept = request.headers.get('Accept') ?? '';
+  const type = request.headers.get('Content-Type') ?? '';
+  return accept.includes('application/json') || type.toLowerCase().startsWith('application/json');
+}
+
+export function respond(request: Request, outcome: Outcome): Response {
+  if (wantsJson(request)) {
+    return new Response(JSON.stringify(jsonFor(outcome)), {
+      status: statusFor(outcome),
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json; charset=utf-8' },
+    });
+  }
+  return new Response(null, {
+    status: 303,
+    headers: { ...BASE_HEADERS, Location: new URL(redirectFor(outcome), request.url).href },
+  });
+}
+
+export async function handleIntake(request: Request, deps: HandlerDeps): Promise<Response> {
+  if (request.method !== 'POST') {
+    return new Response(null, { status: 405, headers: { ...BASE_HEADERS, Allow: 'POST' } });
+  }
+  // Browsers send Origin on every POST; a mismatch is a cross-site post, not our form.
+  const origin = request.headers.get('Origin');
+  if (origin && origin !== new URL(request.url).origin) {
+    return respond(request, { kind: 'error', error: 'bad_request' });
+  }
+  const declared = Number(request.headers.get('Content-Length') ?? 0);
+  const body = declared > MAX_BODY_BYTES ? null : await readBodyLimited(request.body);
+  if (body === null) return respond(request, { kind: 'error', error: 'too_large' });
+
+  const outcome = await processIntake({
+    contentType: request.headers.get('Content-Type') ?? '',
+    body,
+    remoteip: request.headers.get('CF-Connecting-IP') ?? undefined,
+    idempotencyKey: crypto.randomUUID(),
+    turnstileSecret: deps.turnstileSecret,
+    // Script clients always have the widget, so they never get the tokenless lane.
+    allowTokenless: deps.noJsFallback === true && !wantsJson(request),
+    transport: deps.transport,
+    fetchImpl: deps.fetchImpl,
+    now: deps.now,
+  });
+  return respond(request, outcome);
 }
 
 /** Parse a redirect query back into known codes; anything unknown is ignored. */
