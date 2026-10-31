@@ -1,0 +1,20 @@
+---
+// Deck section 6: the five steps and the failed → diagnosed → patched → verified strip.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Process from '../../components/sections/Process.astro';
+import Contact from '../../components/sections/Contact.astro';
+import { PAGES, breadcrumbLd } from '../../lib/seo';
+
+const page = PAGES.process;
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[breadcrumbLd(page)]}
+>
+  <Process pageHeading />
+  <Contact />
+</BaseLayout>

@@ -1,0 +1,20 @@
+---
+// Deck section 3 (More services). URL kept from seo.md; renaming it to /services/ is an owner call.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Services from '../../components/sections/Services.astro';
+import Contact from '../../components/sections/Contact.astro';
+import { PAGES, breadcrumbLd } from '../../lib/seo';
+
+const page = PAGES.services;
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[breadcrumbLd(page)]}
+>
+  <Services pageHeading />
+  <Contact />
+</BaseLayout>

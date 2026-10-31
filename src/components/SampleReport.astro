@@ -1,0 +1,266 @@
+---
+// Proof 5a: the labelled sample finding, set as an inspection note (target frame 1200×700).
+// HTML text throughout; the only drawing is a small C-motif mark beside the quote.
+import Blocks from './Blocks.astro';
+import { PROOF } from '../lib/copy';
+import { repairLine } from '../lib/motif';
+
+const S = PROOF.sample;
+const mark = repairLine({ from: 0, to: 240, at: 24, t: 8, breakFrom: 96, breakTo: 150 });
+---
+
+<article class="report" id="sample" aria-labelledby="sample-label">
+  <header class="bar">
+    <span class="sq" aria-hidden="true"></span>
+    <p class="tag mono" id="sample-label">{S.labelBar}</p>
+  </header>
+
+  <div class="sheet">
+    <div class="top">
+      <p class="intro">{S.intro}</p>
+      <dl class="meta">
+        {S.meta.map((m) => (
+          <div>
+            <dt class="label">{m.term}</dt>
+            <dd>{m.text}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+
+    <div class="body">
+      <div class="main">
+        <section class="part" aria-label={S.symptomLabel}>
+          <p class="label">{S.symptomLabel}</p>
+          <blockquote>{S.symptom}</blockquote>
+          <dl class="pairs">
+            <div>
+              <dt>{S.should.term}:</dt>
+              <dd>{S.should.text}</dd>
+            </div>
+            <div>
+              <dt>{S.actually.term}:</dt>
+              <dd>{S.actually.text}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="part" aria-label={S.evidenceLabel}>
+          <p class="label">{S.evidenceLabel}</p>
+          <ol class="evidence">
+            {S.evidence.map((e, i) => (
+              <li>
+                <span class="mono n" aria-hidden="true">E{i + 1}</span>
+                <span>{e}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section class="part" aria-label={S.causeLabel}>
+          <p class="label">{S.causeLabel}</p>
+          <p class="strong-line">{S.cause}</p>
+          <p class="muted-line">{S.confidence}</p>
+        </section>
+
+        <div class="part split">
+          <section aria-label={S.fixLabel}>
+            <p class="label">{S.fixLabel}</p>
+            <p>{S.fix}</p>
+          </section>
+          <section aria-label={S.checkLabel}>
+            <p class="label">{S.checkLabel}</p>
+            <p>{S.check}</p>
+          </section>
+        </div>
+      </div>
+
+      <aside class="quote" aria-label={S.quoteLabel}>
+        <p class="label">{S.quoteLabel}</p>
+        <p class="price mono">{S.quote[0]}</p>
+        <ul>
+          <li>{S.quote[1]}</li>
+          <li>{S.quote[2]}</li>
+        </ul>
+        <svg class="mark" viewBox="0 0 240 60" aria-hidden="true" focusable="false">
+          <Blocks blocks={mark} />
+        </svg>
+      </aside>
+    </div>
+
+    <p class="foot mono">{S.footnote}</p>
+  </div>
+</article>
+
+<style>
+  .report {
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px clamp(20px, 3vw, 32px);
+    border-bottom: 1px solid var(--color-rule-strong);
+    background: var(--color-bg);
+  }
+  .sq {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+  }
+  .tag {
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .sheet {
+    padding: clamp(20px, 3vw, 40px);
+  }
+  .top {
+    display: grid;
+    gap: 20px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .intro {
+    font-size: var(--text-h3);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .meta {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+  .meta dd {
+    margin: 4px 0 0;
+    font-size: var(--text-small);
+  }
+  @media (min-width: 768px) {
+    .meta {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--grid-gap);
+    }
+  }
+
+  .body {
+    display: grid;
+    gap: 32px;
+    margin-top: 8px;
+  }
+  @media (min-width: 1024px) {
+    .body {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      column-gap: 40px;
+    }
+  }
+  .part {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--color-rule);
+    font-size: var(--text-small);
+    line-height: 1.55;
+  }
+  .part .label {
+    margin-bottom: 10px;
+  }
+  blockquote {
+    margin: 0;
+    font-size: var(--text-body);
+    line-height: 1.5;
+  }
+  .pairs {
+    display: grid;
+    gap: 6px;
+    margin: 14px 0 0;
+    color: var(--color-muted);
+  }
+  .pairs dt {
+    display: inline;
+    color: var(--color-ink);
+  }
+  .pairs dd {
+    display: inline;
+    margin: 0 0 0 0.3em;
+  }
+  .evidence {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .evidence li {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+  .n {
+    font-size: var(--text-data);
+    color: var(--color-muted);
+  }
+  .strong-line {
+    font-size: var(--text-body);
+  }
+  .muted-line {
+    margin-top: 8px;
+    color: var(--color-muted);
+  }
+  .split {
+    display: grid;
+    gap: 22px;
+    border-bottom: 0;
+  }
+  @media (min-width: 768px) {
+    .split {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--grid-gap);
+    }
+  }
+
+  /* Ruled off from the finding, not a card inside the report card. */
+  .quote {
+    align-self: start;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-rule-strong);
+  }
+  .price {
+    margin-top: 12px;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .quote ul {
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 0;
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+  .quote li + li {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-rule);
+  }
+  .mark {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    margin-top: 24px;
+  }
+  .foot {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-rule);
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+</style>

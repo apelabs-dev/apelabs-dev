@@ -1,0 +1,69 @@
+---
+// Deck section 8: one focused closing column. Studio-signed, email and coverage, one CTA.
+import SectionIndex from '../SectionIndex.astro';
+import ColumnRules from '../ColumnRules.astro';
+import Arrow from '../Arrow.astro';
+import { CONTACT } from '../../lib/copy';
+import { CTA_LABEL, EMAIL, ctaHref } from '../../lib/site';
+
+interface Props {
+  pageHeading?: boolean;
+}
+const { pageHeading = false } = Astro.props;
+const Heading = pageHeading ? 'h1' : 'h2';
+---
+
+<section class="section contact" id="contact" aria-labelledby="contact-title">
+  <ColumnRules />
+  <div class="wrap inner">
+    <SectionIndex index={CONTACT.index} label={CONTACT.label} />
+    <div class="col">
+      <Heading class="title" id="contact-title">{CONTACT.h2}</Heading>
+      <p class="lead">{CONTACT.body}</p>
+      <a class="btn" href={ctaHref(Astro.url.pathname)}>{CTA_LABEL}<Arrow /></a>
+      <p class="email">
+        {CONTACT.emailLead} <a class="link" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+      </p>
+      <p class="coverage body-muted">{CONTACT.coverage}</p>
+      <p class="signoff">{CONTACT.signoff}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-block: clamp(112px, 13vw, 200px);
+  }
+  .inner {
+    position: relative;
+    z-index: 1;
+  }
+  .col {
+    max-width: 760px;
+  }
+  .title {
+    font-size: var(--text-display);
+    line-height: 1.04;
+    max-width: 16ch;
+  }
+  .lead {
+    margin: 28px 0 40px;
+    color: var(--color-muted);
+  }
+  .email {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 10px;
+  }
+  .coverage {
+    margin-top: 4px;
+  }
+  .signoff {
+    margin-top: 32px;
+    font-family: var(--font-mono);
+    font-size: var(--text-data);
+    color: var(--color-ink);
+  }
+</style>

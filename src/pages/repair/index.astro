@@ -1,0 +1,22 @@
+---
+// Deck section 2 as its own page, then the process and the closing contact block.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Repair from '../../components/sections/Repair.astro';
+import Process from '../../components/sections/Process.astro';
+import Contact from '../../components/sections/Contact.astro';
+import { PAGES, breadcrumbLd } from '../../lib/seo';
+
+const page = PAGES.repair;
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[breadcrumbLd(page)]}
+>
+  <Repair pageHeading />
+  <Process />
+  <Contact />
+</BaseLayout>

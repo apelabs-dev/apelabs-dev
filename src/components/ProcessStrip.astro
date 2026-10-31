@@ -1,0 +1,111 @@
+---
+// Process chapter strip (deck section 6): failed → diagnosed → patched → verified, matching the
+// hero replay. One ordered list; each state has a small C-motif marker drawn in code.
+// Desktop target 1200×260 between thin rules on a dot field; a vertical list on phones.
+import Blocks from './Blocks.astro';
+import DotField from './DotField.astro';
+import { PROCESS } from '../lib/copy';
+import { blockLine, repairLine } from '../lib/motif';
+
+const base = { from: 0, to: 200, at: 28, t: 8, breakFrom: 80, breakTo: 126 };
+const markers = [
+  repairLine({ ...base, bridge: false }),
+  repairLine({ ...base, bridge: false }),
+  repairLine(base),
+  blockLine({ from: 0, to: 176, at: 28, t: 8 }),
+];
+---
+
+<div class="strip-frame" data-reveal>
+  <DotField id="process-dots" />
+  <ol class="strip">
+    {PROCESS.strip.map((state, i) => (
+      <li class={`state state--${state}`}>
+        <svg class="marker" viewBox="0 0 200 60" aria-hidden="true" focusable="false">
+          <Blocks blocks={markers[i]} />
+          {state === 'diagnosed' && (
+            <path class="frame" d="M70 12 V6 H78 M128 6 H136 V12 M136 46 V52 H128 M78 52 H70 V46" />
+          )}
+          {state === 'verified' && <circle class="ok" cx="190" cy="28" r="6" />}
+        </svg>
+        <p class="name mono">
+          <span class="idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          {state}
+        </p>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .strip-frame {
+    position: relative;
+    border-block: 1px solid var(--color-rule);
+    padding: 28px 0;
+  }
+  .strip {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .state {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    align-items: center;
+    gap: 20px;
+  }
+  .marker {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .frame {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 2;
+  }
+  .ok {
+    fill: var(--color-status);
+  }
+  .name {
+    display: flex;
+    gap: 12px;
+    font-size: var(--text-data);
+    line-height: 20px;
+    color: var(--color-ink);
+  }
+  .idx {
+    color: var(--color-muted);
+  }
+  .state--patched .idx {
+    color: var(--color-accent);
+  }
+  .state--verified .idx {
+    color: var(--color-status);
+  }
+
+  @media (min-width: 768px) {
+    .strip-frame {
+      padding: clamp(40px, 6vw, 72px) clamp(16px, 3vw, 40px);
+      min-height: 0;
+    }
+    .strip {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--grid-gap);
+    }
+    .state {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+    .state:not(:last-child) .name::after {
+      content: "→" / "";
+      margin-left: auto;
+      padding-right: 8px;
+      color: var(--color-muted);
+    }
+  }
+</style>

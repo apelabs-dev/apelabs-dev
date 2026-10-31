@@ -1,0 +1,11 @@
+---
+// Orthogonal arrow glyph used in buttons and links. Drawn, not a Unicode glyph.
+interface Props {
+  class?: string;
+}
+const { class: className = 'btn-arrow' } = Astro.props;
+---
+
+<svg class={className} viewBox="0 0 16 10" aria-hidden="true" focusable="false">
+  <path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" />
+</svg>
