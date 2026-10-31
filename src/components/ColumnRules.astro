@@ -1,0 +1,47 @@
+---
+// Backdrop: hairline column rules on the layout grid (every second column of 12; two on phones).
+// Flat 1px lines, no gradient or fade. Place inside a position:relative parent.
+---
+
+<div class="colrules" aria-hidden="true">
+  <div class="wrap">
+    {Array.from({ length: 6 }, () => <span />)}
+  </div>
+</div>
+
+<style>
+  .colrules {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrap {
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  span {
+    border-left: 1px solid rgb(243 241 234 / 0.06);
+  }
+  span:nth-child(2) {
+    border-right: 1px solid rgb(243 241 234 / 0.06);
+  }
+  span:nth-child(n + 3) {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .wrap {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    span:nth-child(n + 3) {
+      display: block;
+    }
+    span:nth-child(2) {
+      border-right: 0;
+    }
+    span:last-child {
+      border-right: 1px solid rgb(243 241 234 / 0.06);
+    }
+  }
+</style>

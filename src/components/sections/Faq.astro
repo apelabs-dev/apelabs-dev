@@ -1,0 +1,71 @@
+---
+// Deck section 7: report rows, question left and answer right, every answer visible (no accordion).
+import SectionIndex from '../SectionIndex.astro';
+import { FAQ } from '../../lib/copy';
+
+interface Props {
+  pageHeading?: boolean;
+}
+const { pageHeading = false } = Astro.props;
+const Heading = pageHeading ? 'h1' : 'h2';
+const Sub = pageHeading ? 'h2' : 'h3';
+---
+
+<section class="section faq" id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <SectionIndex index={FAQ.index} label={FAQ.label} />
+    <Heading class="h2" id="faq-title">{FAQ.h2}</Heading>
+
+    <div class="rows list">
+      {FAQ.items.map((item, i) => (
+        <div class="row qa">
+          <Sub class="q">
+            <span class="n mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span>{item.q}</span>
+          </Sub>
+          <p class="a">{item.a}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .list {
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+  .qa {
+    display: grid;
+    gap: 10px;
+    padding: 22px 0 26px;
+  }
+  .q {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    font-size: var(--text-body);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+  .n {
+    font-size: var(--text-label);
+    font-weight: 450;
+    line-height: 24px;
+    color: var(--color-muted);
+  }
+  .a {
+    padding-left: 36px;
+    color: var(--color-muted);
+    max-width: 64ch;
+  }
+  @media (min-width: 1024px) {
+    .qa {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: clamp(40px, 5vw, 80px);
+    }
+    .a {
+      padding-left: 0;
+    }
+  }
+</style>

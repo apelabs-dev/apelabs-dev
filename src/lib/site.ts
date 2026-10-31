@@ -32,6 +32,11 @@ export function navHref(item: { anchor: string; page: string }, onHome: boolean)
   return onHome ? `#${item.anchor}` : item.page;
 }
 
+/** Every "Request a free diagnostic" CTA: jump to the form when it is on this page. */
+export function ctaHref(pathname: string): string {
+  return pathname === '/' || pathname === DIAGNOSTIC.page ? `#${DIAGNOSTIC.anchor}` : DIAGNOSTIC.page;
+}
+
 // Deck section 9 footer links.
 export const FOOTER_LINKS = [
   ...NAV.map(({ label, page }) => ({ label, href: page })),

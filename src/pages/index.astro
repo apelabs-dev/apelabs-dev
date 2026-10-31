@@ -1,12 +1,34 @@
 ---
+// Home: the whole story in deck order. Every section renders its final state in HTML; motion only replays it.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/sections/Hero.astro';
+import MotifBand from '../components/MotifBand.astro';
+import Repair from '../components/sections/Repair.astro';
+import Services from '../components/sections/Services.astro';
+import Diagnostic from '../components/sections/Diagnostic.astro';
+import Proof from '../components/sections/Proof.astro';
+import Process from '../components/sections/Process.astro';
+import Faq from '../components/sections/Faq.astro';
+import Contact from '../components/sections/Contact.astro';
+import { PAGES, organizationLd, websiteLd } from '../lib/seo';
+
+const page = PAGES.home;
 ---
 
 <BaseLayout
-  title="apeLabs | We fix and build business systems"
-  description="We fix and build the business systems small teams run on. Something stopped working? Start with a free diagnostic of one broken thing."
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[organizationLd(), websiteLd()]}
 >
-  <section class="wrap" style="padding-block: 120px">
-    <h1 style="font-size: var(--text-display)">We fix and build the business systems small teams run on.</h1>
-  </section>
+  <Hero />
+  <MotifBand />
+  <Repair />
+  <Services />
+  <Diagnostic />
+  <Proof />
+  <Process />
+  <Faq />
+  <Contact />
 </BaseLayout>

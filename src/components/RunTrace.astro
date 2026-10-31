@@ -1,0 +1,309 @@
+---
+// Hero artefact: an illustrative run trace (deck section 1), drawn in code.
+// The default render is the final, repaired state and tells the whole story without motion,
+// in the brand kit's C motif: the line breaks after CHECK, the broken fragments stay visible,
+// orange blocks bridge the gap and add the missing alert, green marks show the verified rerun.
+// The scroll replay (hero-replay.ts) only sets data-chapter on the figure; parts are data-part.
+import Blocks from './Blocks.astro';
+import { TRACE } from '../lib/copy';
+import { blockLine, repairLine, dotPath } from '../lib/motif';
+
+// Wide map: one lane, alert below CHECK. Box 96×36.
+const W = { w: 96, h: 36 };
+const wide = {
+  trigger: { x: 8, y: 78 },
+  check: { x: 160, y: 78 },
+  step1: { x: 400, y: 78 },
+  step2: { x: 536, y: 78 },
+  alert: { x: 160, y: 172 },
+};
+const T = 6;
+const wideLines = {
+  trigger: blockLine({ from: 104, to: 160, at: 96, t: T }),
+  main: repairLine({ from: 256, to: 400, at: 96, t: T, breakFrom: 296, breakTo: 360 }),
+  skip: blockLine({ from: 496, to: 536, at: 96, t: T }),
+  absent: blockLine({ from: 114, to: 172, at: 208, t: T, vertical: true, kind: 'dim' }),
+  alert: blockLine({ from: 114, to: 172, at: 208, t: T, vertical: true, kind: 'fix' }),
+};
+// Narrow map (< 640px): three rows so labels stay at a readable size.
+const N = { w: 104, h: 36 };
+const narrow = {
+  trigger: { x: 8, y: 20 },
+  check: { x: 176, y: 20 },
+  alert: { x: 8, y: 84 },
+  step1: { x: 176, y: 132 },
+  step2: { x: 176, y: 244 },
+};
+const narrowLines = {
+  trigger: blockLine({ from: 112, to: 176, at: 38, t: T }),
+  main: repairLine({ from: 56, to: 132, at: 228, t: T, vertical: true, breakFrom: 76, breakTo: 112 }),
+  skip: blockLine({ from: 168, to: 244, at: 228, t: T, vertical: true }),
+  absent: [
+    ...blockLine({ from: 56, to: 105, at: 196, t: T, vertical: true, kind: 'dim' }),
+    ...blockLine({ from: 112, to: 199, at: 102, t: T, kind: 'dim' }),
+  ],
+  alert: [
+    ...blockLine({ from: 56, to: 105, at: 196, t: T, vertical: true, kind: 'fix' }),
+    ...blockLine({ from: 112, to: 199, at: 102, t: T, kind: 'fix' }),
+  ],
+};
+const mainParts = { ink: 'c-break', fix: 'patch', frag1: 'frags', frag2: 'frags' } as const;
+const LABELS = { trigger: 'TRIGGER', check: 'CHECK', step1: 'STEP 1', step2: 'STEP 2', alert: 'ALERT' } as const;
+type NodeKey = keyof typeof LABELS;
+const keys = Object.keys(LABELS) as NodeKey[];
+const okNodes: NodeKey[] = ['step1', 'step2', 'alert'];
+---
+
+<figure class="trace" data-trace aria-labelledby="trace-title">
+  <div class="trace-bar">
+    <span class="sq" aria-hidden="true"></span>
+    <p class="label">{TRACE.label}</p>
+  </div>
+  <p class="trace-title" id="trace-title">{TRACE.title}</p>
+
+  <div class="trace-map">
+    <svg class="map map--wide" viewBox="0 0 640 232" aria-hidden="true" focusable="false">
+      <path class="dots" d={dotPath(20, 16, 620, 216, 40, 1)} />
+      <Blocks blocks={wideLines.trigger} part="c-trigger" />
+      <Blocks blocks={wideLines.main} parts={mainParts} />
+      <Blocks blocks={wideLines.skip} part="c-skip" />
+      <Blocks blocks={wideLines.absent} part="c-absent" />
+      <Blocks blocks={wideLines.alert} part="patch-alert" />
+      {keys.map((k) => (
+        <g data-part={k} class="node">
+          <rect x={wide[k].x} y={wide[k].y} width={W.w} height={W.h} rx="3" />
+          <text x={wide[k].x + 12} y={wide[k].y + 22}>{LABELS[k]}</text>
+        </g>
+      ))}
+      {okNodes.map((k) => (
+        <circle data-part="ok" class="ok" cx={wide[k].x + W.w - 11} cy={wide[k].y + 11} r="3.5" />
+      ))}
+    </svg>
+
+    <svg class="map map--narrow" viewBox="0 0 330 296" aria-hidden="true" focusable="false">
+      <path class="dots" d={dotPath(24, 8, 304, 288, 40, 1)} />
+      <Blocks blocks={narrowLines.trigger} part="c-trigger" />
+      <Blocks blocks={narrowLines.main} parts={mainParts} />
+      <Blocks blocks={narrowLines.skip} part="c-skip" />
+      <Blocks blocks={narrowLines.absent} part="c-absent" />
+      <Blocks blocks={narrowLines.alert} part="patch-alert" />
+      {keys.map((k) => (
+        <g data-part={k} class="node">
+          <rect x={narrow[k].x} y={narrow[k].y} width={N.w} height={N.h} rx="3" />
+          <text x={narrow[k].x + 12} y={narrow[k].y + 22.5}>{LABELS[k]}</text>
+        </g>
+      ))}
+      {okNodes.map((k) => (
+        <circle data-part="ok" class="ok" cx={narrow[k].x + N.w - 11} cy={narrow[k].y + 11} r="3.5" />
+      ))}
+    </svg>
+  </div>
+
+  <div class="log mono">
+    <p class="sr-only">{TRACE.a11yNote}</p>
+    <p class="log-head">{TRACE.run}</p>
+    <ol>
+      {TRACE.lines.map((line, i) => (
+        <li data-line={i + 1}>
+          <span class="t">{line.time}</span>
+          <span class="k">{line.kind}</span>
+          <span class="m">{line.text}</span>
+          {line.status && <span class="s">{line.status}</span>}
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <div class="verdicts">
+    <p class="verdict verdict--before" data-part="before">
+      <span class="mark" aria-hidden="true"></span>{TRACE.before}
+    </p>
+    <p class="verdict verdict--after" data-part="after">
+      <span class="mark" aria-hidden="true"></span>{TRACE.after}
+    </p>
+  </div>
+
+  <figcaption class="trace-foot">
+    <span class="mono">{TRACE.footnote}</span>
+    <span class="rm-note">{TRACE.reducedMotion}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .trace {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius);
+    padding: 0 0 20px;
+    min-width: 0;
+  }
+  .trace-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .trace-bar .label {
+    color: var(--color-ink);
+  }
+  .sq {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent);
+  }
+  .trace-title {
+    padding: 18px 20px 0;
+    font-size: var(--text-small);
+    font-weight: 560;
+    letter-spacing: -0.01em;
+  }
+
+  /* Map */
+  .trace-map {
+    padding: 8px 12px 4px;
+  }
+  .map {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .map--narrow {
+    max-width: 380px;
+  }
+  .map--wide {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .map--wide {
+      display: block;
+    }
+    .map--narrow {
+      display: none;
+    }
+  }
+  .node rect {
+    fill: var(--color-surface-2);
+    stroke: var(--color-rule-strong);
+    stroke-width: 1;
+  }
+  .node text {
+    fill: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    letter-spacing: 0.06em;
+  }
+  .ok {
+    fill: var(--color-status);
+  }
+
+  /* Log */
+  .log {
+    margin: 12px 20px 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-rule);
+    font-size: 12px;
+    line-height: 18px;
+  }
+  .log-head {
+    color: var(--color-muted);
+    margin-bottom: 6px;
+  }
+  .log ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .log li {
+    display: grid;
+    grid-template-columns: 64px 64px minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgb(243 241 234 / 0.06);
+    transition:
+      color var(--dur) var(--ease-out-dock),
+      opacity var(--dur) var(--ease-out-dock);
+  }
+  .log li:last-child {
+    border-bottom: 0;
+  }
+  .t {
+    color: var(--color-muted);
+  }
+  .k {
+    color: var(--color-ink);
+    font-weight: 450;
+  }
+  .m {
+    color: var(--color-ink);
+    min-width: 0;
+  }
+  .s {
+    grid-column: 3;
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+  }
+  @media (min-width: 480px) {
+    .log li {
+      grid-template-columns: 64px 64px minmax(0, 1fr) auto;
+    }
+    .s {
+      grid-column: auto;
+      text-align: right;
+    }
+  }
+
+  /* Verdicts */
+  .verdicts {
+    display: grid;
+    gap: 10px;
+    margin: 16px 20px 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-rule);
+    font-size: var(--text-small);
+    line-height: 1.45;
+  }
+  .verdict {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .verdict--before {
+    color: var(--color-muted);
+  }
+  .mark {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--color-muted);
+    transform: translateY(-1px);
+  }
+  .verdict--after .mark {
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-status);
+  }
+
+  .trace-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+    margin: 14px 20px 0;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--color-muted);
+  }
+  .rm-note {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) and (min-width: 1024px) {
+    .rm-note {
+      display: inline;
+    }
+  }
+</style>

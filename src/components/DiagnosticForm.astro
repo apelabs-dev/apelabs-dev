@@ -1,0 +1,425 @@
+---
+// The diagnostic request form (deck section 4): exact labels, helper text, errors and confirmation.
+// Works without JavaScript: a native POST to /api/diagnostic, which answers no-JS posts with a 303
+// to /diagnostic/thanks/ or back here with ?error=… (functions/diagnostic/_middleware.ts reveals the
+// matching pre-rendered messages; input is never echoed). With JS, diagnostic-form.ts validates
+// inline, loads Turnstile near the viewport and shows the confirmation in place.
+import Arrow from './Arrow.astro';
+import { FORM_COPY as F, FORM_ERRORS as E, PRIVACY_NOTE } from '../lib/copy';
+import { LIMITS, TOOL_OPTIONS, NOTICED_OPTIONS, HONEYPOT_FIELD } from '../lib/intake';
+
+interface Props {
+  /** Heading level for the in-place confirmation (one below the section heading). */
+  confirmLevel?: 'h2' | 'h3';
+}
+const { confirmLevel = 'h3' } = Astro.props;
+const ConfirmHeading = confirmLevel;
+
+// Turnstile test key only in dev; a production build without a key shows the spam-check error.
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DEV ? '1x00000000000000000000AA' : '');
+
+const text = [
+  { name: 'name', label: F.name.label, helper: F.name.helper, type: 'text', autocomplete: 'name', max: LIMITS.name },
+  {
+    name: 'email',
+    label: F.email.label,
+    helper: F.email.helper,
+    type: 'email',
+    autocomplete: 'email',
+    max: LIMITS.email,
+  },
+  {
+    name: 'business',
+    label: F.business.label,
+    helper: F.business.helper,
+    type: 'text',
+    autocomplete: 'organization',
+    max: LIMITS.business,
+  },
+] as const;
+---
+
+<div class="form-shell" data-form-shell>
+  <form
+    class="dx-form"
+    method="post"
+    action="/api/diagnostic"
+    data-diagnostic-form
+    data-site-key={siteKey}
+    accept-charset="utf-8"
+  >
+    <p class="req-note">{F.requiredNote}</p>
+
+    <p class="form-error" data-form-error="spam" role="alert" hidden={!!siteKey}>{E.spam}</p>
+    <p class="form-error" data-form-error="send" role="alert" hidden>{E.send}</p>
+
+    {text.map((f) => (
+      <div class="field" data-field={f.name}>
+        <label for={`f-${f.name}`}>
+          {f.label} <span class="req" aria-hidden="true">*</span>
+        </label>
+        <p class="helper" id={`f-${f.name}-help`}>{f.helper}</p>
+        <input
+          id={`f-${f.name}`}
+          name={f.name}
+          type={f.type}
+          autocomplete={f.autocomplete}
+          maxlength={f.max}
+          required
+          aria-describedby={`f-${f.name}-help`}
+          spellcheck={f.name === 'name' || f.name === 'email' ? 'false' : undefined}
+          autocapitalize={f.name === 'email' ? 'off' : undefined}
+        />
+        <p class="error" id={`f-${f.name}-required`} data-error="required" hidden>{E.required}</p>
+        {f.name === 'email' && <p class="error" id="f-email-invalid" data-error="email" hidden>{E.email}</p>}
+      </div>
+    ))}
+
+    <fieldset class="field" data-field="tools">
+      <legend>
+        {F.tools.label} <span class="req" aria-hidden="true">*</span>
+      </legend>
+      <div class="checks">
+        {TOOL_OPTIONS.map((tool, i) => (
+          <label class="check" for={`f-tool-${i}`}>
+            <input id={`f-tool-${i}`} type="checkbox" name="tools" value={tool} />
+            <span>{tool}</span>
+          </label>
+        ))}
+      </div>
+      <label class="other-label" for="f-tools-other">{F.tools.other}</label>
+      <input id="f-tools-other" name="tools_other" type="text" maxlength={LIMITS.toolsOther} autocomplete="off" />
+      <p class="error" id="f-tools-required" data-error="required" hidden>{E.required}</p>
+    </fieldset>
+
+    <div class="field" data-field="problem">
+      <label for="f-problem">
+        {F.problem.label} <span class="req" aria-hidden="true">*</span>
+      </label>
+      <p class="helper" id="f-problem-help">{F.problem.helper}</p>
+      <textarea
+        id="f-problem"
+        name="problem"
+        rows="6"
+        maxlength={LIMITS.problem}
+        required
+        placeholder={F.problem.placeholder}
+        aria-describedby="f-problem-help"></textarea>
+      <p class="error" id="f-problem-required" data-error="required" hidden>{E.required}</p>
+    </div>
+
+    <fieldset class="field" data-field="noticed">
+      <legend>{F.noticed.label}</legend>
+      <div class="checks checks--radio">
+        {NOTICED_OPTIONS.map((opt, i) => (
+          <label class="check" for={`f-noticed-${i}`}>
+            <input id={`f-noticed-${i}`} type="radio" name="noticed" value={opt} />
+            <span>{opt}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <div class="field" data-field="extra">
+      <label for="f-extra">{F.extra.label}</label>
+      <input id="f-extra" name="extra" type="text" maxlength={LIMITS.extra} autocomplete="off" />
+    </div>
+
+    <div class="hp" aria-hidden="true">
+      <label for="f-hp">Leave this field empty</label>
+      <input id="f-hp" name={HONEYPOT_FIELD} type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="field turnstile" data-turnstile>
+      <p class="helper">{F.spam.label}</p>
+      <div class="ts-slot" data-turnstile-slot></div>
+    </div>
+
+    <div class="submit">
+      <button class="btn" type="submit" data-submit>
+        <span data-submit-label>{F.submit}</span><Arrow />
+      </button>
+      <p class="under">{F.underButton}</p>
+    </div>
+  </form>
+
+  <div class="confirm" data-confirm hidden tabindex="-1" role="status">
+    <ConfirmHeading class="confirm-title">{F.confirmation.heading}</ConfirmHeading>
+    <p>{F.confirmation.body}</p>
+    <p>{F.confirmation.until}</p>
+    <p class="signoff">{F.confirmation.signoff}</p>
+  </div>
+
+  <details class="privacy">
+    <summary>{F.privacyToggle}</summary>
+    <dl>
+      {PRIVACY_NOTE.map((item) => (
+        <div>
+          <dt>{item.term}:</dt>
+          <dd>{item.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </details>
+</div>
+
+<style>
+  .form-shell {
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius);
+    padding: clamp(20px, 4vw, 40px);
+  }
+  .req-note {
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: var(--color-muted);
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .form-error {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    font-size: var(--text-small);
+    line-height: 1.45;
+  }
+  .form-error[hidden] {
+    display: none;
+  }
+
+  .field {
+    margin: 28px 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  label,
+  legend {
+    display: block;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 560;
+    line-height: 1.4;
+  }
+  .req {
+    color: var(--color-accent);
+  }
+  .helper {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+  input[type="text"],
+  input[type="email"],
+  textarea {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    min-height: 52px;
+    padding: 13px 16px;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: border-color var(--dur-fast) var(--ease-out-dock);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 152px;
+  }
+  ::placeholder {
+    color: rgb(154 150 140 / 0.75);
+  }
+  input:hover,
+  textarea:hover {
+    border-color: rgb(243 241 234 / 0.4);
+  }
+  input:focus-visible,
+  textarea:focus-visible {
+    border-color: var(--color-accent);
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+  .field[data-invalid] input[type="text"],
+  .field[data-invalid] input[type="email"],
+  .field[data-invalid] textarea {
+    border-color: var(--color-accent);
+  }
+  .error {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--color-ink);
+  }
+  .error::before {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 2px;
+    margin-top: 0.7em;
+    background: var(--color-accent);
+  }
+  .error[hidden] {
+    display: none;
+  }
+
+  .checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    font-weight: 400;
+    font-size: 15px;
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-out-dock),
+      background-color var(--dur-fast) var(--ease-out-dock);
+  }
+  .check:hover {
+    border-color: var(--color-rule-strong);
+  }
+  .check:has(input:checked) {
+    border-color: var(--color-accent);
+    background: var(--color-bg);
+  }
+  .check input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+  .other-label {
+    margin-top: 16px;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--color-muted);
+  }
+  .other-label + input {
+    margin-top: 6px;
+  }
+
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .turnstile {
+    min-height: 0;
+  }
+  .ts-slot:not(:empty) {
+    margin-top: 10px;
+    min-height: 65px;
+  }
+
+  .submit {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--color-rule);
+  }
+  .submit .btn {
+    min-height: 52px;
+    width: 100%;
+  }
+  @media (min-width: 640px) {
+    .submit .btn {
+      width: auto;
+    }
+  }
+  .btn[aria-disabled="true"] {
+    opacity: 0.7;
+    cursor: progress;
+  }
+  .under {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-muted);
+    max-width: 52ch;
+  }
+
+  .confirm {
+    padding: 8px 0;
+  }
+  .confirm:focus {
+    outline: none;
+  }
+  .confirm-title {
+    font-size: var(--text-h3);
+    line-height: 1.25;
+    max-width: 24ch;
+  }
+  .confirm p {
+    margin-top: 16px;
+    max-width: 52ch;
+    color: var(--color-muted);
+  }
+  .confirm .signoff {
+    color: var(--color-ink);
+    font-weight: 560;
+  }
+
+  .privacy {
+    margin-top: 32px;
+    border-top: 1px solid var(--color-rule);
+  }
+  .privacy summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding-top: 4px;
+    cursor: pointer;
+    font-size: var(--text-small);
+    font-weight: 560;
+    list-style: none;
+  }
+  .privacy summary::-webkit-details-marker {
+    display: none;
+  }
+  .privacy summary::before {
+    content: "+";
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    width: 12px;
+  }
+  .privacy[open] summary::before {
+    content: "−";
+  }
+  .privacy dl {
+    margin: 8px 0 0;
+    display: grid;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .privacy dt {
+    display: inline;
+    font-weight: 560;
+  }
+  .privacy dd {
+    display: inline;
+    margin: 0 0 0 0.3em;
+    color: var(--color-muted);
+  }
+</style>
