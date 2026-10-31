@@ -100,6 +100,21 @@ const current = (page: string) => (path === page ? 'page' : undefined);
     menu.addEventListener('click', (event) => {
       if (event.target === menu) menu.close();
     });
+    // The modal makes the page inert, but Tab past the last item still leaves for the browser UI.
+    // Wrap it so focus stays in the menu.
+    menu.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      const items = [...menu.querySelectorAll<HTMLElement>('a[href], button')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
     menu.querySelectorAll('[data-menu-link]').forEach((link) =>
       link.addEventListener('click', () => menu.close()),
     );
@@ -122,7 +137,7 @@ const current = (page: string) => (path === page ? 'page' : undefined);
     content: '';
     position: absolute;
     inset: 0;
-    background: rgb(11 11 12 / 0.94);
+    background: var(--color-bg);
     border-bottom: 1px solid var(--color-rule);
     transition:
       opacity var(--dur) var(--ease-out-dock),
