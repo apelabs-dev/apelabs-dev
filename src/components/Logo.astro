@@ -9,6 +9,9 @@ interface Props {
 const { class: className, height = 22 } = Astro.props;
 const VIEWBOX = [56.8, 56.8, 569.3, 96.65];
 const width = Math.round((height * VIEWBOX[2]) / VIEWBOX[3]);
+// Brand kit size rule: the lockup is never shown narrower than 96 px (the fork closes up below).
+const MIN_WIDTH = 96;
+if (width < MIN_WIDTH) throw new Error(`Logo lockup ${width}px wide is below the ${MIN_WIDTH}px brand minimum`);
 ---
 
 <svg
