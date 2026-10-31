@@ -181,13 +181,21 @@ const text = [
     padding-bottom: 24px;
     border-bottom: 1px solid var(--color-rule);
   }
+  /* Accent square marker instead of a box: the form already sits in a panel. */
   .form-error {
+    display: flex;
+    gap: 12px;
     margin-top: 20px;
-    padding: 14px 16px;
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius);
     font-size: var(--text-small);
     line-height: 1.45;
+  }
+  .form-error::before {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-top: 0.45em;
+    background: var(--color-accent);
   }
   .form-error[hidden] {
     display: none;
@@ -238,7 +246,7 @@ const text = [
     min-height: 152px;
   }
   ::placeholder {
-    color: rgb(154 150 140 / 0.75);
+    color: var(--color-muted);
   }
   input:hover,
   textarea:hover {
