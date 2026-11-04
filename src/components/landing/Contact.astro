@@ -1,5 +1,146 @@
-<section id="08-contact" class="section">
-  <div class="wrap">
-    <h2>Contact</h2>
+---
+import Icon from '../Icon.astro';
+import { CONTACT, FORM_COPY as F, FORM_ERRORS, PRIVACY_NOTE } from '../../lib/copy';
+import { LIMITS, TOOL_OPTIONS, NOTICED_OPTIONS, HONEYPOT_FIELD } from '../../lib/intake';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DEV ? '1x00000000000000000000AA' : '');
+---
+<section id="08-contact" class="contact" data-island="contact" aria-labelledby="contact-heading">
+  <div class="contact-inner">
+    <p class="label">Contact</p>
+    <h2 id="contact-heading">{CONTACT.h2}</h2>
+    <p class="contact-body">We read every request and answer within one business day.</p>
+    <div class="contact-ask">
+      <div class="contact-panel" data-panel>
+        <form data-email-well hidden novalidate aria-label="Request a free diagnostic">
+          <label class="sr-only" for="contact-start-email">Work email</label>
+          <input id="contact-start-email" type="email" autocomplete="email" maxlength={LIMITS.email} placeholder="Work email" aria-describedby="contact-start-error" required />
+          <button class="btn" type="submit" aria-controls="contact-full" aria-expanded="false">Request a free diagnostic</button>
+        </form>
+        <p id="contact-start-error" class="contact-error well-error" role="alert" hidden></p>
+        <div id="contact-full" data-full>
+          <p class="contact-bar label">Free diagnostic</p>
+          <form data-contact-form action="/api/diagnostic" method="post" accept-charset="utf-8" data-site-key={siteKey}>
+            <div class="contact-grid">
+              <div class="contact-field" data-field="name">
+                <label for="contact-name">Your name <span class="optional">(optional)</span></label>
+                <input id="contact-name" name="name" type="text" autocomplete="name" maxlength={LIMITS.name} disabled />
+              </div>
+              <noscript><style>[data-island="contact"] [data-field="name"] { display: none; }</style><input type="hidden" name="name" value="(not provided)" /></noscript>
+              <div class="contact-field" data-field="email">
+                <label for="contact-email">Work email</label>
+                <input id="contact-email" name="email" type="email" autocomplete="email" maxlength={LIMITS.email} required aria-describedby="contact-email-error" />
+                <p id="contact-email-error" class="contact-error" hidden></p>
+              </div>
+              <div class="contact-field" data-field="business">
+                <label for="contact-business">Business name or website</label>
+                <input id="contact-business" name="business" type="text" autocomplete="organization" maxlength={LIMITS.business} required aria-describedby="contact-business-error" />
+                <p id="contact-business-error" class="contact-error" hidden></p>
+              </div>
+              <fieldset class="contact-field" data-field="tools" aria-describedby="contact-tools-error">
+                <legend>Which tools are involved?</legend>
+                <div class="contact-choices">{TOOL_OPTIONS.map((tool) => <label class="contact-choice"><input type="checkbox" name="tools" value={tool} aria-describedby="contact-tools-error" /><span>{tool}</span></label>)}</div>
+                <label class="contact-other" for="contact-tools-other">Other (type it)</label>
+                <input id="contact-tools-other" name="tools_other" type="text" autocomplete="off" maxlength={LIMITS.toolsOther} aria-describedby="contact-tools-error" />
+                <p id="contact-tools-error" class="contact-error" hidden></p>
+              </fieldset>
+              <div class="contact-field" data-field="problem">
+                <label for="contact-problem">What should happen, and what happens instead?</label>
+                <p class="contact-hint" id="contact-problem-hint">{F.problem.helper}</p>
+                <textarea id="contact-problem" name="problem" rows="5" maxlength={LIMITS.problem} placeholder={F.problem.placeholder} required aria-describedby="contact-problem-hint contact-problem-error"></textarea>
+                <p id="contact-problem-error" class="contact-error" hidden></p>
+              </div>
+              <fieldset class="contact-field" data-field="noticed">
+                <legend>When did you first notice it? <span class="optional">(optional)</span></legend>
+                <div class="contact-choices">{NOTICED_OPTIONS.map((option) => <label class="contact-choice"><input type="radio" name="noticed" value={option} /><span>{option}</span></label>)}</div>
+              </fieldset>
+              <div class="contact-field">
+                <label for="contact-extra">Anything else we should know? <span class="optional">(optional)</span></label>
+                <input id="contact-extra" name="extra" type="text" maxlength={LIMITS.extra} autocomplete="off" />
+              </div>
+              <div class="sr-only" aria-hidden="true"><label for="contact-website">Leave this field empty</label><input id="contact-website" name={HONEYPOT_FIELD} type="text" tabindex="-1" autocomplete="off" /></div>
+              <div class="contact-spam"><p class="contact-hint">{F.spam.label}</p><div data-turnstile-slot></div></div>
+            </div>
+            <p class="contact-error" data-form-error="spam" role="alert" hidden={!!siteKey}>{FORM_ERRORS.spam}</p>
+            <p class="contact-error" data-form-error="send" role="alert" hidden>{FORM_ERRORS.send}</p>
+            <div class="contact-send"><button class="btn" type="submit" data-send><span data-send-label>Send my request</span><Icon name="arrow-right" size={16} /></button><p>Please don't include passwords, API keys or customer data.</p></div>
+          </form>
+          <div class="contact-done" data-confirm hidden tabindex="-1" role="status">
+            <h3>Got it. We'll be in touch within one business day.</h3>
+            <p>A person at apeLabs will read it and reply to the email you gave us.</p>
+            <p>Until then, please don't send passwords or customer data.</p>
+            <p class="contact-sign">apeLabs</p>
+          </div>
+          <details class="contact-privacy"><summary><span>How we handle this</span><Icon name="plus" size={16} /></summary><dl>{PRIVACY_NOTE.map((item) => <div><dt>{item.term}:</dt> <dd>{item.text}</dd></div>)}</dl></details>
+        </div>
+      </div>
+    </div>
+    <p class="contact-mail">Prefer email? <a href="mailto:hello@apelabs.dev">hello@apelabs.dev</a></p>
+    <p class="contact-coverage">Remote, serving the US.</p>
   </div>
 </section>
+<script>
+  import { onVisible } from '../../scripts/lib/island';
+  import { init } from '../../scripts/contact/index';
+  onVisible(document.querySelector('[data-island="contact"]'), init);
+</script>
+<style>
+  .contact { padding-block: clamp(96px, 10vw, 140px); }
+  .contact-inner { width: var(--frame); margin-inline: auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  h2 { margin-top: 16px; max-width: 15em; font-size: var(--t-h2); line-height: var(--lh-h2); }
+  .contact-body { margin-top: 18px; max-width: 560px; font-size: var(--t-lede); line-height: var(--lh-lede); color: var(--color-text-2); }
+  .contact-ask { position: relative; margin-top: 36px; width: min(720px, 100%); display: flex; justify-content: center; }
+  .contact-panel { position: relative; width: 100%; text-align: left; border: 1px solid var(--color-rule-strong); border-radius: var(--radius); background: var(--color-report); }
+  .contact[data-step="well"] .contact-panel { width: min(540px, 100%); border-radius: 12px; background: var(--color-bg); border-color: var(--color-hair); }
+  .contact[data-step="well"] .contact-ask::before { content: ''; position: absolute; pointer-events: none; inset: -44px -16px; background: radial-gradient(ellipse, color-mix(in srgb, var(--color-orange) 10%, transparent), transparent 68%); }
+  [data-email-well] { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 4px 4px 16px; }
+  [data-email-well] input { flex: 1; min-width: 0; width: 0; min-height: 44px; background: transparent; font-family: var(--font-mono); font-size: 12px; border: 0; }
+  [data-email-well] .btn { flex: none; min-height: 44px; padding-inline: 16px; }
+  .contact-bar { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 1px solid var(--color-rule-strong); }
+  .contact-bar::before, .contact-error::before { content: ''; flex: none; width: 7px; height: 7px; background: var(--color-orange); }
+  [data-contact-form], .contact-done { padding: clamp(20px, 3vw, 28px); }
+  .contact-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 22px; }
+  .contact-field { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .contact-field > label, legend { display: block; font-size: var(--t-body); font-weight: 560; line-height: 1.35; }
+  .optional { margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--color-grey); }
+  .contact-hint { margin-top: 4px; font-size: var(--t-small); color: var(--color-grey); line-height: 1.45; }
+  .contact-field > input, textarea { display: block; width: 100%; min-height: 52px; margin-top: 10px; padding: 13px 16px; border: 1px solid var(--color-rule-strong); border-radius: var(--radius); background: var(--color-bg); color: var(--color-paper); font: inherit; font-size: var(--t-body); line-height: 1.5; }
+  textarea { min-height: 132px; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: var(--color-grey); opacity: 1; }
+  input:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-orange); outline-offset: 1px; }
+  [aria-invalid="true"] { border-color: var(--color-orange-hi); }
+  .contact-error { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; font-size: var(--t-small); line-height: 1.45; }
+  .well-error { padding: 0 16px 12px; }
+  .contact-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .contact-choice { display: inline-flex; align-items: center; gap: 9px; min-height: 40px; padding: 0 14px 0 12px; border: 1px solid var(--color-rule-strong); border-radius: var(--radius); background: var(--color-bg); color: var(--color-text-2); font-size: var(--t-small); cursor: pointer; }
+  .contact-choice input { width: 12px; height: 12px; accent-color: var(--color-paper); }
+  .contact-choice:has(:checked) { border-color: var(--color-text-2); color: var(--color-paper); }
+  .contact-choice:has(:focus-visible) { outline: 2px solid var(--color-orange); outline-offset: 2px; }
+  .contact-choice:has([aria-invalid="true"]) { border-color: var(--color-orange-hi); }
+  .contact-field > .contact-other { margin-top: 14px; font-size: var(--t-small); color: var(--color-text-2); font-weight: 400; }
+  #contact-tools-other { max-width: 420px; margin-top: 8px; }
+  .sr-only input { width: 1px; max-width: 100%; }
+  .contact-spam { min-width: 0; }
+  .contact-send { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--color-rule); }
+  .contact-send .btn { min-height: 52px; padding-inline: 24px; }
+  .contact-send p { flex: 1 1 260px; font-size: 13px; line-height: 1.5; color: var(--color-grey); }
+  .btn { background: var(--cta-fill); border-color: var(--color-cta-edge); }
+  .btn:hover { background: var(--color-orange-hi); }
+  .btn:disabled { cursor: wait; opacity: .65; }
+  .contact-done h3 { max-width: 18em; font-family: var(--font-pixel); font-weight: 400; font-size: clamp(24px, 1rem + 1.2vw, 32px); line-height: 1.15; }
+  .contact-done p { margin-top: 14px; font-size: var(--t-body); color: var(--color-text-2); }
+  .contact-done .contact-sign { margin-top: 22px; font-family: var(--font-mono); font-size: 12px; color: var(--color-grey); }
+  .contact-privacy { border-top: 1px solid var(--color-rule-strong); }
+  summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding-inline: clamp(20px, 3vw, 28px); cursor: pointer; list-style: none; font-family: var(--font-mono); font-size: var(--t-label); letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-2); }
+  summary::-webkit-details-marker { display: none; }
+  .contact-privacy dl { padding: 0 clamp(20px, 3vw, 28px) 22px; font-size: var(--t-small); }
+  .contact-privacy dl div + div { margin-top: 8px; }
+  dt, dd { display: inline; }
+  dt { font-weight: 560; } dd { color: var(--color-text-2); }
+  .contact-mail { margin-top: 28px; font-size: 15px; color: var(--color-text-2); }
+  .contact-mail a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-decoration-color: var(--color-rule-strong); }
+  .contact-mail a:hover { text-decoration-color: var(--color-orange); }
+  .contact-coverage { margin-top: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-4); }
+  [hidden] { display: none !important; }
+  @media (min-width: 720px) { .contact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; } .contact-field:not([data-field="name"], [data-field="email"]), .contact-spam { grid-column: 1 / -1; } }
+  @media (max-width: 480px) { [data-email-well] { padding-left: 12px; } [data-email-well] input { font-size: var(--t-body); } [data-email-well] .btn { padding-inline: 12px; } }
+</style>
