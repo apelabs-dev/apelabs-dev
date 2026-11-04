@@ -1,10 +1,279 @@
-<header id="01-nav" class="landing-nav">
-  <h2>Navigation</h2>
+---
+// 01-nav: the glass bar (fixed, 54px) and, below 1024px, the full-height menu sheet.
+// Without JS the menu button is a plain link to the footer; src/scripts/hero/nav.ts upgrades it.
+import Logo from '../Logo.astro';
+
+const LINKS = [
+  { href: '#04-journey', label: 'Repair' },
+  { href: '#05-services', label: 'More services' },
+  { href: '#06-proof', label: 'Proof' },
+  { href: '#jr-diagnostic', label: 'Process' },
+  { href: '#07-faq', label: 'FAQ' },
+] as const;
+const CTA = { href: '#08-contact', label: 'Request a free diagnostic' } as const;
+const EMAIL = 'hello@apelabs.dev';
+---
+
+<header class="bar" id="01-nav" data-island="nav" data-material="glass">
+  <div class="bar-in">
+    <a class="bar-logo" href="#02-hero" aria-label="apeLabs home">
+      <Logo class="bar-lockup" height={18} />
+      <svg class="bar-mark" width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <g transform="translate(10 10) scale(0.8)">
+          <path class="mark-ink" d="M31.00 43.00 L0.00 43.00 L0.00 57.00 L29.88 57.00 L30.49 57.02 L30.92 57.07 L31.30 57.13 L31.64 57.22 L31.95 57.33 L32.24 57.45 L32.53 57.60 L32.83 57.78 L33.13 58.00 L33.44 58.25 L33.77 58.54 L34.11 58.89 L34.46 59.28 L34.83 59.71 L35.20 60.20 L35.58 60.73 L36.36 61.92 L36.76 62.58 L37.57 63.99 L40.21 68.84 L41.21 70.58 L41.75 71.47 L42.31 72.36 L42.91 73.25 L43.55 74.14 L44.23 75.02 L44.96 75.90 L45.74 76.76 L46.58 77.60 L47.48 78.42 L48.45 79.20 L49.49 79.93 L50.61 80.61 L51.79 81.22 L53.04 81.75 L54.34 82.20 L55.70 82.55 L57.10 82.80 L58.54 82.95 L59.88 83.00 L74.00 83.00 L74.00 69.00 L60.12 69.00 L59.51 68.98 L59.08 68.93 L58.70 68.87 L58.36 68.78 L58.05 68.67 L57.76 68.55 L57.47 68.40 L57.17 68.22 L56.87 68.00 L56.56 67.75 L56.23 67.46 L55.89 67.11 L55.54 66.72 L55.17 66.29 L54.80 65.80 L54.03 64.70 L53.24 63.42 L52.43 62.01 L49.79 57.16 L48.79 55.42 L48.25 54.53 L47.69 53.64 L47.09 52.75 L46.45 51.86 L45.77 50.98 L45.04 50.10 L44.26 49.24 L43.42 48.40 L42.52 47.58 L41.55 46.80 L40.51 46.07 L39.39 45.39 L38.21 44.78 L36.96 44.25 L35.66 43.80 L34.30 43.45 L32.90 43.20 L31.46 43.05 L31.00 43.03 Z M62.00 43.00 L62.00 57.00 L100.00 57.00 L100.00 43.00 Z"></path>
+          <path class="mark-fix" d="M32.90 56.80 L34.30 56.55 L35.66 56.20 L36.96 55.75 L38.21 55.22 L39.39 54.61 L40.51 53.93 L41.55 53.20 L42.52 52.42 L43.42 51.60 L44.26 50.76 L45.04 49.90 L45.77 49.02 L46.45 48.14 L47.09 47.25 L47.69 46.36 L48.25 45.47 L49.30 43.71 L50.26 41.98 L52.02 38.74 L52.84 37.27 L53.64 35.92 L54.42 34.73 L54.80 34.20 L55.17 33.71 L55.54 33.28 L55.89 32.89 L56.23 32.54 L56.56 32.25 L56.87 32.00 L57.17 31.78 L57.47 31.60 L57.76 31.45 L58.05 31.33 L58.36 31.22 L58.70 31.13 L59.08 31.07 L59.51 31.02 L60.12 31.00 L74.00 31.00 L74.00 17.00 L59.88 17.00 L58.54 17.05 L57.10 17.20 L55.70 17.45 L54.34 17.80 L53.04 18.25 L51.79 18.78 L50.61 19.39 L49.49 20.07 L48.45 20.80 L47.48 21.58 L46.58 22.40 L45.74 23.24 L44.96 24.10 L44.23 24.98 L43.55 25.86 L42.91 26.75 L42.31 27.64 L41.75 28.53 L40.70 30.29 L39.74 32.02 L37.57 36.01 L36.76 37.42 L35.97 38.70 L35.58 39.27 L35.20 39.80 L34.83 40.29 L34.46 40.72 L34.11 41.11 L33.77 41.46 L33.44 41.75 L33.13 42.00 L32.83 42.22 L32.53 42.40 L32.24 42.55 L31.95 42.67 L31.64 42.78 L31.30 42.87 L30.92 42.93 L30.49 42.98 L29.88 43.00 L31.00 43.00 L31.00 56.97 L31.46 56.95 Z"></path>
+        </g>
+      </svg>
+    </a>
+    <nav class="bar-nav" aria-label="Main">
+      <ul>
+        {LINKS.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="bar-end">
+      <a class="bar-cta" href={CTA.href} data-cta>{CTA.label}</a>
+      <a class="bar-menu" href="#09-footer" aria-label="Menu" aria-controls="nav-menu">
+        <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M0 1h18M0 11h18" stroke="currentColor" stroke-width="1.5"></path></svg>
+      </a>
+    </div>
+  </div>
+  <div class="menu" id="nav-menu" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+    <div class="menu-in">
+      <button class="menu-close" type="button" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5"></path></svg>
+      </button>
+      <ol class="menu-list">
+        {LINKS.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+      </ol>
+      <a class="menu-cta" href={CTA.href} data-cta>{CTA.label}</a>
+      <a class="menu-mail" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+    </div>
+  </div>
 </header>
 
+<script>
+  import { initNav } from '../../scripts/hero/nav';
+
+  const root = document.querySelector('[data-island="nav"]');
+  if (root) initNav(root);
+</script>
+
 <style>
-  .landing-nav {
-    padding: var(--space-4) var(--space-6);
-    border-bottom: 1px solid var(--color-rule);
+  /* Fixed bar: 54px, logo at the page margin, links centred, CTA right. The mobile sheet is a fixed
+     panel (not a modal dialog), so it also works in a sandboxed frame. */
+  .bar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    height: var(--bar-h);
+    --dock: 1;
+  }
+  .bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: var(--dock);
+    transition: opacity 220ms var(--ease-out);
+  }
+  .bar[data-material='glass']::before {
+    background: var(--color-glass);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(24px) saturate(1.6);
+    box-shadow: 0 1px 0 var(--color-hair);
+  }
+  .bar-in {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding-inline: 56px;
+  }
+  .bar-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    border-radius: 4px;
+  }
+  .bar-mark {
+    display: none;
+  }
+  .mark-ink {
+    fill: var(--color-paper);
+  }
+  .mark-fix {
+    fill: var(--color-orange);
+  }
+  .bar-nav ul {
+    display: flex;
+    gap: 4px;
+  }
+  .bar-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-size: 15px;
+    line-height: 20px;
+    color: var(--color-text-2);
+    text-decoration: none;
+    transition:
+      color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+  .bar-nav a:hover {
+    color: var(--color-text);
+    background: color-mix(in srgb, var(--color-paper) 6%, transparent);
+  }
+  .bar-end {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* The primary button: brand orange, lit from the top left, mono label. */
+  .bar-cta,
+  .menu-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 1px solid var(--color-cta-edge);
+    border-radius: 8px;
+    background: var(--cta-fill);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-paper) 28%, transparent) inset;
+    color: var(--color-cta-text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 450;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      filter 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+  .bar-cta:hover,
+  .menu-cta:hover {
+    filter: brightness(1.08);
+  }
+  .bar-cta:active,
+  .menu-cta:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+  }
+
+  .bar-menu {
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .bar-menu:hover {
+    background: color-mix(in srgb, var(--color-paper) 8%, transparent);
+  }
+
+  @media (max-width: 1023px) {
+    .bar-in {
+      grid-template-columns: auto 1fr;
+      padding-inline: 16px 8px;
+    }
+    .bar-nav {
+      display: none;
+    }
+    .bar-menu {
+      display: inline-flex;
+    }
+  }
+  @media (max-width: 479px) {
+    .bar-logo :global(.bar-lockup) {
+      display: none;
+    }
+    .bar-mark {
+      display: block;
+    }
+    .bar-cta {
+      padding-inline: 12px;
+    }
+  }
+
+  /* Mobile sheet */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: color-mix(in srgb, var(--color-bg) 96%, transparent);
+    color: var(--color-text);
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu-in {
+    min-height: 100%;
+    padding: 72px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .menu-close {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .menu-list {
+    display: grid;
+  }
+  .menu-list a {
+    display: block;
+    padding: 6px 0;
+    font-size: 22px;
+    line-height: 28px;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+  .menu-cta {
+    align-self: start;
+  }
+  .menu-mail {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-text-2);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule-strong);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 180ms var(--ease-out);
+  }
+  .menu-mail:hover,
+  .menu-mail:focus-visible {
+    text-decoration-color: var(--color-orange);
+  }
+  /* Everything behind the open sheet is inert; this keeps the page from scrolling under it. */
+  :global(html.menu-open) {
+    overflow: hidden;
   }
 </style>
