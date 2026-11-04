@@ -43,3 +43,7 @@ workers/*/.dev.vars
 .dispatch/tmp/
 .dispatch/prompt.md
 .dispatch/tools/node_modules/
+
+# local agent settings and run scratch
+.claude/settings.local.json
+.dispatch/
