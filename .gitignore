@@ -38,8 +38,13 @@ graphify-out/
 .dev.vars
 workers/*/.dev.vars
 
-# dispatch run inputs and scratch (deliverables in .dispatch/shots, lighthouse, *.md stay tracked)
-.dispatch/ref/
-.dispatch/tmp/
-.dispatch/prompt.md
-.dispatch/tools/node_modules/
+# dispatch run inputs and scratch (report stays on disk, untracked)
+.dispatch/
+
+# claude local settings
+.claude/settings.local.json
+
+# playwright artifacts
+test-results/
+playwright-report/
+blob-report/

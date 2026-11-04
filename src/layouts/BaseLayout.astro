@@ -16,6 +16,8 @@ interface Props {
   canonical?: boolean;
   /** JSON-LD objects rendered as application/ld+json. */
   jsonLd?: object[];
+  /** Shared site Header/Footer. Off when a page supplies its own chrome (the landing page). */
+  chrome?: boolean;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   noindex = false,
   canonical = true,
   jsonLd = [],
+  chrome = true,
 } = Astro.props;
 
 const onHome = Astro.url.pathname === '/';
@@ -88,11 +91,11 @@ const cfAnalyticsToken = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <Header onHome={onHome} />
+    {chrome ? <Header onHome={onHome} /> : <slot name="nav" />}
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    {chrome ? <Footer /> : <slot name="footer" />}
     <script>
       import '../scripts/reveal';
     </script>

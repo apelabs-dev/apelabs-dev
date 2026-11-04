@@ -10,6 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "node --test tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:section": "playwright test",
     "pages:dev": "wrangler pages dev dist",
     "astro": "astro"
   },
@@ -18,11 +20,15 @@
     "@astrojs/sitemap": "^3.7.2",
     "@tailwindcss/vite": "4.2.2",
     "astro": "^6.1.1",
+    "gsap": "^3.15.1",
+    "lucide-static": "^1.68.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "simple-icons": "^16.36.0",
     "tailwindcss": "4.2.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "wrangler": "^4.156.0"
   }
 }

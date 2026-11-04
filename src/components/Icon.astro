@@ -1,0 +1,43 @@
+---
+import { iconData, type IconSet } from '../lib/icons';
+
+interface Props {
+  set?: IconSet;
+  name: string;
+  size?: number;
+  class?: string;
+  'aria-hidden'?: boolean | 'true' | 'false';
+  'aria-label'?: string;
+}
+
+const {
+  set = 'lucide',
+  name,
+  size = 16,
+  class: className,
+  'aria-hidden': ariaHidden,
+  'aria-label': ariaLabel,
+} = Astro.props;
+
+const { viewBox, body } = iconData(set, name);
+const isLucide = set === 'lucide';
+const hidden = ariaLabel ? undefined : (ariaHidden ?? true);
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox={viewBox}
+  class={className}
+  fill={isLucide ? 'none' : 'currentColor'}
+  stroke={isLucide ? 'currentColor' : undefined}
+  stroke-width={isLucide ? '1.5' : undefined}
+  stroke-linecap={isLucide ? 'round' : undefined}
+  stroke-linejoin={isLucide ? 'round' : undefined}
+  role={ariaLabel ? 'img' : undefined}
+  aria-label={ariaLabel}
+  aria-hidden={hidden}
+  focusable="false"
+  set:html={body}
+/>
