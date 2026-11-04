@@ -8,7 +8,7 @@
 // width. The loop runs only while a rail is on screen, the tab is visible and motion is allowed; a switch to
 // reduced motion clears the strips and stops it. Device pixel ratio is capped.
 
-import { drawSpark, makePath, sprite, type Path } from './spark';
+import { drawSpark, makePath, sprite, type Path } from '../circuit/spark';
 
 const SPEED = 120; // px/s
 const TAIL = 96; // the spark's five-step tail

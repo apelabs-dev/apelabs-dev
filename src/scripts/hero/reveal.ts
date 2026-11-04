@@ -140,7 +140,7 @@ function overlay(el: HTMLElement, list: Band[], elapsed: number, color: string):
 /** Wait for the hero faces so line bands are measured with the real glyphs, but never for long. */
 function fontsReady(): Promise<void> {
   if (!document.fonts) return Promise.resolve();
-  const loaded = Promise.all([document.fonts.load('400 1em "Hero Pixel Line"'), document.fonts.ready]).then(() => undefined);
+  const loaded = Promise.all([document.fonts.load('400 1em "Geist Pixel Line"'), document.fonts.ready]).then(() => undefined);
   const cap = new Promise<void>((done) => setTimeout(done, FONT_WAIT_MS));
   return Promise.race([loaded.catch(() => undefined), cap]);
 }

@@ -34,6 +34,12 @@
   line-gap-override: 0%;
   size-adjust: 99.7%;
 }
+@font-face {
+  font-family: 'Geist Pixel Line';
+  src: url('/fonts/geist-pixel-line.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
 
 /* ------------------------------------------------------------------
    Tokens (palette P1). Tailwind exposes each as a utility and a CSS var.
@@ -82,7 +88,7 @@
 
   --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  /* The deck's Geist Pixel Line is unused by its stylesheets; Geist Mono stands in. */
+  /* Geist Pixel Line is declared above; the token keeps Geist Mono as its fallback. */
   --font-pixel: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
 
   /* Measured type scale from the deck (desktop value, then the 390-wide value). */

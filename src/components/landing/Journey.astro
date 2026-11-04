@@ -381,15 +381,6 @@ const ro = [
 </script>
 
 <style is:global>
-  /* The approved deck's display face for the board's readouts and the closing line: Geist Pixel Line
-     (the deck's --f-pixel, self-hosted here). It is scoped to this section so the shared --font-pixel
-     token can keep its mono fallback for the rest of the build until the face ships site-wide. */
-  @font-face {
-    font-family: 'Geist Pixel Line';
-    src: url('/fonts/geist-pixel-line.woff2') format('woff2');
-    font-weight: 400;
-    font-display: swap;
-  }
   .jx {
     --font-pixel: 'Geist Pixel Line', var(--font-mono);
   }
