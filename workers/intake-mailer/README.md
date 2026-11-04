@@ -11,6 +11,14 @@ Functions cannot hold a `send_email` binding themselves.
   the mailbox.
 - Logs hold error codes only, never request contents.
 
+## Current setup (2026-11-04)
+
+Active route: **Option B on `intake.apelabs.dev`**. Email Routing is enabled for that subdomain only (its own
+Cloudflare MX + SPF); the apex keeps Google Workspace MX, and `mail.apelabs.dev` stays with Resend. `MAIL_FROM`
+is `form@intake.apelabs.dev`, the destination `hello@apelabs.dev` is a verified Email Routing address, the Worker
+is deployed, and the Pages project has the `INTAKE_MAILER` binding plus the Turnstile variable and secret in both
+Production and Preview.
+
 ## Activation (owner steps, none done by this repo)
 
 The apex `apelabs.dev` receives mail through Google Workspace. **Do not change the apex MX records.**

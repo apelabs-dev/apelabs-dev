@@ -16,9 +16,9 @@
     }
   ],
   "vars": {
-    // Must be on a domain onboarded to Cloudflare Email Sending. Onboarding puts its records on
-    // cf-bounce.apelabs.dev and leaves the apex Google Workspace MX alone (README, option A).
-    "MAIL_FROM": "intake@apelabs.dev",
+    // Must be on a domain with Cloudflare Email Routing. Routing is enabled on the intake.apelabs.dev
+    // subdomain only, so the apex Google Workspace MX is untouched (README, option B).
+    "MAIL_FROM": "form@intake.apelabs.dev",
     "MAIL_TO": "hello@apelabs.dev"
   },
   "observability": { "enabled": true }
