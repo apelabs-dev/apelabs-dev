@@ -24,26 +24,6 @@ export const PAGES = {
     ogDescription:
       'apeLabs is a small studio. We start with repair: a free diagnostic, then a fixed quote. We also build with AI where it helps.',
   },
-  repair: {
-    path: '/repair/',
-    name: 'Repair',
-    title: 'Fix broken automations and integrations | apeLabs',
-    description:
-      'A form that never reaches the CRM. A booking with no confirmation. We find the break, fix it and rerun it to show it works. Fixed quote first.',
-    ogTitle: 'We repair automations that stopped without saying so',
-    ogDescription:
-      'Zapier, Make, n8n, HubSpot, GoHighLevel, Airtable and more. Free diagnostic, fixed quote, and no charge if the fix fails the agreed check.',
-  },
-  services: {
-    path: '/build-and-care/',
-    name: 'More services',
-    title: 'AI systems setup, second opinions, custom builds | apeLabs',
-    description:
-      'Beyond repair: AI systems setup from $300, second opinion $250, AI workshop $400, and custom builds by quote. Start with a free diagnostic.',
-    ogTitle: 'What else we build',
-    ogDescription:
-      'One AI workflow on your existing tools, a written second opinion, a team workshop, or a custom build. Prices shown up front.',
-  },
   diagnostic: {
     path: '/diagnostic/',
     name: 'Free diagnostic',
@@ -52,43 +32,6 @@ export const PAGES = {
       "Request a free, bounded look at one broken workflow. You get a written note on what's broken and one fixed quote. No passwords needed.",
     ogTitle: 'Request a free diagnostic',
     ogDescription: 'Tell us about one problem. A person reads it and replies within one business day.',
-  },
-  proof: {
-    path: '/proof/',
-    name: 'Proof',
-    title: "Sample finding and what we've built | apeLabs",
-    description:
-      "A labeled sample of the written finding you'd get, plus two tools we built and maintain ourselves: sur9e and hermes-finance.",
-    ogTitle: 'What our work looks like',
-    ogDescription:
-      'No invented clients. A labeled sample finding and two open-source builds, with the checks behind them.',
-  },
-  process: {
-    path: '/process/',
-    name: 'Process',
-    title: 'How apeLabs repairs a broken automation',
-    description:
-      'Request, inspect, written finding and fixed quote, repair, then a rerun and handoff. The price is fixed before any work starts.',
-    ogTitle: 'How a repair runs',
-    ogDescription: 'From your request to a verified rerun. Fixed quote before work, 14-day warranty after.',
-  },
-  faq: {
-    path: '/faq/',
-    name: 'FAQ',
-    title: 'Automation repair FAQ: pricing, access, guarantee | apeLabs',
-    description:
-      'What the free diagnostic includes, how repairs are priced, why we never need your passwords, and what we don\'t do.',
-    ogTitle: 'Questions before you write',
-    ogDescription: 'Pricing, tools, access, security, turnaround and warranty.',
-  },
-  contact: {
-    path: '/contact/',
-    name: 'Contact',
-    title: 'Contact apeLabs',
-    description:
-      'Request a free diagnostic or email hello@apelabs.dev. Remote studio serving the US. We reply within one business day.',
-    ogTitle: 'Got something that quietly stopped working?',
-    ogDescription: 'Tell us about one problem. We read every request.',
   },
   blog: {
     path: '/blog/',

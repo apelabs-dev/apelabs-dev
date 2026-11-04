@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Arrow from '../../components/Arrow.astro';
 import { PAGES } from '../../lib/seo';
-import { CTA_LABEL, DIAGNOSTIC } from '../../lib/site';
+import { CTA_LABEL, CONTACT_HREF } from '../../lib/site';
 
 const page = PAGES.blog;
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
@@ -40,7 +40,7 @@ const date = (d: Date) => d.toISOString().slice(0, 10);
       ) : (
         <div class="empty rows">
           <p>No posts yet.</p>
-          <a class="btn" href={DIAGNOSTIC.page}>{CTA_LABEL}<Arrow /></a>
+          <a class="btn" href={CONTACT_HREF}>{CTA_LABEL}<Arrow /></a>
         </div>
       )}
     </div>
