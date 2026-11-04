@@ -13,16 +13,20 @@ export interface NavItem {
   page: string;
 }
 
-// Deck section 0, left to right.
+// Deck section 0, left to right. The standalone section pages were retired on 2026-11-04 (they 301 to
+// these landing anchors, see public/_redirects), so from inner pages every link goes to the landing section.
 export const NAV: NavItem[] = [
-  { label: 'Repair', anchor: 'repair', page: '/repair/' },
-  { label: 'More services', anchor: 'services', page: '/build-and-care/' },
-  { label: 'Proof', anchor: 'proof', page: '/proof/' },
-  { label: 'Process', anchor: 'process', page: '/process/' },
-  { label: 'FAQ', anchor: 'faq', page: '/faq/' },
+  { label: 'Repair', anchor: 'repair', page: '/#04-journey' },
+  { label: 'Process', anchor: 'process', page: '/#jr-diagnostic' },
+  { label: 'More services', anchor: 'services', page: '/#05-services' },
+  { label: 'Proof', anchor: 'proof', page: '/#06-proof' },
+  { label: 'FAQ', anchor: 'faq', page: '/#07-faq' },
 ];
 
+/** /diagnostic/ stays as the no-JS form fallback (native posts land on it and on /diagnostic/thanks/). */
 export const DIAGNOSTIC = { anchor: 'diagnostic', page: '/diagnostic/' };
+/** The live contact form on the landing page. */
+export const CONTACT_HREF = '/#08-contact';
 
 /**
  * One scheme everywhere: on the home page (the whole story) nav links jump to the
@@ -34,7 +38,7 @@ export function navHref(item: { anchor: string; page: string }, onHome: boolean)
 
 /** Every "Request a free diagnostic" CTA: jump to the form when it is on this page. */
 export function ctaHref(pathname: string): string {
-  return pathname === '/' || pathname === DIAGNOSTIC.page ? `#${DIAGNOSTIC.anchor}` : DIAGNOSTIC.page;
+  return pathname === DIAGNOSTIC.page ? `#${DIAGNOSTIC.anchor}` : CONTACT_HREF;
 }
 
 // Deck section 9 footer links.

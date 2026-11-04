@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Arrow from '../components/Arrow.astro';
-import { CTA_LABEL, DIAGNOSTIC, EMAIL } from '../lib/site';
+import { CTA_LABEL, CONTACT_HREF, EMAIL } from '../lib/site';
 ---
 
 <BaseLayout
@@ -18,7 +18,7 @@ import { CTA_LABEL, DIAGNOSTIC, EMAIL } from '../lib/site';
       too.
     </p>
     <div class="actions">
-      <a class="btn" href={DIAGNOSTIC.page}>{CTA_LABEL}<Arrow /></a>
+      <a class="btn" href={CONTACT_HREF}>{CTA_LABEL}<Arrow /></a>
       <a class="link" href="/">Back to the home page</a>
     </div>
   </section>

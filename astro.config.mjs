@@ -10,7 +10,9 @@ const NOT_IN_SITEMAP = ['/blog/', '/diagnostic/thanks/', '/404/'];
 
 // Older subpages from the 2026-10-30 build. The landing does not link them and they predate the new
 // design, so they stay noindex and out of the sitemap until they are restyled and linked.
-export const LEGACY_PAGES = ['/repair/', '/build-and-care/', '/diagnostic/', '/proof/', '/process/', '/faq/', '/contact/'];
+// /diagnostic/ is the no-JS form fallback: kept, noindexed, out of the sitemap. The other Oct-30 section
+// pages were retired on 2026-11-04 and 301 to their landing sections (public/_redirects).
+export const LEGACY_PAGES = ['/diagnostic/'];
 const SITEMAP_EXCLUDE = [...NOT_IN_SITEMAP, ...LEGACY_PAGES];
 
 export default defineConfig({
