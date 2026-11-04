@@ -60,10 +60,14 @@ export function init(root: Element): void {
     section.dataset.step = step;
     if (reducedMotion()) return;
     const after = panel.getBoundingClientRect();
+    section.classList.add('is-morphing');
     motion = panel.animate([
       { width: `${before.width}px`, height: `${before.height}px` },
       { width: `${after.width}px`, height: `${after.height}px` },
     ], { duration: 620, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+    // The rows' rise (CSS) runs past the morph; drop the class once the last one lands (0.12 + 10 × 0.045 + 0.55 s).
+    const done = motion;
+    done.finished.catch(() => undefined).then(() => setTimeout(() => { if (motion === done) section.classList.remove('is-morphing'); }, 520));
   }
   function showError(which: 'spam' | 'send' | null) {
     for (const code of ['spam', 'send']) query<HTMLElement>(`[data-form-error="${code}"]`).hidden = code !== which;

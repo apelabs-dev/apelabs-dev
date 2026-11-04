@@ -39,7 +39,6 @@ export interface ProofProject {
   frameFill: string;
   max: number;
   element: ProofElement;
-  score?: { crop: ProofCut; sizes: string };
   caption?: string;
   facts: ProofFact[];
 }
@@ -71,10 +70,6 @@ export const PROJECTS: ProofProject[] = [
       sizes: '(min-width: 1024px) 640px, (min-width: 824px) 792px, calc(100vw - 72px)',
       alt: 'A job report header from the sur9e app: the role, company, location and pay, scored 4.2 out of 5 with high confidence.',
       crop: { x: 0, y: 0, w: 1584, h: 400 },
-    },
-    score: {
-      crop: { x: 1128, y: 8, w: 440, h: 384 },
-      sizes: '720px',
     },
     facts: [
       {

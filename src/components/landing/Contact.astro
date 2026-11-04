@@ -17,6 +17,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
           <button class="btn" type="submit" aria-controls="contact-full" aria-expanded="false">Request a free diagnostic</button>
         </form>
         <p id="contact-start-error" class="contact-error well-error" role="alert" hidden></p>
+        <span class="contact-beam" aria-hidden="true"></span>
         <div id="contact-full" data-full>
           <p class="contact-bar label">Free diagnostic</p>
           <form data-contact-form action="/api/diagnostic" method="post" accept-charset="utf-8" data-site-key={siteKey}>
@@ -146,6 +147,23 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   .contact-mail a { display: inline-block; text-decoration: underline; text-decoration-color: var(--color-rule-strong); }
   .contact-mail a:hover { text-decoration-color: var(--color-orange); }
   .contact-coverage { margin-top: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-4); }
+  /* Motion (round-10 deck): a light runs along the well's bottom edge while it waits; the panel morphs its size
+     (script) and the opened form's rows, or the confirmation, rise in one after another. */
+  .contact-panel { transition: border-radius .5s var(--ease-out), background-color .5s var(--ease-out), border-color .5s var(--ease-out); }
+  .contact-ask::before { transition: opacity .5s var(--ease-out); }
+  .contact-beam { display: none; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgb(255 214 190 / .9), transparent) no-repeat; background-size: 30% 100%; background-position: -40% 0; animation: contact-beam 7s cubic-bezier(.65, 0, .35, 1) 1.2s infinite; }
+  .contact[data-step="well"] .contact-beam { display: block; }
+  .contact[data-step="well"] .contact-panel { overflow: clip; }
+  @keyframes contact-beam { 0% { background-position: -40% 0; } 45%, 100% { background-position: 140% 0; } }
+  .contact.is-morphing .contact-panel { overflow: clip; }
+  .contact.is-morphing[data-step="form"] :is(.contact-bar, .contact-field, .contact-spam, .contact-send, .contact-privacy) { animation: contact-rise .55s var(--ease-out) both; animation-delay: calc(.12s + var(--n, 0) * .045s); }
+  .contact.is-morphing[data-step="form"] .contact-bar { --n: -2; }
+  .contact.is-morphing[data-step="form"] .contact-privacy { --n: 10; }
+  .contact.is-morphing[data-step="done"] .contact-done > * { animation: contact-rise .55s var(--ease-out) both; }
+  .contact.is-morphing[data-step="done"] .contact-done > :nth-child(2) { animation-delay: .08s; }
+  .contact.is-morphing[data-step="done"] .contact-done > :nth-child(n + 3) { animation-delay: .16s; }
+  @keyframes contact-rise { from { opacity: 0; translate: 0 10px; } }
+  @media (prefers-reduced-motion: reduce) { .contact-beam { display: none !important; } .contact-panel, .contact-ask::before { transition: none; } }
   [hidden] { display: none !important; }
   @media (min-width: 720px) { .contact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; } .contact-field:not([data-field="name"], [data-field="email"]), .contact-spam { grid-column: 1 / -1; } }
   @media (max-width: 480px) { [data-email-well] { padding-left: 12px; } [data-email-well] input { font-size: var(--t-body); } [data-email-well] .btn { padding-inline: 12px; } }

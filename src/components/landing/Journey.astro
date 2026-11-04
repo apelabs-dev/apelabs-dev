@@ -2475,15 +2475,13 @@ const ro = [
     transition-delay: 800ms;
   }
 
-  /* Phones and tablets: the board is full, so a caption strip goes under it (the board keeps its size, the steps
-     pin that much lower) and the plate docks there, its leader running up to the part. */
+  /* Phones and tablets: the board gets the dock's height too, and an opened plate docks over the board's bottom
+     edge, its leader running up to the part. No strip is reserved, so steps without an open note show no empty
+     band under the board. */
   @media (max-width: 1023px) {
     .jx.cx-live.jr-live {
       --cx-dock: 76px;
       --jx-stage-h: calc(clamp(300px, 50svh, 440px) + var(--cx-dock));
-    }
-    .jx.cx-live.jr-live .jx-stage-in {
-      padding-bottom: var(--cx-dock);
     }
   }
   .jx .cx-layer .cx-plate.is-dock {

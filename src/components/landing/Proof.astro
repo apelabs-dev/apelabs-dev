@@ -78,25 +78,6 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
                   </picture>
                 </div>
               </div>
-              {p.score && (
-                <div class="pr3-score" aria-hidden="true">
-                  <div class="pr3-crop" style={`aspect-ratio:${p.score.crop.w}/${p.score.crop.h}`}>
-                    <picture>
-                      <source type="image/avif" srcset={srcsetFor(p.element, 'avif')} sizes={p.score.sizes} />
-                      <source type="image/webp" srcset={srcsetFor(p.element, 'webp')} sizes={p.score.sizes} />
-                      <img
-                        src={p.element.src}
-                        alt=""
-                        width={p.element.nativeWidth / 2}
-                        height={p.element.nativeHeight / 2}
-                        decoding="async"
-                        loading="lazy"
-                        style={cropStyle(p.element, p.score.crop)}
-                      />
-                    </picture>
-                  </div>
-                </div>
-              )}
               {p.caption && <figcaption class="pr3-cap">{p.caption}</figcaption>}
             </figure>
           </div>
@@ -411,14 +392,6 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     translate: 0 -6px;
   }
 
-  .pr3-score {
-    width: min(100%, 200px);
-    margin: 20px auto 0;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 0 1px var(--color-rule-strong);
-  }
-
   .pr3-a .pr3-cap {
     margin-top: 16px;
     text-align: center;
@@ -571,12 +544,6 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
       left: 0;
       width: 100%;
       height: 37px;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .pr3-score {
-      display: none;
     }
   }
 
