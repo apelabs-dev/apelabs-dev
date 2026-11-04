@@ -1,5 +1,97 @@
-<section id="05-services" class="section">
-  <div class="wrap">
-    <h2>Services</h2>
+---
+// 05-services: four photo cards that grow in place; the open card dims its photograph and plays one bounded
+// 9-second diagram over it. The scenes and the icon sprite are built here at build time (no icon or scene
+// renderer ships to the browser); src/scripts/services only paints progress and handles the controls.
+// Without JS every photo, diagram final state and service line stays readable.
+import Icon from '../Icon.astro';
+import Arrow from '../Arrow.astro';
+import { services, treatment, note, heading, lede, after } from '../../scripts/services/content';
+import { collectIcons, symbolId } from '../../scripts/services/primitives';
+import { renderScene } from '../../scripts/services/scene';
+import '../../scripts/services/services.css';
+
+const ID = '05-services';
+const IMAGES = '/images/services/';
+const { value: scenes, icons } = collectIcons(() =>
+  Object.fromEntries(services.map((s) => [s.id, renderScene(s.id)])),
+);
+---
+
+<section id={ID} data-island="services" aria-labelledby={`${ID}-heading`}>
+  <svg class="sr3-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      {[...icons.lucide].sort().map((name) => (
+        <g id={symbolId('lucide', name)}><Icon set="lucide" name={name} size={16} /></g>
+      ))}
+      {[...icons.simple].sort().map((name) => (
+        <g id={symbolId('simple', name)}><Icon set="simple" name={name} size={16} /></g>
+      ))}
+    </defs>
+  </svg>
+  <div class="sr3-frame">
+    <header class="sr3-heading">
+      <h2 id={`${ID}-heading`}>{heading}</h2>
+      <p>{lede}</p>
+    </header>
+    <div class="sr3-deck" id={`${ID}-deck`}>
+      {services.map((s) => (
+        <article class="sr3-panel" data-service={s.id}>
+          <div class="sr3-photo">
+            <img src={`${IMAGES}${s.slot}.jpg`} width="1344" height="768" alt="" loading="lazy" decoding="async" data-slot={s.slot} />
+            <h3>
+              <button class="sr3-toggle" type="button" aria-controls={`${ID}-${s.id}-body`} aria-expanded="true">
+                <span class="sr3-service-name">{s.name}</span>
+                <span class="sr3-price">{s.price}</span>
+                <span class="sr3-plus" aria-hidden="true"><Icon set="lucide" name="plus" size={16} /></span>
+              </button>
+            </h3>
+          </div>
+          <div class="sr3-body" id={`${ID}-${s.id}-body`}>
+            <div class="sr3-artifact-head"><span class="sr3-treatment">{treatment}</span></div>
+            <div class="sr3-artifact" set:html={scenes[s.id]} />
+            <div class="sr3-foot">
+              <div class="sr3-controls" hidden>
+                <button type="button" class="sr3-play" data-mode="replay" aria-label={`Replay ${s.name} illustration`}>
+                  <Icon set="lucide" name="play" size={16} class="sr3-i-play" />
+                  <Icon set="lucide" name="pause" size={16} class="sr3-i-pause" />
+                  <Icon set="lucide" name="rotate-ccw" size={16} class="sr3-i-replay" />
+                  <span class="sr3-play-label">Replay</span>
+                </button>
+                <label class="sr3-scrub-label">
+                  <span class="sr3-sr">{s.name} animation progress</span>
+                  <input class="sr3-scrub" type="range" min="0" max="100" value="100" aria-valuetext="Complete" />
+                </label>
+                <output class="sr3-progress">100%</output>
+              </div>
+              <span class="sr3-note">{note}</span>
+            </div>
+            <div class="sr3-detail-row">
+              <button type="button" class="sr3-more" aria-expanded="true" aria-controls={`${ID}-${s.id}-detail`} hidden>More about this service</button>
+              <p class="sr3-detail" id={`${ID}-${s.id}-detail`}>{s.line}{s.detail ? ` ${s.detail}` : ''}</p>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+    <div class="sr3-after">
+      <p>{after.text}</p>
+      <a href={after.href} data-cta>{after.cta}<Arrow class="sr3-arrow" /></a>
+      <button class="sr3-section-more" type="button" aria-expanded="true" aria-controls={`${ID}-detail`} hidden>{after.moreLabel}</button>
+      <div class="sr3-section-detail" id={`${ID}-detail`}>
+        <p>{after.lead}</p>
+        <p>{after.question}</p>
+        <ul>
+          {after.items.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </div>
+    <span class="sr3-sr" role="status" aria-live="polite" data-status></span>
   </div>
 </section>
+
+<script>
+  import { onVisible } from '../../scripts/lib/island';
+  import { init } from '../../scripts/services';
+
+  onVisible(document.querySelector('[data-island="services"]'), init);
+</script>
