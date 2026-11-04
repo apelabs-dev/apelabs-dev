@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { services as SERVICE_COPY } from '../../src/scripts/services/content';
 import { noConsoleErrors, noOverflow, reducedMotion } from './helpers';
 
 // Deck order, copy and prices are the approved deck's; photos are the four approved files.
@@ -521,8 +522,8 @@ test.describe('@services', () => {
     await expect(panel(page, 'setup').locator('.sr3-detail')).toBeHidden();
     await more.click();
     await expect(more).toHaveAttribute('aria-expanded', 'true');
-    await expect(panel(page, 'setup').locator('.sr3-detail')).toContainText('One AI workflow or assistant on the tools you already use.');
-    await expect(panel(page, 'setup').locator('.sr3-detail')).toContainText('Local or private AI is included');
+    await expect(panel(page, 'setup').locator('.sr3-detail')).toContainText('One AI workflow or assistant, set up on the tools you already use.');
+    await expect(panel(page, 'setup').locator('.sr3-detail')).toContainText('keep your data private, we set that up too');
     const sectionMore = page.locator(`${ROOT} .sr3-section-more`);
     await expect(sectionMore).toHaveAttribute('aria-expanded', 'false');
     await sectionMore.click();
@@ -585,13 +586,7 @@ test.describe('@services', () => {
     test('all four photos, final diagrams and service lines are readable', async ({ page }) => {
       await page.goto('/', { waitUntil: 'load' });
       await page.locator(ROOT).scrollIntoViewIfNeeded();
-      const lines = [
-        'One AI workflow or assistant on the tools you already use.',
-        'Bigger setups are quoted. Local or private AI is included; you buy the hardware directly, at cost.',
-        'One small app or critical flow, written findings, in three days.',
-        'After the diagnostic.',
-        'Two hours, up to ten people.',
-      ];
+      const lines = SERVICE_COPY.map((x) => x.line);
       await expect(page.locator(`${ROOT} .sr3-panel`)).toHaveCount(4);
       for (const s of SERVICES) {
         const p = panel(page, s.id);

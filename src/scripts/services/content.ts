@@ -14,16 +14,15 @@ export const services: readonly Service[] = [
     name: 'AI systems setup',
     price: 'from $300',
     slot: 'services-ai-systems-setup',
-    line: 'One AI workflow or assistant on the tools you already use.',
-    detail:
-      'Bigger setups are quoted. Local or private AI is included; you buy the hardware directly, at cost.',
+    line: 'One AI workflow or assistant, set up on the tools you already use. For example, a drafting assistant tied to your inbox, or a step that sorts incoming requests. Bigger setups are quoted before we start. If you want the AI to run locally or keep your data private, we set that up too, and you buy the hardware directly, at cost.',
+    detail: '',
   },
   {
     id: 'opinion',
     name: 'Second opinion',
     price: '$250',
     slot: 'services-second-opinion',
-    line: 'One small app or critical flow, written findings, in three days.',
+    line: "Someone built you a small app or a critical flow, and you want to know if it holds up. We review one of them and send written findings in three days: what's solid, what's risky, and what we'd change.",
     detail: '',
   },
   {
@@ -31,7 +30,7 @@ export const services: readonly Service[] = [
     name: 'Custom builds',
     price: 'quote only',
     slot: 'services-custom-builds',
-    line: 'After the diagnostic.',
+    line: "For when the thing you need doesn't exist yet. We start with the free diagnostic, then send a quote for the build before any work starts. We build with AI where it helps.",
     detail: '',
   },
   {
@@ -39,7 +38,7 @@ export const services: readonly Service[] = [
     name: 'AI workshop',
     price: '$400',
     slot: 'services-ai-workshop',
-    line: 'Two hours, up to ten people.',
+    line: "Two hours for your team, up to ten people, built around the tools you already use. Bring the tasks your team repeats every week, and we work through where AI helps with them and where it doesn't.",
     detail: '',
   },
 ];
