@@ -6,7 +6,8 @@
 // by. Short landscape phones pin nothing: the board scrolls with the page. With reduced motion the layout and
 // the pin stay, and every state lands at once.
 
-import { gsap, ScrollTrigger, reducedMotion } from '../lib/island';
+import { gsap, ScrollTrigger } from '../lib/gsap';
+import { reducedMotion } from '../lib/island';
 import { createJourney } from './engine';
 import { createNotes } from './notes';
 import { watchRows } from './rows';
@@ -30,12 +31,24 @@ function barHeight(): number {
   return position === 'fixed' || position === 'sticky' ? bar.offsetHeight : 0;
 }
 
-export function init(section: Element): void {
-  const root = section as HTMLElement;
+export interface JourneyHandle {
+  state(): { step: number; scene: string | undefined };
+  destroy(): void;
+}
+type JourneyRoot = HTMLElement & { __journey?: JourneyHandle };
+
+/**
+ * Wire the journey once. The handle is exposed as `root.__journey`; destroy() tears down only what this init
+ * created (its pin, observers, listeners and the board's loops), after which the section can be mounted again.
+ */
+export function init(section: Element): JourneyHandle | null {
+  const root = section as JourneyRoot;
+  if (root.__journey) return null;
   const stage = root.querySelector<HTMLElement>('.jx-stage');
   const grid = root.querySelector<HTMLElement>('.jx-grid');
   const view = root.querySelector<HTMLElement>('.jx-view');
-  if (!stage || !grid || !view) return;
+  if (!stage || !grid || !view) return null;
+  const ac = new AbortController();
 
   const reduced = reducedMotion();
   // Pinned on top of the steps (phones and tablets), as opposed to beside them (desktop) or not at all.
@@ -64,7 +77,7 @@ export function init(section: Element): void {
   };
 
   const renderer = createUi(view, { gsap, reduced });
-  watchRows(view);
+  const rows = watchRows(view);
   const notes = createNotes(root, { desk: () => matches(DESK), docked: stacked });
   const scrollToStep = (el: Element) =>
     window.scrollBy({ top: el.getBoundingClientRect().top - stepOffset(), behavior: reduced ? 'instant' : 'smooth' });
@@ -88,15 +101,19 @@ export function init(section: Element): void {
 
   // Step anchors elsewhere on the page land on their step, with the board showing it.
   const steps = [...root.querySelectorAll<HTMLElement>('.jr-step')];
-  document.addEventListener('click', (e) => {
-    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[href^="#jr-"]');
-    if (!a || root.contains(a)) return;
-    const n = steps.findIndex((s) => `#${s.id}` === a.getAttribute('href'));
-    if (n < 0) return;
-    e.preventDefault();
-    root.querySelector<HTMLButtonElement>(`[data-jr-go="${n}"]`)?.click();
-  });
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[href^="#jr-"]');
+      if (!a || root.contains(a)) return;
+      const n = steps.findIndex((s) => `#${s.id}` === a.getAttribute('href'));
+      if (n < 0) return;
+      e.preventDefault();
+      root.querySelector<HTMLButtonElement>(`[data-jr-go="${n}"]`)?.click();
+    },
+    { signal: ac.signal },
+  );
 
   // The pin. Desktop: the board holds DESK_GAP under the bar beside the steps. Phones and tablets: right under
   // the bar, over the steps, its ink running down to where the current step pins. The pin ends when the grid's
@@ -120,5 +137,25 @@ export function init(section: Element): void {
   });
 
   // Late fonts change the steps' heights, and with them where the pin ends.
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+  void document.fonts?.ready.then(() => {
+    if (!ac.signal.aborted) ScrollTrigger.refresh();
+  });
+
+  const handle: JourneyHandle = {
+    state: journey.state,
+    destroy() {
+      if (ac.signal.aborted) return;
+      ac.abort();
+      // Only this section's matchMedia context: its pin, nothing a sibling created.
+      mm.revert();
+      journey.destroy();
+      notes.destroy();
+      rows?.destroy();
+      renderer.destroy();
+      root.style.removeProperty('--jx-bar');
+      if (root.__journey === handle) delete root.__journey;
+    },
+  };
+  root.__journey = handle;
+  return handle;
 }

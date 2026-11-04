@@ -374,10 +374,9 @@ const ro = [
 </section>
 
 <script>
-  import { onVisible } from '../../scripts/lib/island';
-  import { init } from '../../scripts/journey';
+  import { lazyIsland } from '../../scripts/lib/island';
 
-  onVisible(document.querySelector('[data-island="journey"]'), init);
+  lazyIsland(document.querySelector('[data-island="journey"]'), () => import('../../scripts/journey').then((m) => m.init));
 </script>
 
 <style is:global>
@@ -1263,6 +1262,26 @@ const ro = [
     }
     .jx.jr-live .jx-rail li:has(button[aria-current]) {
       flex-grow: 3.2;
+    }
+    /* Seven 44px targets need more than the frame once the current word is open, so the rail's ends take the
+       page gutter as unpainted hit area: the ink stays on the frame, the outer buttons reach the screen edge. */
+    .jx.jr-live .jx-rail ol {
+      margin-inline: calc(var(--gut) * -1);
+    }
+    .jx.jr-live .jx-rail li:not(:has(button[aria-current])) {
+      min-width: 44px;
+    }
+    .jx.jr-live .jx-rail li:first-child button {
+      padding-left: var(--gut);
+    }
+    .jx.jr-live .jx-rail li:last-child button {
+      padding-right: var(--gut);
+    }
+    .jx.jr-live .jx-rail li:first-child button::before {
+      left: var(--gut);
+    }
+    .jx.jr-live .jx-rail li:last-child button::before {
+      right: var(--gut);
     }
     .jx.jr-live .jx-rail button:not([aria-current]) .jx-rail-t {
       position: absolute;

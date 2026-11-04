@@ -37,7 +37,8 @@ export function init(root: Element): void {
   const confirm = query<HTMLElement>('[data-confirm]');
   const send = query<HTMLButtonElement>('[data-send]');
   const sendLabel = query<HTMLElement>('[data-send-label]');
-  const key = form.dataset.siteKey ?? '';
+  // Read when the widget is needed, not at init (the section now mounts at load).
+  const key = () => form.dataset.siteKey ?? '';
   const control = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
   const value = (name: string) => control(name).value.trim();
   control('name').disabled = false;
@@ -68,12 +69,12 @@ export function init(root: Element): void {
     for (const code of ['spam', 'send']) query<HTMLElement>(`[data-form-error="${code}"]`).hidden = code !== which;
   }
   function start(): Promise<void> {
-    if (!key) { showError('spam'); return Promise.resolve(); }
+    if (!key()) { showError('spam'); return Promise.resolve(); }
     if (widgetId !== undefined) return Promise.resolve();
     starting ??= loadWidget().then((widget) => {
       widgetFailed = false;
       widgetId = widget.render(query('[data-turnstile-slot]'), {
-        sitekey: key, theme: 'dark', size: 'flexible',
+        sitekey: key(), theme: 'dark', size: 'flexible',
         callback: () => { widgetFailed = false; query('[data-form-error="spam"]').hidden = true; },
         'error-callback': () => { widgetFailed = true; showError('spam'); },
         'expired-callback': () => { if (widgetId !== undefined) widget.reset(widgetId); },
@@ -130,7 +131,7 @@ export function init(root: Element): void {
     let first: Field | undefined;
     for (const field of FIELDS) { const error = check(field); fieldError(field, error); if (error) first ??= field; }
     if (first) { focusField(first); return; }
-    if (!key) { showError('spam'); return; }
+    if (!key()) { showError('spam'); return; }
     busy = true;
     send.disabled = true;
     form.setAttribute('aria-busy', 'true');

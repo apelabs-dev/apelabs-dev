@@ -2,6 +2,7 @@
 // Home: the whole story in deck order. Each landing block owns its own file and id.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/landing/Nav.astro';
+import Backdrop from '../components/landing/Backdrop.astro';
 import Hero from '../components/landing/Hero.astro';
 import Tools from '../components/landing/Tools.astro';
 import Journey from '../components/landing/Journey.astro';
@@ -23,7 +24,10 @@ const page = PAGES.home;
   jsonLd={[organizationLd(), websiteLd()]}
   chrome={false}
 >
+  {/* The hero headline's face, the only one preloaded here: found only once the CSS is parsed, and the entrance waits for it. */}
+  <link slot="head" rel="preload" href="/fonts/geist-pixel-line.woff2" as="font" type="font/woff2" crossorigin />
   <Nav slot="nav" />
+  <Backdrop />
   <Hero />
   <Tools />
   <Journey />

@@ -193,7 +193,7 @@ test.describe('@contact', () => {
   test('missing production key fails closed', async ({ page }) => {
     const console = noConsoleErrors(page);
     await page.goto('/');
-    // Before the lazy island initializes, emulate a production build without its configured key.
+    // Emulate a production build without its configured key (read when the widget is first needed).
     await section(page).locator('[data-contact-form]').evaluate((el) => { (el as HTMLElement).dataset.siteKey = ''; });
     await section(page).scrollIntoViewIfNeeded();
     await expect(section(page)).toHaveAttribute('data-step', 'well');

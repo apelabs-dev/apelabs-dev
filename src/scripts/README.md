@@ -10,21 +10,28 @@ island, no runtime framework, nothing ships for a section that is not on the pag
   ...
 </section>
 <script>
-  import { onVisible } from '../scripts/lib/island';
-  import { init } from '../scripts/sections/name';
-  onVisible(document.querySelector('[data-island="name"]'), init);
+  import { lazyIsland } from '../scripts/lib/island';
+  lazyIsland(document.querySelector('[data-island="name"]'), () =>
+    import('../scripts/sections/name').then((m) => m.init),
+  );
 </script>
 ```
 
-`src/scripts/sections/<name>.ts` exports `init(root: Element): void`. It runs once, the first
-time the section is near the viewport, and owns its own GSAP timeline.
+`src/scripts/sections/<name>.ts` exports `init(root: Element)`, which returns a `{ destroy() }`
+handle (or `null` if the root is already mounted). Its chunk downloads once the section is within
+a screen of the viewport, and `init` runs once, the first time the section is in view. The hero is the exception: it is the first screen, so it imports its code statically
+and uses `onVisible`.
 
 ## Rules
 
-- `onVisible` calls `init` immediately when `IntersectionObserver` is missing or the reader
-  prefers reduced motion. Render the final state in HTML/CSS, then animate toward it.
-- Import `gsap` / `ScrollTrigger` from `src/scripts/lib/island`, never from the package
-  directly, so the plugin registers exactly once.
+- `onVisible` / `lazyIsland` call `init` immediately when `IntersectionObserver` is missing or the
+  reader prefers reduced motion. Render the final state in HTML/CSS, then animate toward it.
+- The island is stored on the root (`root.__island`), so a second call returns it instead of
+  mounting twice. `destroy()` cancels pending visibility, scroll and import work and calls the
+  handle's `destroy`; `mount()` mounts again. A chunk that fails to load leaves the static markup.
+  `destroy` releases only the section's own listeners, observers and triggers.
+- Import `gsap` / `ScrollTrigger` from `src/scripts/lib/gsap`, never from the package directly,
+  so the plugin registers exactly once and the library only loads with a section that uses it.
 - Use `reducedMotion()` for any motion the helper cannot gate (hover replays, autoplay).
 - Scoped styles stay in the section's `.astro` file; shared tokens live in
   `src/styles/global.css`.

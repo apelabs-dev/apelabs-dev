@@ -46,7 +46,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
             <p class="pr3-links">
               {p.links.map((link) => (
                 <a
-                  class={link.arrow ? 'pr3-go' : 'pr3-gh'}
+                  class={link.arrow ? 'pr3-go' : 'pr3-gh hit'}
                   href={link.href}
                   target="_blank"
                   rel="noopener"
@@ -121,19 +121,20 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
 </section>
 
 <script>
-  import { onVisible } from '../../scripts/lib/island';
-  import { init } from '../../scripts/sections/proof';
+  import { lazyIsland } from '../../scripts/lib/island';
 
-  onVisible(document.querySelector('[data-island="proof"]'), init);
+  lazyIsland(document.querySelector('[data-island="proof"]'), () => import('../../scripts/sections/proof').then((m) => m.init));
 </script>
 
 <style>
+  /* InterVariable subset to printable ASCII (both axes, the browser-default layout features): the lockup is its
+     only text, and the full 344 KB face was the page's heaviest download. */
   @font-face {
     font-family: 'HF Inter';
     font-style: normal;
     font-weight: 100 900;
     font-display: swap;
-    src: url('/assets/proof/hf-font/InterVariable.woff2') format('woff2');
+    src: url('/assets/proof/hf-font/inter-var-ascii.woff2') format('woff2');
   }
 
   section {
@@ -174,8 +175,11 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
 
   .pr3-h2 {
     margin: 0;
+    font-family: var(--font-pixel);
     font-size: var(--t-h2);
     line-height: var(--lh-h2);
+    font-weight: 400;
+    letter-spacing: normal;
   }
 
   .pr3-line {

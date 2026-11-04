@@ -51,8 +51,11 @@ const cfAnalyticsToken = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0B0B0C" />
 
-    <link rel="preload" href="/fonts/geist-latin-var.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/geist-mono-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    {/* Font preloads: the shared Geist faces, unless the page names its own (the landing preloads its hero face only). */}
+    <slot name="head">
+      <link rel="preload" href="/fonts/geist-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+      <link rel="preload" href="/fonts/geist-mono-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    </slot>
 
     <!-- Brand kit head tags (kit favicons/head-snippet.html). Files are fixed slots in public/. -->
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />

@@ -5,12 +5,14 @@
 // Without JS every photo, diagram final state and service line stays readable.
 import Icon from '../Icon.astro';
 import Arrow from '../Arrow.astro';
-import { services, treatment, note, heading, lede, after } from '../../scripts/services/content';
+import { services, treatment, note, label, heading, lede, after } from '../../scripts/services/content';
 import { collectIcons, symbolId } from '../../scripts/services/primitives';
 import { renderScene } from '../../scripts/services/scene';
 import '../../scripts/services/services.css';
 
 const ID = '05-services';
+// The approved JPEGs, plus same-size AVIF/WebP copies in derived/ (an open card shows the photo near full width,
+// so there is no smaller rendition).
 const IMAGES = '/images/services/';
 const { value: scenes, icons } = collectIcons(() =>
   Object.fromEntries(services.map((s) => [s.id, renderScene(s.id)])),
@@ -30,6 +32,7 @@ const { value: scenes, icons } = collectIcons(() =>
   </svg>
   <div class="sr3-frame">
     <header class="sr3-heading">
+      <p class="sr3-label">{label}</p>
       <h2 id={`${ID}-heading`}>{heading}</h2>
       <p>{lede}</p>
     </header>
@@ -37,7 +40,11 @@ const { value: scenes, icons } = collectIcons(() =>
       {services.map((s) => (
         <article class="sr3-panel" data-service={s.id}>
           <div class="sr3-photo">
-            <img src={`${IMAGES}${s.slot}.jpg`} width="1344" height="768" alt="" loading="lazy" decoding="async" data-slot={s.slot} />
+            <picture>
+              <source type="image/avif" srcset={`${IMAGES}derived/${s.slot}-1344.avif`} />
+              <source type="image/webp" srcset={`${IMAGES}derived/${s.slot}-1344.webp`} />
+              <img src={`${IMAGES}${s.slot}.jpg`} width="1344" height="768" alt="" loading="lazy" decoding="async" data-slot={s.slot} />
+            </picture>
             <h3>
               <button class="sr3-toggle" type="button" aria-controls={`${ID}-${s.id}-body`} aria-expanded="true">
                 <span class="sr3-service-name">{s.name}</span>
@@ -90,8 +97,7 @@ const { value: scenes, icons } = collectIcons(() =>
 </section>
 
 <script>
-  import { onVisible } from '../../scripts/lib/island';
-  import { init } from '../../scripts/services';
+  import { lazyIsland } from '../../scripts/lib/island';
 
-  onVisible(document.querySelector('[data-island="services"]'), init);
+  lazyIsland(document.querySelector('[data-island="services"]'), () => import('../../scripts/services').then((m) => m.init));
 </script>

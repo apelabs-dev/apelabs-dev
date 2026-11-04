@@ -48,6 +48,7 @@ export const treatment = 'Deliverable diagram';
 // One honest note per panel, in the footer.
 export const note = 'Illustration · sample data';
 
+export const label = 'More services';
 export const heading = "Repair is how most people start. Here's what else we do.";
 export const lede = 'We also build, and we build with AI where it helps.';
 export const after = {

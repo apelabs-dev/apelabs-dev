@@ -23,6 +23,20 @@ test.describe('@shell', () => {
 
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    // networkidle and fonts.ready leave offscreen loading="lazy" images unrequested, and the fullPage
+    // capture's viewport resize only sometimes triggers them, so a photo could land in the baseline
+    // on one run and its card fallback on the next. Force every image eager in this test's DOM (the
+    // shipped markup stays lazy) and wait until each one is decoded; a broken asset fails here.
+    await page.evaluate(() =>
+      Promise.all(
+        Array.from(document.images, (img) => {
+          img.loading = 'eager';
+          return img.decode().catch(() => {
+            throw new Error(`image failed to load or decode: ${img.currentSrc || img.src}`);
+          });
+        }),
+      ).then(() => undefined),
+    );
 
     for (const id of SECTIONS) {
       await expect(page.locator(`[id="${id}"]`), `missing section #${id}`).toHaveCount(1);

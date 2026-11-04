@@ -16,7 +16,7 @@ const EMAIL = 'hello@apelabs.dev';
 
 <header class="bar" id="01-nav" data-island="nav" data-material="glass">
   <div class="bar-in">
-    <a class="bar-logo" href="#02-hero" aria-label="apeLabs home">
+    <a class="bar-logo hit" href="#02-hero" aria-label="apeLabs home">
       <Logo class="bar-lockup" height={18} />
       <svg class="bar-mark" width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
         <g transform="translate(10 10) scale(0.8)">
@@ -27,11 +27,11 @@ const EMAIL = 'hello@apelabs.dev';
     </a>
     <nav class="bar-nav" aria-label="Main">
       <ul>
-        {LINKS.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        {LINKS.map((link) => <li><a class="hit" href={link.href}>{link.label}</a></li>)}
       </ul>
     </nav>
     <div class="bar-end">
-      <a class="bar-cta" href={CTA.href} data-cta>{CTA.label}</a>
+      <a class="bar-cta hit" href={CTA.href} data-cta>{CTA.label}</a>
       <a class="bar-menu" href="#09-footer" aria-label="Menu" aria-controls="nav-menu">
         <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M0 1h18M0 11h18" stroke="currentColor" stroke-width="1.5"></path></svg>
       </a>
@@ -45,7 +45,7 @@ const EMAIL = 'hello@apelabs.dev';
       <ol class="menu-list">
         {LINKS.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
       </ol>
-      <a class="menu-cta" href={CTA.href} data-cta>{CTA.label}</a>
+      <a class="menu-cta hit" href={CTA.href} data-cta>{CTA.label}</a>
       <a class="menu-mail" href={`mailto:${EMAIL}`}>{EMAIL}</a>
     </div>
   </div>

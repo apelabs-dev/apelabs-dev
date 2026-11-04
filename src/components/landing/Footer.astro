@@ -20,10 +20,10 @@ const LINKS = [
   <div class="ft-in">
     <div class="ft-row">
       <div class="ft-brand">
-        <a class="ft-logo" href="#top" aria-label="apeLabs home"><Logo height={17} /></a>
+        <a class="ft-logo hit" href="#top" aria-label="apeLabs home"><Logo height={17} /></a>
         <p class="ft-tag">Business system repair.</p>
       </div>
-      <p class="ft-mail"><a class="ft-a" href="mailto:hello@apelabs.dev">hello@apelabs.dev</a></p>
+      <p class="ft-mail"><a class="ft-a hit" href="mailto:hello@apelabs.dev">hello@apelabs.dev</a></p>
     </div>
     <div class="ft-row ft-legal">
       <nav class="ft-nav" aria-label="Footer">
@@ -32,7 +32,7 @@ const LINKS = [
             LINKS.map((link) => (
               <li>
                 {link.href ? (
-                  <a class="ft-a" href={link.href}>
+                  <a class="ft-a hit" href={link.href}>
                     {link.label}
                   </a>
                 ) : (
@@ -100,6 +100,11 @@ const LINKS = [
   .ft-logo {
     display: inline-block;
     flex: none;
+  }
+  /* The lockup's 44px hit area sits up into the footer's top padding, clear of the email's when that wraps
+     under it on phones (16px row gap). */
+  .ft-logo.hit::after {
+    translate: -50% calc(-50% - 8px);
   }
   .ft-logo :global(svg) {
     display: block;

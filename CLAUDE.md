@@ -38,12 +38,12 @@ JSON-LD, optional Cloudflare Web Analytics when `PUBLIC_CF_WEB_ANALYTICS_TOKEN` 
 **Brand:** `Logo.astro` is the single swap point for the logo (lockup ≥96px wide, mark ≥32px). Kit
 files in `public/` (favicons, icons, `og/og-image.png`, `site.webmanifest`) are verbatim brand-kit
 drops; replace them file-for-file. Do not regenerate them. Diagrams are code: `Blocks.astro` +
-`src/lib/motif.ts` (the kit's "C" block-line motif), `RunTrace`, `RepairFlow`, `ProcessStrip`, `SampleReport`.
+`src/lib/motif.ts` (the kit's "C" block-line motif), `RepairFlow`, `ProcessStrip`, `SampleReport`.
 
-**Motion:** `src/scripts/hero-replay.ts` sets `--p` (0–6) on the hero while the reader scrolls past the
-chapters, and `RunTrace.astro` CSS eases each part with smoothstep windows. It only runs at
-≥1024×760 with motion allowed, and the final state is the default for no-JS and reduced motion.
-`src/scripts/reveal.ts` fades in diagram fix marks (`[data-reveal]`). No scroll-jacking, no Lenis.
+**Motion:** the landing sections live in `src/components/landing/` with their scripts in `src/scripts/`
+(see `src/scripts/README.md`): below-the-fold sections load their chunk through `lazyIsland`, and GSAP
+(`src/scripts/lib/gsap.ts`) ships only with the journey. The final state is the default for no-JS and
+reduced motion. `src/scripts/reveal.ts` fades in diagram fix marks (`[data-reveal]`). No scroll-jacking, no Lenis.
 
 **Form:** `src/components/DiagnosticForm.astro` + `src/scripts/diagnostic-form.ts` (progressive
 enhancement; works without JS). `functions/api/diagnostic.ts` → `src/lib/intake.ts` (validation,

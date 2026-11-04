@@ -74,19 +74,24 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
         </div>
       </div>
     </div>
-    <p class="contact-mail">Prefer email? <a href="mailto:hello@apelabs.dev">hello@apelabs.dev</a></p>
+    <p class="contact-mail">Prefer email? <a class="hit" href="mailto:hello@apelabs.dev">hello@apelabs.dev</a></p>
     <p class="contact-coverage">Remote, serving the US.</p>
   </div>
 </section>
 <script>
-  import { onVisible } from '../../scripts/lib/island';
   import { init } from '../../scripts/contact/index';
-  onVisible(document.querySelector('[data-island="contact"]'), init);
+  // At load, not on visibility: init swaps the no-JS full form for the email well, and doing that as the reader
+  // scrolls in would collapse the section under them and jump the footer up. The Turnstile widget stays lazy.
+  const contact = document.querySelector('[data-island="contact"]');
+  if (contact) init(contact);
 </script>
 <style>
   .contact { padding-block: clamp(96px, 10vw, 140px); }
   .contact-inner { width: var(--frame); margin-inline: auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
-  h2 { margin-top: 16px; max-width: 15em; font-size: var(--t-h2); line-height: var(--lh-h2); }
+  /* The deck's section label: a small orange square, then the label. */
+  .contact-inner > .label { display: flex; align-items: center; gap: 10px; font-weight: 500; color: color-mix(in srgb, var(--color-paper) 88%, transparent); }
+  .contact-inner > .label::before { content: ''; width: 7px; height: 7px; flex: none; background: var(--color-orange); }
+  h2 { margin-top: 16px; max-width: 15em; font-family: var(--font-pixel); font-size: var(--t-h2); line-height: var(--lh-h2); font-weight: 400; letter-spacing: normal; }
   .contact-body { margin-top: 18px; max-width: 560px; font-size: var(--t-lede); line-height: var(--lh-lede); color: var(--color-text-2); }
   .contact-ask { position: relative; margin-top: 36px; width: min(720px, 100%); display: flex; justify-content: center; }
   .contact-panel { position: relative; width: 100%; text-align: left; border: 1px solid var(--color-rule-strong); border-radius: var(--radius); background: var(--color-report); }
@@ -94,7 +99,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   .contact[data-step="well"] .contact-ask::before { content: ''; position: absolute; pointer-events: none; inset: -44px -16px; background: radial-gradient(ellipse, color-mix(in srgb, var(--color-orange) 10%, transparent), transparent 68%); }
   [data-email-well] { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 4px 4px 16px; }
   [data-email-well] input { flex: 1; min-width: 0; width: 0; min-height: 44px; background: transparent; font-family: var(--font-mono); font-size: 12px; border: 0; }
-  [data-email-well] .btn { flex: none; min-height: 44px; padding-inline: 16px; }
+  [data-email-well] .btn { flex: none; min-height: 44px; padding-inline: 16px; font-family: var(--font-mono); font-size: 11px; line-height: 14px; font-weight: 450; letter-spacing: .04em; text-transform: uppercase; }
   .contact-bar { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 1px solid var(--color-rule-strong); }
   .contact-bar::before, .contact-error::before { content: ''; flex: none; width: 7px; height: 7px; background: var(--color-orange); }
   [data-contact-form], .contact-done { padding: clamp(20px, 3vw, 28px); }
@@ -136,8 +141,9 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   .contact-privacy dl div + div { margin-top: 8px; }
   dt, dd { display: inline; }
   dt { font-weight: 560; } dd { color: var(--color-text-2); }
-  .contact-mail { margin-top: 28px; font-size: 15px; color: var(--color-text-2); }
-  .contact-mail a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-decoration-color: var(--color-rule-strong); }
+  .contact-mail { margin-top: 28px; font-size: 15px; line-height: 22px; color: var(--color-text-2); }
+  /* The deck's 22px line; the 44px target is the unpainted .hit box. */
+  .contact-mail a { display: inline-block; text-decoration: underline; text-decoration-color: var(--color-rule-strong); }
   .contact-mail a:hover { text-decoration-color: var(--color-orange); }
   .contact-coverage { margin-top: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-4); }
   [hidden] { display: none !important; }

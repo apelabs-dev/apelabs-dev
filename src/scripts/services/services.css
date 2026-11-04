@@ -56,9 +56,13 @@
 [data-island="services"] .sr3-heading { max-width: 850px; margin-bottom: 38px; }
 [data-island="services"] .sr3-heading h2 { font: 400 var(--t-h2)/var(--lh-h2) var(--font-pixel); letter-spacing: -.025em; text-wrap: balance; margin: 0; }
 [data-island="services"] .sr3-heading p { font-size: var(--t-lede); line-height: var(--lh-lede); color: var(--sr3-muted); margin: var(--space-6) 0 0; }
+/* The deck's section label: a small orange square, then the label. */
+[data-island="services"] .sr3-heading .sr3-label { display: flex; align-items: center; gap: 10px; margin: 0 0 24px; font: 500 var(--t-label)/14px var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: color-mix(in srgb, var(--color-paper) 88%, transparent); }
+[data-island="services"] .sr3-heading .sr3-label::before { content: ''; width: 7px; height: 7px; flex: none; background: var(--color-orange); }
 [data-island="services"] .sr3-deck { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--space-2); }
 [data-island="services"] .sr3-panel { position: relative; min-width: 0; border: 1px solid var(--sr3-rule); border-radius: var(--radius-sm); overflow: clip; background: var(--sr3-surface); }
 [data-island="services"] .sr3-photo { position: relative; height: 200px; overflow: hidden; }
+[data-island="services"] .sr3-photo picture { display: contents; }
 [data-island="services"] .sr3-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: filter .48s var(--sr3-ease), scale .48s var(--sr3-ease); }
 [data-island="services"] .sr3-photo h3 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.15; letter-spacing: -.01em; text-wrap: auto; }
 [data-island="services"] .sr3-toggle { position: absolute; inset: 0; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; border: 0; text-align: left; background: transparent; padding: var(--sr3-pad); }
