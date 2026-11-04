@@ -1,0 +1,22 @@
+---
+// Renders motif blocks (src/lib/motif.ts) inside an <svg>. Fills come from the global .blk classes.
+import type { Block, BlockKind } from '../lib/motif';
+
+interface Props {
+  blocks: Block[];
+  /** Optional data-part per kind, so the replay can address the patch or fragments. */
+  parts?: Partial<Record<BlockKind, string>>;
+  part?: string;
+}
+const { blocks, parts = {}, part } = Astro.props;
+const kinds = [...new Set(blocks.map((b) => b.kind))];
+const r = (n: number) => Math.round(n * 100) / 100;
+---
+
+{kinds.map((kind) => (
+  <g data-part={parts[kind] ?? part}>
+    {blocks
+      .filter((b) => b.kind === kind)
+      .map((b) => <rect class={`blk blk--${b.kind}`} x={r(b.x)} y={r(b.y)} width={r(b.w)} height={r(b.h)} rx={r(b.rx)} />)}
+  </g>
+))}

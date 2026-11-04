@@ -1,0 +1,40 @@
+---
+// Where a successful no-JS form post lands (303 from /api/diagnostic). The deck's confirmation text.
+// noindex and kept out of the sitemap.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { FORM_COPY } from '../../lib/copy';
+
+const C = FORM_COPY.confirmation;
+---
+
+<BaseLayout title="Request received | apeLabs" description={C.body} noindex>
+  <section class="wrap thanks">
+    <h1>{C.heading}</h1>
+    <p class="lead">{C.body}</p>
+    <p class="lead">{C.until}</p>
+    <p class="signoff">{C.signoff}</p>
+    <a class="link" href="/">Back to the home page</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .thanks {
+    padding-block: clamp(96px, 14vw, 200px);
+    min-height: 60vh;
+  }
+  h1 {
+    max-width: 20ch;
+    font-size: var(--text-h2);
+    line-height: 1.1;
+  }
+  .lead {
+    margin-top: 24px;
+    max-width: 56ch;
+    color: var(--color-muted);
+  }
+  .signoff {
+    margin: 32px 0 40px;
+    font-family: var(--font-mono);
+    font-size: var(--text-data);
+  }
+</style>

@@ -1,17 +1,50 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Arrow from '../components/Arrow.astro';
+import { CTA_LABEL, DIAGNOSTIC, EMAIL } from '../lib/site';
 ---
 
-<BaseLayout title="Page Not Found — apeLabs" description="The page you're looking for doesn't exist.">
-  <div class="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-    <p class="text-8xl font-extrabold gradient-text">404</p>
-    <h1 class="mt-4 text-2xl font-bold text-white">Page not found</h1>
-    <p class="mt-2 text-gray-400">The page you're looking for doesn't exist or has been moved.</p>
-    <a
-      href="/"
-      class="mt-8 rounded-full bg-gradient-to-r from-brand-500 to-brand-400 px-8 py-3 font-medium text-white glow-btn"
-    >
-      Back to Home
-    </a>
-  </div>
+<BaseLayout
+  title="Page not found | apeLabs"
+  description="That page isn't here. If a form or link broke on our end, tell us at hello@apelabs.dev."
+  noindex
+  canonical={false}
+>
+  <section class="wrap notfound">
+    <p class="label mono">404</p>
+    <h1>That page isn't here.</h1>
+    <p class="lead">
+      If a form or link broke on our end, tell us at <a class="link" href={`mailto:${EMAIL}`}>{EMAIL}</a>. We fix those
+      too.
+    </p>
+    <div class="actions">
+      <a class="btn" href={DIAGNOSTIC.page}>{CTA_LABEL}<Arrow /></a>
+      <a class="link" href="/">Back to the home page</a>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .notfound {
+    padding-block: clamp(96px, 14vw, 200px);
+    min-height: 60vh;
+  }
+  h1 {
+    margin-top: 24px;
+    font-size: var(--text-display);
+  }
+  .lead {
+    margin-top: 24px;
+  }
+  .lead .link {
+    display: inline;
+    min-height: 0;
+  }
+  .actions {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 32px;
+  }
+</style>

@@ -1,0 +1,297 @@
+---
+// 02-hero: full-height opener. A live circuit lattice (canvas) runs behind the headline, which sits in a
+// quiet pocket the traces route around. The poster SVG is the same network at rest, for no-JS readers and
+// the moment before the canvas draws its first frame.
+import { posterSVG } from '../../scripts/hero/poster';
+
+const LABELS = ['failed', 'diagnosed', 'patched', 'verified'];
+
+// Poster estimates of the copy block at 1440×900 and 390×844 (the live canvas measures the real one).
+const col = 1102 / 6;
+const wide = posterSVG({
+  width: 1440,
+  height: 900,
+  frameLeft: 169,
+  frameWidth: 1102,
+  top: 54,
+  quiet: [{ x: 169, y: 360, w: col * 4, h: 420 }],
+  seed: 7,
+  idPrefix: 'cp-w',
+});
+const tall = posterSVG({
+  width: 390,
+  height: 844,
+  frameLeft: 16,
+  frameWidth: 358,
+  top: 54,
+  quiet: [{ x: 16, y: 250, w: 358, h: 560 }],
+  seed: 7,
+  idPrefix: 'cp-t',
+});
+---
+
+<section class="hero" id="02-hero" data-island="hero" data-labels={JSON.stringify(LABELS)} aria-labelledby="hero-h1">
+  <script is:inline>
+    // Before first paint: arm the copy entrance (hidden start state) unless motion is reduced. If the reveal
+    // module has not taken over within 3s, or throws, drop it so the copy is never left hidden.
+    (function (s) {
+      var r = s.parentElement;
+      if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      r.classList.add('rt');
+      setTimeout(function () {
+        if (!r.dataset.reveal) r.classList.remove('rt');
+      }, 3000);
+    })(document.currentScript);
+  </script>
+  <div class="hero-poster" aria-hidden="true">
+    <div class="hero-poster-wide" set:html={wide}></div>
+    <div class="hero-poster-tall" set:html={tall}></div>
+  </div>
+  <canvas class="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-in">
+    <div class="hero-copy">
+      <p class="hero-eyebrow" data-rt="block">apeLabs / business system repair</p>
+      <h1 class="hero-h1" id="hero-h1" data-rt>We fix and build the business systems small teams run on.</h1>
+      <p class="hero-sub" data-rt>When something stops working and nobody notices, start with a free diagnostic.</p>
+      <div class="hero-actions" data-rt="block">
+        <a class="hero-cta" href="#08-contact" data-cta>Request a free diagnostic</a>
+        <a class="hero-more" href="#jr-findings">See what you get back</a>
+      </div>
+      <p class="hero-micro" data-rt>Free. No passwords needed.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { onVisible } from '../../scripts/lib/island';
+  import { initHero } from '../../scripts/hero/hero';
+  import { initHeroReveal } from '../../scripts/hero/reveal';
+
+  const hero = document.querySelector<HTMLElement>('[data-island="hero"]');
+  onVisible(hero, initHero);
+  // Not behind onVisible: the entrance has its own observers and the inline script's timer is bounded.
+  if (hero) {
+    try {
+      initHeroReveal(hero);
+    } catch {
+      hero.classList.remove('rt');
+    }
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    min-height: max(660px, 100svh);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: clip;
+    background: var(--color-bg);
+  }
+  .hero-canvas,
+  .hero-poster {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .hero-poster :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  .hero-poster-wide {
+    height: 100%;
+  }
+  .hero-poster-tall {
+    display: none;
+  }
+  @media (max-aspect-ratio: 4/5) {
+    .hero-poster-wide {
+      display: none;
+    }
+    .hero-poster-tall {
+      display: block;
+      height: 100%;
+    }
+  }
+  .hero.is-live .hero-poster {
+    display: none;
+  }
+
+  .hero-in {
+    position: relative;
+    width: var(--frame);
+    margin-inline: auto;
+    padding-block: calc(var(--bar-h) + 140px) clamp(72px, 12vh, 136px);
+  }
+  .hero-copy {
+    width: calc(var(--col) * 4);
+    max-width: 100%;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-2);
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: var(--color-orange);
+    flex: none;
+  }
+  .hero-h1 {
+    margin-top: 22px;
+    font-family: 'Geist Pixel Line', var(--font-pixel);
+    font-weight: 400;
+    font-size: clamp(42px, 1.6rem + 3.9vw, 82px);
+    line-height: 0.94;
+    letter-spacing: -0.01em;
+    color: var(--color-paper);
+    text-wrap: balance;
+  }
+  .hero-sub {
+    margin-top: 26px;
+    max-width: 35em;
+    font-size: var(--t-lede);
+    line-height: var(--lh-lede);
+    color: var(--color-text-2);
+    text-wrap: pretty;
+  }
+  .hero-actions {
+    margin-top: 34px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 26px;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 22px;
+    border: 1px solid var(--color-cta-edge);
+    border-radius: 8px;
+    background: var(--cta-fill);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-paper) 28%, transparent) inset;
+    color: var(--color-cta-text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 450;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      filter 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+  .hero-cta:hover {
+    filter: brightness(1.08);
+  }
+  .hero-cta:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+  }
+  .hero-more {
+    padding-block: 11px;
+    font-size: 15px;
+    line-height: 22px;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule-strong);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 180ms var(--ease-out);
+  }
+  .hero-more:hover,
+  .hero-more:focus-visible {
+    text-decoration-color: var(--color-orange);
+  }
+  .hero-micro {
+    margin-top: 18px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 0.02em;
+    color: var(--color-text-3);
+  }
+
+  /* Copy entrance. Hidden states only exist under .hero.rt, which the inline script sets before first paint when
+     JavaScript runs and motion is allowed; without it every block is simply visible. */
+  .hero.rt [data-rt]:not(.rt-in, .rt-run) {
+    opacity: 0;
+  }
+  .hero.rt [data-rt].rt-in {
+    transition: opacity 700ms ease;
+  }
+  .hero.rt [data-rt].rt-dim:not(:focus-within, :hover) {
+    opacity: 0.3;
+  }
+  /* Blocks that hold controls fade and lift as one piece, and are never stranded hidden under focus or hover. */
+  .hero.rt [data-rt].rt-block {
+    transition:
+      opacity 800ms var(--ease-out),
+      translate 900ms var(--ease-out);
+  }
+  .hero.rt [data-rt].rt-block:not(.rt-in) {
+    translate: 0 14px;
+  }
+  .hero.rt [data-rt='block']:not(.rt-in):is(:focus-within, :hover) {
+    opacity: 1;
+    translate: none;
+  }
+  /* While lines travel, the original text holds its place, invisible, under the line overlay (built at runtime). */
+  .hero :global(.rt-run),
+  .hero :global(.rt-run :not(.rt-fx, .rt-fx *)) {
+    color: transparent !important;
+    text-decoration-color: transparent !important;
+  }
+  .hero :global(.rt-fx),
+  .hero :global(.rt-band) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+  .hero :global(.rt-copy) {
+    position: absolute;
+    display: block;
+    will-change: transform, opacity;
+  }
+
+  @media (max-width: 1023px) {
+    .hero-copy {
+      width: calc(var(--col) * 5);
+    }
+  }
+  @media (max-width: 700px) {
+    .hero-in {
+      padding-block: calc(var(--bar-h) + 200px) 56px;
+    }
+    .hero-copy {
+      width: 100%;
+    }
+    .hero-sub {
+      margin-top: 20px;
+    }
+    .hero-actions {
+      margin-top: 26px;
+    }
+  }
+</style>

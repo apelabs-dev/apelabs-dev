@@ -1,0 +1,336 @@
+---
+// FAQ (deck A): heading and CTA set on the left (sticky on wide screens), the nine questions on the
+// right as native <details>. Questions and answers are deck copy, verbatim.
+//
+// Every item ships open so the answers read straight through without JavaScript; the island closes
+// all but the first on load. Opening is the browser's own work, and the answer's height animates
+// through ::details-content where that is supported.
+import type { Item } from '../../scripts/sections/faq';
+
+const ITEMS: Item[] = [
+  {
+    id: 0,
+    q: 'What do I get from the free diagnostic?',
+    a: [
+      "A short written note on what's broken and the likely fix, plus one fixed quote. The note is yours either way.",
+      "We look at one broken thing and tell you what we found, whatever it's built on.",
+      "If it's a fit for a free diagnostic, we'll send a link to book a short call over Google Meet.",
+      'A short screen-share call where you drive and we look. No passwords needed.',
+    ],
+  },
+  {
+    id: 1,
+    q: 'What costs money?',
+    a: ['The repair, after you approve the fixed quote. Repairs start at $150. The diagnostic is free.'],
+  },
+  {
+    id: 2,
+    q: 'How do you price repairs?',
+    a: [
+      'One fixed number, quoted before any work starts.',
+      'Under $500 is paid in full upfront. At $500 and above, half is paid upfront and half when the fix passes the check.',
+      'Invoices are due within seven days. If the scope changes, you get a new quote first.',
+    ],
+  },
+  {
+    id: 3,
+    q: 'Do you need my passwords?',
+    a: [
+      'No, and please never send them. The diagnostic is a screen-share where you drive.',
+      'For paid work we ask you to add a named user with limited access, and we remove it when we hand over.',
+      'We never take shared logins, owner seats, billing access or exports of your customer data.',
+      "If we need something sensitive later, we'll tell you how to share it safely.",
+    ],
+  },
+  {
+    id: 4,
+    q: "What's the warranty?",
+    a: ['14 days on the same issue after handoff. If it breaks again, we fix it at no charge.'],
+  },
+  {
+    id: 5,
+    q: 'Is there support after the fix?',
+    a: [
+      'Care plan $120/mo, after a paid repair.',
+      'It covers a monthly health check, alerts when something fails without an error, small fixes up to an hour, and a reply within one business day.',
+    ],
+  },
+  {
+    id: 6,
+    q: 'Do you build new things, or only repair?',
+    a: [],
+    list: [
+      'Something is broken: repair.',
+      "Something doesn't exist yet: a build, or an AI systems setup.",
+      'It works now and you want it to stay that way: the care plan, after a repair.',
+    ],
+  },
+  {
+    id: 7,
+    q: 'Which tools do you work with?',
+    a: [
+      "Zapier, Make, n8n, GoHighLevel, HubSpot, Pipedrive, Airtable, Google Sheets, QuickBooks, payment tools and custom code. If yours isn't listed, ask.",
+      "If it's outside what we can fix, we'll say so in the first reply.",
+    ],
+  },
+  {
+    id: 8,
+    q: 'What do you not do?',
+    a: [
+      '24/7 on-call, full database migrations, marketing, ads or SEO work, and hardware repair.',
+      'Also: rebuilding a whole platform inside a fix, and live payment or ledger changes without a sandbox test.',
+      'Anything outside the quote gets its own quote.',
+    ],
+  },
+];
+---
+
+<section id="07-faq" class="faq" data-island="faq" aria-labelledby="fq-h2">
+  <div class="frame fq-in">
+    <header class="fq-head">
+      <p class="eyebrow">Questions</p>
+      <h2 class="fq-h2" id="fq-h2">What people ask before they write.</h2>
+      <a class="btn fq-cta hit" href="#08-contact">Request a free diagnostic</a>
+    </header>
+    <div class="fq-list">
+      {
+        ITEMS.map((item) => (
+          <details class="fq" open>
+            <summary class="fq-q" id={`fq-q${item.id}`}>
+              <span class="fq-t">{item.q}</span>
+              <span class="fq-mark" aria-hidden="true" />
+            </summary>
+            <div class="fq-a" role="region" aria-labelledby={`fq-q${item.id}`}>
+              {item.list ? (
+                <ul class="fq-list-a">
+                  {item.list.map((line) => (
+                    <li>{line}</li>
+                  ))}
+                </ul>
+              ) : (
+                item.a.map((line) => <p>{line}</p>)
+              )}
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initFaq } from '../../scripts/sections/faq';
+
+  initFaq(document.querySelector('[data-island="faq"]'));
+</script>
+
+<style>
+  .faq {
+    position: relative;
+    padding-block: var(--sec-pad);
+  }
+  .fq-in {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(40px, 5vw, 56px);
+    width: var(--frame);
+    margin-inline: auto;
+  }
+  /* The deck's section label: a small orange square, then the label. */
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  }
+  .eyebrow::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    flex: none;
+    background: var(--color-orange);
+  }
+  .fq-h2 {
+    margin-top: 22px;
+    max-width: 12em;
+    font-family: var(--font-pixel);
+    font-size: var(--t-h2);
+    line-height: var(--lh-h2);
+    font-weight: 400;
+    letter-spacing: normal;
+    color: var(--color-text);
+  }
+  .fq-cta {
+    margin-top: 32px;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 1px solid var(--color-cta-edge);
+    border-radius: 8px;
+    background: var(--cta-fill);
+    color: var(--color-cta-text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 450;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-paper) 28%, transparent) inset;
+    transition:
+      filter 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+  .fq-cta:hover {
+    filter: brightness(1.08);
+  }
+  .fq-cta:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+  }
+
+  @media (min-width: 1024px) {
+    .fq-in {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0;
+      align-items: start;
+    }
+    .fq-head {
+      grid-column: 1 / span 2;
+      padding-right: 24px;
+      position: sticky;
+      top: calc(var(--bar-h) + 40px);
+    }
+    .fq-list {
+      grid-column: 3 / span 4;
+    }
+  }
+
+  .fq-list {
+    border-bottom: 1px solid var(--color-rule-strong);
+  }
+  .fq {
+    border-top: 1px solid var(--color-rule-strong);
+  }
+  .fq-q {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 22px 0;
+    min-height: 44px;
+    cursor: pointer;
+    list-style: none;
+    font-size: clamp(17px, 0.95rem + 0.3vw, 20px);
+    line-height: 1.35;
+    font-weight: 450;
+    color: var(--color-text);
+    border-radius: 2px;
+  }
+  .fq-q::-webkit-details-marker {
+    display: none;
+  }
+  .fq-q:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 4px;
+  }
+  .fq-t {
+    text-wrap: pretty;
+  }
+  .fq-q:hover .fq-t {
+    color: var(--color-paper);
+  }
+  /* The mark is a plus that turns into a minus while the answer is open. */
+  .fq-mark {
+    position: relative;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin-top: 1px;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: 3px;
+  }
+  .fq-mark::before,
+  .fq-mark::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: 50%;
+    height: 1px;
+    margin-top: -0.5px;
+    background: var(--color-text-2);
+    transition: rotate 0.3s var(--ease-out);
+  }
+  .fq-mark::after {
+    rotate: 90deg;
+  }
+  .fq[open] .fq-mark::after {
+    rotate: 0deg;
+  }
+  .fq-q:hover .fq-mark {
+    border-color: color-mix(in srgb, var(--color-paper) 40%, transparent);
+  }
+
+  .fq-a p {
+    padding: 0 48px 26px 0;
+    max-width: 40em;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-2);
+    text-wrap: pretty;
+  }
+  /* An answer can run to several short paragraphs; only the last one keeps the gap below. */
+  .fq-a p:not(:last-child) {
+    padding-bottom: 10px;
+  }
+  .fq-list-a {
+    display: grid;
+    gap: 8px;
+    max-width: 40em;
+    margin: 0;
+    padding: 0 48px 26px 0;
+    list-style: none;
+  }
+  .fq-list-a li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-2);
+    text-wrap: pretty;
+  }
+  .fq-list-a li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.8em;
+    width: 6px;
+    height: 1px;
+    background: var(--color-text-3);
+  }
+  @media (max-width: 560px) {
+    .fq-a p,
+    .fq-list-a {
+      padding-right: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fq::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size 0.45s var(--ease-out),
+        content-visibility 0.45s allow-discrete;
+    }
+    .fq[open]::details-content {
+      block-size: auto;
+    }
+  }
+</style>

@@ -1,0 +1,145 @@
+---
+// Repair section diagram, 1200×560, in the brand kit's C motif: a form-to-CRM workflow whose
+// line breaks after FIELD MAPPINGS (fragments fall out), orange blocks bridge the gap and add
+// the alert path that was missing, green marks show the rerun. Dot grid between thin rules.
+// Below 640px a vertical variant keeps labels legible. Node labels reuse deck words.
+import Blocks from './Blocks.astro';
+import { REPAIR } from '../lib/copy';
+import { blockLine, repairLine, dotPath } from '../lib/motif';
+
+// Accessible name from two deck sentences: the symptom and what we do about it.
+const sentences = REPAIR.lead.split('. ');
+const label = `${sentences[0]}. ${sentences.at(-1)}`;
+
+const wideNodes = [
+  { label: 'FORM', x: 40, y: 204, w: 140 },
+  { label: 'TRIGGER', x: 260, y: 204, w: 160 },
+  { label: 'FIELD MAPPINGS', x: 500, y: 204, w: 200 },
+  { label: 'CRM', x: 1020, y: 204, w: 140 },
+  { label: 'ALERT', x: 780, y: 420, w: 160 },
+];
+const wideLines = [
+  ...blockLine({ from: 180, to: 260, at: 232, t: 10 }),
+  ...blockLine({ from: 420, to: 500, at: 232, t: 10 }),
+  ...repairLine({ from: 700, to: 1020, at: 232, t: 10, breakFrom: 790, breakTo: 900 }),
+  ...blockLine({ from: 250, to: 420, at: 872, t: 10, vertical: true, kind: 'fix' }),
+];
+
+const narrowNodes = [
+  { label: 'FORM', x: 20, y: 30, w: 200 },
+  { label: 'TRIGGER', x: 20, y: 130, w: 200 },
+  { label: 'FIELD MAPPINGS', x: 20, y: 230, w: 200 },
+  { label: 'CRM', x: 20, y: 500, w: 200 },
+  { label: 'ALERT', x: 240, y: 380, w: 100 },
+];
+const narrowLines = [
+  ...blockLine({ from: 78, to: 130, at: 120, t: 8, vertical: true }),
+  ...blockLine({ from: 178, to: 230, at: 120, t: 8, vertical: true }),
+  ...repairLine({ from: 278, to: 500, at: 120, t: 8, vertical: true, breakFrom: 318, breakTo: 372 }),
+  ...blockLine({ from: 128, to: 240, at: 404, t: 8, kind: 'fix' }),
+];
+---
+
+<figure class="flow" data-reveal>
+  <svg class="flow-svg flow--wide" viewBox="0 0 1200 560" role="img" aria-label={label} focusable="false">
+    <path class="rule" d="M0 60.5 H1200 M0 520.5 H1200" />
+    <path class="dots" d={dotPath(20, 100, 1180, 500, 40, 1.4)} />
+    <g class="idx">
+      {wideNodes.slice(0, 4).map((n, i) => <text x={n.x} y={n.y - 20}>{String(i + 1).padStart(2, '0')}</text>)}
+    </g>
+    <Blocks blocks={wideLines} />
+    <text class="note note--fix" x="790" y="196">FIX</text>
+    {wideNodes.map((n) => (
+      <g class="node">
+        <rect x={n.x} y={n.y} width={n.w} height="56" rx="4" />
+        <text x={n.x + 20} y={n.y + 34}>{n.label}</text>
+      </g>
+    ))}
+    <circle class="ok" cx="1142" cy="222" r="6" />
+    <circle class="ok" cx="922" cy="438" r="6" />
+    <text class="note note--ok" x="1020" y="292">RERUN</text>
+  </svg>
+
+  <svg class="flow-svg flow--narrow" viewBox="0 0 360 600" role="img" aria-label={label} focusable="false">
+    <path class="rule" d="M0 10.5 H360 M0 589.5 H360" />
+    <path class="dots" d={dotPath(20, 30, 340, 570, 40, 1)} />
+    <Blocks blocks={narrowLines} />
+    {narrowNodes.map((n) => (
+      <g class="node">
+        <rect x={n.x} y={n.y} width={n.w} height="48" rx="4" />
+        <text class="sm" x={n.x + 14} y={n.y + 29}>{n.label}</text>
+      </g>
+    ))}
+    <circle class="ok" cx="206" cy="514" r="4.5" />
+    <circle class="ok" cx="326" cy="394" r="4.5" />
+    <text class="note sm note--ok" x="20" y="572">RERUN</text>
+  </svg>
+</figure>
+
+<style>
+  .flow {
+    margin: 0;
+  }
+  .flow-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .flow--narrow {
+    max-width: 420px;
+    margin-inline: auto;
+  }
+  .flow--wide {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .flow--wide {
+      display: block;
+    }
+    .flow--narrow {
+      display: none;
+    }
+  }
+  .rule {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-opacity: 0.12;
+    stroke-width: 1;
+  }
+  .node rect {
+    fill: var(--color-surface);
+    stroke: var(--color-rule-strong);
+    stroke-width: 1.5;
+  }
+  .node text,
+  .idx text,
+  .note {
+    font-family: var(--font-mono);
+    font-weight: 450;
+    letter-spacing: 0.06em;
+  }
+  .node text {
+    fill: var(--color-ink);
+    font-size: 18px;
+  }
+  .node text.sm,
+  .note.sm {
+    font-size: 13px;
+  }
+  .idx text {
+    fill: var(--color-muted);
+    font-size: 14px;
+  }
+  .note {
+    font-size: 14px;
+  }
+  .note--fix {
+    fill: var(--color-accent);
+  }
+  .note--ok {
+    fill: var(--color-status);
+  }
+  .ok {
+    fill: var(--color-status);
+  }
+</style>

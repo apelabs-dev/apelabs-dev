@@ -33,8 +33,27 @@ graphify-out/
 # claude worktrees
 .claude/worktrees/
 
-# local Claude Code settings (machine-specific absolute paths)
+# local Cloudflare dev state and secrets
+.wrangler/
+.dev.vars
+workers/*/.dev.vars
+
+# dispatch run inputs and scratch (report stays on disk, untracked)
+.dispatch/
+
+# claude local settings
 .claude/settings.local.json
 
-# dispatch scratch (briefs, progress notes, internal card ids)
+# playwright artifacts
+test-results/
+playwright-report/
+blob-report/
+
+# dispatch run inputs and scratch (deliverables in .dispatch/shots, lighthouse, *.md stay tracked)
+.dispatch/ref/
+.dispatch/tmp/
+.dispatch/prompt.md
+.dispatch/tools/node_modules/
+
+# local agent settings and run scratch
 .dispatch/

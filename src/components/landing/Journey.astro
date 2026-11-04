@@ -1,0 +1,2717 @@
+---
+// 04 Journey: a lead pipeline (web form → CRM → the owner's phone) that works, breaks silently, then the repair
+// steps on that same pipeline. The board is decorative (aria-hidden); the steps carry the story. Without JS the
+// board shows its final, verified state above the steps as a plain list with every note open. With JS
+// (src/scripts/journey) the board pins beside the steps on desktop and over them on phones, and each step
+// changes the board's scene as it is scrolled to.
+import Icon from '../Icon.astro';
+import { DIAGNOSTIC_COPY, REPAIR } from '../../lib/copy';
+import { CTA_LABEL } from '../../lib/site';
+import { SEAL_BODY, SEAL_VIEWBOX } from '../../scripts/journey/seal';
+
+const steps = [
+  { id: 'jr-works', rail: 'Works', name: 'When it works', line: 'A lead fills in your form, lands in the CRM, and your phone buzzes.' },
+  { id: 'jr-fails', rail: 'Broken', name: 'It fails silently', line: REPAIR.rows[0].symptom },
+  { id: 'jr-diagnostic', rail: 'Diagnose', name: 'Free diagnostic', line: 'A free, bounded look at one problem over a screen-share.' },
+  { id: 'jr-findings', rail: 'Findings', name: 'Findings', line: "A written note on what's broken, plus one fixed quote." },
+  { id: 'jr-quote', rail: 'Quote', name: 'Fixed quote', line: 'One fixed quote before any work starts. Repairs start at $150.' },
+  { id: 'jr-repair', rail: 'Repair', name: 'Repair', line: "We run the check we agreed on. If it doesn't pass, you don't pay." },
+  { id: 'jr-verified', rail: 'Warranty', name: 'Warranty and care', line: '14-day warranty on the same issue.' },
+];
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// The notes in the picture: steps 01, 04 and 06 get a plate with a leader to the part it explains; step 02's
+// list is written into the run-history rows it reads (one line per row, in order).
+const plates = [
+  { host: 'fails', step: 1, anchor: '.ui-hop-1 .ui-chip', text: REPAIR.h2 },
+  {
+    host: 'quote',
+    step: 4,
+    anchor: '.jx-card-quote .jx-quote-check .jx-card-k',
+    text: 'We agree a written acceptance check in advance. You approve the quote and the acceptance check.',
+  },
+  {
+    host: 'verified',
+    step: 6,
+    anchor: '.jx-card-check .jx-card-h .jx-card-k',
+    text: 'We show you it passes, and hand over what we changed.',
+  },
+];
+const rowsHost = { host: 'diagnostic', step: 2, lead: DIAGNOSTIC_COPY.lookAtLabel, items: DIAGNOSTIC_COPY.lookAt };
+
+const log = [
+  { t: '09:02:11', w: 'Form submitted', c: '200' },
+  { t: '09:02:12', w: 'Create CRM contact', c: '401', bad: true },
+  { t: '09:02:42', w: 'Retry 1 of 3', c: '401', bad: true },
+  { t: '09:04:12', w: 'Retry 2 of 3', c: '401', bad: true },
+  { t: '09:09:12', w: 'Retry 3 of 3', c: '401', bad: true },
+  { t: '09:09:13', w: 'Lead dropped. No alert sent.', end: true },
+];
+const leads = [
+  { av: 'J', who: 'Jordan', src: 'Web form', st: 'contacted', label: 'Contacted', when: 'Mon' },
+  { av: 'S', who: 'Sam', src: 'Referral', st: 'booked', label: 'Booked', when: 'Sun' },
+  { av: 'R', who: 'Riley', src: 'Web form', st: 'booked', label: 'Booked', when: 'Sat' },
+  { av: 'M', who: 'Morgan', src: 'Phone', st: 'contacted', label: 'Contacted', when: 'Fri' },
+  { av: 'T', who: 'Taylor', src: 'Web form', st: 'booked', label: 'Booked', when: 'Thu' },
+  { av: 'Q', who: 'Quinn', src: 'Referral', st: 'contacted', label: 'Contacted', when: 'Thu' },
+];
+const ro = [
+  ['ok', 'New lead'],
+  ['broken', 'Nothing'],
+  ['diag', 'Nothing'],
+  ['find', 'Nothing'],
+  ['quote', 'Nothing'],
+  ['fix', 'Alerts on'],
+  ['done', 'Every lead'],
+];
+---
+
+<section
+  id="04-journey"
+  data-island="journey"
+  class="jx"
+  data-scene="done"
+  data-step="6"
+  aria-labelledby="jx-h2"
+>
+  <div class="jx-in">
+    <header class="jx-head">
+      <p class="jx-eyebrow">{REPAIR.label}</p>
+      <h2 class="jx-h2" id="jx-h2"><span>{REPAIR.hook[0]}</span> <span>{REPAIR.hook[1]}</span></h2>
+    </header>
+    <div class="jx-grid">
+      <div class="jx-stage">
+        <div class="jx-stage-in">
+          <nav class="jx-rail" aria-label="Journey steps">
+            <ol>
+              {
+                steps.map((s, i) => (
+                  <li>
+                    <button type="button" data-jr-go={i} aria-controls={s.id}>
+                      <span class="sr-only">Step {i + 1} of 7: </span>
+                      <span class="jx-num" aria-hidden="true"><span class="jx-num-in"><span class="jx-num-n">{pad(i)}</span></span></span>
+                      <span class="jx-rail-t">{s.rail}</span>
+                    </button>
+                  </li>
+                ))
+              }
+            </ol>
+          </nav>
+
+          <div class="jx-view ui" aria-hidden="true">
+            <div class="ui-desk">
+              <div class="ui-win ui-form">
+                <div class="ui-chrome">
+                  <span class="ui-dots"><i></i><i></i><i></i></span>
+                  <span class="ui-url"><Icon set="lucide" name="lock" size={16} class="ic" />example.com/quote</span>
+                </div>
+                <div class="ui-form-in">
+                  <p class="ui-form-h">Get a quote</p>
+                  <div class="ui-field ui-f-name"><span class="ui-lab">Name</span><span class="ui-in">Alex</span></div>
+                  <div class="ui-field ui-f-mail"><span class="ui-lab">Email</span><span class="ui-in">alex@example.com</span></div>
+                  <div class="ui-field ui-f-need"><span class="ui-lab">What do you need?</span><span class="ui-in">A quote for next week</span></div>
+                  <span class="ui-send">
+                    <span class="ui-send-a">Send request</span>
+                    <span class="ui-send-b"><Icon set="lucide" name="loader" size={16} class="ic ic-spin" /> Sending…</span>
+                  </span>
+                  <p class="ui-toast"><Icon set="lucide" name="check" size={16} class="ic" /> Thanks! We’ll be in touch.</p>
+                </div>
+              </div>
+
+              <div class="ui-hop ui-hop-1">
+                <i class="ui-wire"></i>
+                <span class="ui-chip"><Icon set="lucide" name="webhook" size={16} class="ic" /> Webhook</span>
+                <i class="ui-pk"></i><i class="ui-pk ui-pk-2"></i><i class="ui-pk ui-pk-3"></i>
+              </div>
+
+              <div class="ui-win ui-crm">
+                <div class="ui-crm-top">
+                  <span class="ui-crm-t"><i class="ui-crm-logo"></i>Leads</span>
+                  <span class="ui-int">
+                    <i class="ui-dot"></i>
+                    <span class="ui-int-a">Web form · Connected</span>
+                    <span class="ui-int-b"><Icon set="lucide" name="triangle-alert" size={16} class="ic" /> Login expired</span>
+                    <span class="ui-int-c"><Icon set="lucide" name="loader" size={16} class="ic ic-spin" /> Reconnecting…</span>
+                    <i class="ui-brk"><i></i><i></i><i></i><i></i></i>
+                  </span>
+                </div>
+                <div class="ui-rows">
+                  <div class="ui-row ui-row-h"><span>Name</span><span>Source</span><span>Status</span><span>Added</span></div>
+                  {
+                    [3, 2, 1].map((n) => (
+                      <div class="ui-row ui-r-test" style={`--i:${n - 1}`}>
+                        <span class="ui-who"><i class="ui-av">T</i>Test lead {n}</span>
+                        <span class="ui-src">Web form</span>
+                        <span class="ui-st" data-st="new">New</span>
+                        <span class="ui-when">Now</span>
+                      </div>
+                    ))
+                  }
+                  <div class="ui-row ui-r-alex">
+                    <span class="ui-who"><i class="ui-av">A</i>Alex</span><span class="ui-src">Web form</span>
+                    <span class="ui-st" data-st="new">New</span><span class="ui-when">Now</span>
+                  </div>
+                  <div class="ui-row ui-r-skel">
+                    <span class="ui-who"><i class="ui-av"></i><i class="ui-bone"></i></span><span><i class="ui-bone"></i></span>
+                    <span><i class="ui-bone"></i></span><span><i class="ui-bone ui-bone-s"></i></span>
+                  </div>
+                  <div class="ui-row ui-r-bf" style="--i:0">
+                    <span class="ui-who"><i class="ui-av">A</i>Alex</span><span class="ui-src">Backfilled</span>
+                    <span class="ui-st" data-st="new">New</span><span class="ui-when">Tue</span>
+                  </div>
+                  <div class="ui-row ui-r-bf" style="--i:1">
+                    <span class="ui-who"><i class="ui-av">C</i>Casey</span><span class="ui-src">Backfilled</span>
+                    <span class="ui-st" data-st="new">New</span><span class="ui-when">Mon</span>
+                  </div>
+                  {
+                    leads.map((l) => (
+                      <div class="ui-row">
+                        <span class="ui-who"><i class="ui-av">{l.av}</i>{l.who}</span>
+                        <span class="ui-src">{l.src}</span>
+                        <span class="ui-st" data-st={l.st}>{l.label}</span>
+                        <span class="ui-when">{l.when}</span>
+                      </div>
+                    ))
+                  }
+                </div>
+                <div class="ui-set">
+                  <span class="ui-set-t"><Icon set="lucide" name="bell" size={16} class="ic" /> Alert me when a handoff fails</span>
+                  <span class="ui-tog"><i></i></span>
+                </div>
+              </div>
+
+              <div class="ui-hop ui-hop-2">
+                <i class="ui-wire"></i>
+                <span class="ui-chip"><Icon set="lucide" name="bell" size={16} class="ic" /> Push</span>
+                <i class="ui-pk"></i><i class="ui-pk ui-pk-2"></i><i class="ui-pk ui-pk-3"></i>
+              </div>
+
+              <div class="ui-readout">
+                <span class="ui-ro-k">Owner sees</span>
+                <p class="ui-ro-v">{ro.map(([s, w]) => <span data-s={s}>{w}</span>)}</p>
+              </div>
+
+              <div class="ui-phone">
+                <div class="ui-ph-scr">
+                  <div class="ui-ph-bar"><span>9:02</span><span class="ui-ph-sig"><i></i><i></i><i></i></span></div>
+                  <p class="ui-ph-clock">9:02</p>
+                  <p class="ui-ph-date">Tuesday</p>
+                  <div class="ui-notes">
+                    {
+                      [3, 2, 1].map((n) => (
+                        <div class="ui-note ui-n-test" style={`--i:${n - 1}`}>
+                          <i class="ui-n-ic"><Icon set="lucide" name="user" size={16} class="ic" /></i>
+                          <span class="ui-n-t">New lead</span><span class="ui-n-b">Test lead {n}</span><span class="ui-n-w">now</span>
+                        </div>
+                      ))
+                    }
+                    <div class="ui-note ui-n-alex">
+                      <i class="ui-n-ic"><Icon set="lucide" name="user" size={16} class="ic" /></i>
+                      <span class="ui-n-t">New lead</span><span class="ui-n-b">Alex wants a quote</span><span class="ui-n-w">now</span>
+                    </div>
+                    <div class="ui-note ui-n-fix">
+                      <i class="ui-n-ic"><Icon set="lucide" name="bell" size={16} class="ic" /></i>
+                      <span class="ui-n-t">Handoff alerts on</span><span class="ui-n-b">You’ll hear if a lead gets stuck</span><span class="ui-n-w">now</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ui-cards jx-screen">
+              <div class="jx-card jx-card-log jx-scr" data-card="log">
+                <div class="jx-card-h">
+                  <span class="jx-card-k"><Icon set="lucide" name="zap" size={16} class="ic" /> Run history</span>
+                  <span class="jx-card-s">Web form → CRM</span>
+                </div>
+                <p class="cx-row-lead">{rowsHost.lead}</p>
+                <ol class="jx-log">
+                  {
+                    log.map((r, k) => (
+                      <li class:list={[{ 'is-bad': r.bad, 'is-end': r.end }]}>
+                        <span class="jx-log-t">{r.t}</span>
+                        <span class="jx-log-w">{r.w}</span>
+                        {r.c && <span class="jx-log-c">{r.c}</span>}
+                        <span class="cx-row" style={`--k:${k}`}>{rowsHost.items[k]}</span>
+                      </li>
+                    ))
+                  }
+                </ol>
+                <p class="jx-card-foot"><Icon set="lucide" name="lock" size={16} class="ic" /> 401 = the CRM refused the login</p>
+              </div>
+
+              <div class="jx-card jx-card-note jx-scr" data-card="note">
+                <p class="jx-card-bar">ILLUSTRATIVE SAMPLE · fictional business · not a client, not a case study</p>
+                <div class="jx-card-body">
+                  <span class="jx-seal">
+                    <svg class="jx-seal-svg" viewBox={SEAL_VIEWBOX} width="1122" height="574" aria-hidden="true" focusable="false" set:html={SEAL_BODY} />
+                  </span>
+                  <p class="jx-card-title">Leads stop at the CRM handoff.</p>
+                  <dl class="jx-card-dl">
+                    <div class="jx-card-wide"><dt>Symptom (as reported)</dt><dd>{REPAIR.rows[0].symptom}</dd></div>
+                    <div class="jx-card-wide">
+                      <dt>Evidence (what we observed)</dt>
+                      <dd>
+                        <ul class="jx-list">
+                          <li>A test submission from Tuesday got the thank-you message and reached the handoff.</li>
+                          <li>The CRM refused to create the contact: the login behind the handoff had expired.</li>
+                          <li>The handoff retried three times, then dropped the lead. Nobody was alerted.</li>
+                        </ul>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Likely cause</dt>
+                      <dd>The CRM login behind the form’s handoff expired, and no alert was set up for failed handoffs.</dd>
+                    </div>
+                    <div>
+                      <dt>Fix</dt>
+                      <dd>Reconnect the handoff with a fresh login, alert the owner when a handoff fails, and backfill the leads missed since it broke.</dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+
+              <div class="jx-card jx-card-quote jx-scr" data-card="quote">
+                <p class="jx-card-bar">Fixed quote (example) · SAMPLE</p>
+                <p class="jx-quote-n">$350</p>
+                <p class="jx-quote-s">Payment under $500: 100% upfront</p>
+                <div class="jx-quote-check">
+                  <span class="jx-card-k">Acceptance check</span>
+                  <p>Three test leads each create one CRM contact within five minutes and send one alert to the owner’s phone, with no duplicates.</p>
+                </div>
+                <p class="jx-quote-s">No fix, no charge, measured against the check above.</p>
+                <span class="jx-approve">
+                  <span class="jx-approve-a">Approve quote</span>
+                  <span class="jx-approve-b"><Icon set="lucide" name="check" size={16} class="ic" /> Approved</span>
+                </span>
+              </div>
+
+              <div class="jx-card jx-card-check" data-card="check">
+                <div class="jx-card-h">
+                  <span class="jx-card-k">Acceptance check</span>
+                  <span class="jx-pass"><Icon set="lucide" name="check" size={16} class="ic" /> 3/3 passed</span>
+                </div>
+                <ol class="jx-tests">
+                  {
+                    [1, 2, 3].map((n) => (
+                      <li style={`--i:${n - 1}`}>
+                        <span>Test lead {n}</span>
+                        <span><Icon set="lucide" name="check" size={16} class="ic" /> Contact</span>
+                        <span><Icon set="lucide" name="check" size={16} class="ic" /> Alert</span>
+                      </li>
+                    ))
+                  }
+                </ol>
+                <div class="jx-warranty">
+                  <span class="jx-card-k">Warranty · 14 days</span>
+                  <span class="jx-ticks">{Array.from({ length: 14 }, (_, i) => <i style={`--i:${i}`}></i>)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cx-layer" data-cx-layer>
+            <svg class="cx-lead-line" aria-hidden="true" focusable="false"><path d=""></path></svg>
+            {
+              plates.map((p) => (
+                <div class="cx-plate" id={`cx-plate-${p.host}`} data-cx-for={p.host} data-anchor={p.anchor} aria-hidden="true">
+                  <p>{p.text}</p>
+                </div>
+              ))
+            }
+            <div class="cx-rows-sr" id={`cx-plate-${rowsHost.host}`} data-cx-for={rowsHost.host} hidden>
+              <p>{rowsHost.lead}</p>
+              <ul>{rowsHost.items.map((item) => <li>{item}</li>)}</ul>
+            </div>
+          </div>
+
+          <div class="jx-foot">
+            <span class="jx-tag" aria-hidden="true">Illustrative · fictional business</span>
+            <span class="jx-where" data-jx-where aria-hidden="true">Warranty</span>
+          </div>
+        </div>
+      </div>
+
+      <ol class="jr-steps jx-steps">
+        {
+          steps.map((s, i) => {
+            const plate = plates.find((p) => p.step === i);
+            const rows = rowsHost.step === i;
+            return (
+              <li class="jr-step jx-step" id={s.id} data-step={i}>
+                <div class="jx-step-in">
+                  <h3 class="jr-name jx-name">
+                    <span class="sr-only">Step {i + 1} of 7: </span>
+                    <span class="jx-num" aria-hidden="true"><span class="jx-num-in"><span class="jx-num-n">{pad(i)}</span></span></span>
+                    <span>{s.name}</span>
+                  </h3>
+                  <p class="jx-line">{s.line}</p>
+                  {plate && (
+                    <div class="cx-notes" data-cx-host={plate.host}>
+                      <p class="cx-item">{plate.text}</p>
+                    </div>
+                  )}
+                  {rows && (
+                    <div class="cx-notes" data-cx-host={rowsHost.host}>
+                      <p class="cx-lead">{rowsHost.lead}</p>
+                      <ul class="cx-list">{rowsHost.items.map((item) => <li class="cx-item">{item}</li>)}</ul>
+                    </div>
+                  )}
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </div>
+
+    <div class="jx-close">
+      <p class="jx-close-h">Want us to look at yours?</p>
+      <a class="btn jx-cta" href="#08-contact" data-cta>{CTA_LABEL}</a>
+      <p class="jx-other">Built on something else? Send it anyway.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { lazyIsland } from '../../scripts/lib/island';
+
+  lazyIsland(document.querySelector('[data-island="journey"]'), () => import('../../scripts/journey').then((m) => m.init));
+</script>
+
+<style is:global>
+  .jx {
+    --font-pixel: 'Geist Pixel Line', var(--font-mono);
+  }
+
+  /* Everything is scoped under .jx (the section), and the board's own parts under .jx .ui. Colour roles alias
+     the site tokens; the board's few in-between tones are mixes of them. */
+
+  .jx {
+    --jx-line: color-mix(in srgb, var(--color-paper) 12%, transparent);
+    --jx-line-2: var(--color-rule-strong);
+    --jx-desk: color-mix(in srgb, var(--color-bg), var(--color-paper) 1.3%);
+    --jx-dot: color-mix(in srgb, var(--color-paper) 7.5%, transparent);
+    --jx-ease: var(--ease-out-expo);
+    --jx-bar-h: var(--jx-bar, var(--bar-h));
+    --jx-stage-top: calc(var(--jx-bar-h) + 24px);
+    position: relative;
+    padding-block: var(--sec-pad);
+    color: var(--color-text);
+  }
+  .jx-in {
+    position: relative;
+    width: var(--frame);
+    margin-inline: auto;
+  }
+  .jx :focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .jx-head {
+    max-width: calc(var(--col) * 5);
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+  /* The section label: a small orange square, then the word. */
+  .jx-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .jx-eyebrow::before {
+    content: '';
+    flex: none;
+    width: 7px;
+    height: 7px;
+    background: var(--color-orange);
+  }
+  .jx-h2 {
+    margin-top: 22px;
+    font-family: var(--font-pixel);
+    font-size: var(--t-h2);
+    line-height: var(--lh-h2);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-text);
+  }
+  .jx-h2 span {
+    display: block;
+  }
+  .jx-h2 span + span {
+    color: var(--color-text-3);
+  }
+
+  /* ---------------------------------------------------------------- grid: static base */
+
+  .jx-grid {
+    display: grid;
+    gap: 40px;
+  }
+  .jx-stage {
+    position: relative;
+  }
+  .jx-stage-in {
+    position: relative;
+    container: jxstage / inline-size;
+    display: flex;
+    flex-direction: column;
+    height: clamp(400px, 56vw, 620px);
+  }
+
+  /* ---------------------------------------------------------------- rail */
+
+  .jx-rail {
+    flex: none;
+    border-bottom: 1px solid var(--jx-line);
+  }
+  .jx-rail ol {
+    display: flex;
+  }
+  .jx-rail li {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .jx-rail button {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 4px 10px 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-3);
+    text-align: left;
+    white-space: nowrap;
+    transition: color var(--dur) var(--jx-ease);
+  }
+  /* The rule under each rail item: 2px paper under the current step, nothing under the others. */
+  .jx-rail button::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 2px;
+    background: transparent;
+    transition: background-color var(--dur) var(--jx-ease);
+  }
+  .jx-rail button:hover,
+  .jx-rail button[aria-current] {
+    color: var(--color-text);
+  }
+  .jx-rail button[aria-current]::before {
+    background: var(--color-text);
+  }
+  .jx-rail-t {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  html:not(.js) .jx-rail {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------------- step labels (the manual's figures) */
+  /* Each rail item and step name starts with the step's two digits, 00–06, as a technical manual's figures: big
+     light tabular numerals and hairlines, no box and no orange. On the rail a hairline between items and, under
+     the current one, a 2px paper rule; in a step name a hairline after the figures, 2px paper when current, so
+     the current step never depends on colour alone. The figures are aria-hidden (the sr-only "Step 5 of 7: "
+     carries them). */
+  .jx-num {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+  }
+  .jx-num-in {
+    display: inline-flex;
+    align-items: center;
+  }
+  .jx-rail li + li button {
+    padding-left: 7px;
+    border-left: 1px solid var(--jx-line);
+  }
+  .jx-rail .jx-num,
+  .jx-name .jx-num {
+    align-self: baseline;
+  }
+  .jx-num-n {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-4);
+  }
+  .jx-rail button[aria-current] .jx-num-n,
+  .jx.jr-live .jx-step.is-active .jx-num-n {
+    color: var(--color-text);
+  }
+  /* In a step name: a fixed-width slot, so every name starts at the same x. */
+  .jx-name .jx-num-in {
+    gap: 12px;
+    min-width: 70px;
+  }
+  .jx-name .jx-num-n {
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .jx-name .jx-num-in::after {
+    content: '';
+    width: 1px;
+    height: 26px;
+    background: var(--color-rule-strong);
+  }
+  .jx.jr-live .jx-step.is-active .jx-num-in::after {
+    width: 2px;
+    margin-right: -1px;
+    background: var(--color-text);
+  }
+
+  /* ---------------------------------------------------------------- the board's field */
+
+  .jx-view {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    container: jxview / size;
+    background:
+      radial-gradient(circle at 1px 1px, var(--jx-dot) 1px, transparent 1.4px) 0 0 / 16px 16px,
+      var(--jx-desk);
+  }
+  .jx-foot {
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--jx-line);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-3);
+  }
+
+  /* ---------------------------------------------------------------- steps */
+
+  .jx-step {
+    position: relative;
+    border-top: 1px solid var(--color-hair);
+    padding-block: 28px;
+  }
+  .jx-step:last-child {
+    border-bottom: 1px solid var(--color-hair);
+  }
+  .jx-step-in {
+    max-width: 34em;
+  }
+  .jx-name {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: clamp(20px, 1rem + 0.6vw, 24px);
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    text-wrap: initial;
+    scroll-margin-top: 120px;
+  }
+  .jx-name:focus {
+    outline: none;
+  }
+  .jx-name:focus-visible {
+    outline: 2px solid var(--color-orange);
+  }
+  .jx-line {
+    margin-top: 10px;
+    color: var(--color-text-2);
+    font-size: var(--t-lede);
+    line-height: var(--lh-lede);
+  }
+
+  /* Bullet lists on the board's cards. */
+  .jx-list li {
+    position: relative;
+    padding-left: 16px;
+  }
+  .jx-list li + li {
+    margin-top: 4px;
+  }
+  .jx-list li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.68em;
+    width: 5px;
+    height: 1px;
+    background: var(--color-text-3);
+  }
+
+  /* ---------------------------------------------------------------- close */
+
+  .jx-close {
+    margin-top: clamp(56px, 8vw, 104px);
+    display: grid;
+    justify-items: start;
+    gap: 24px;
+  }
+  .jx-close-h {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    letter-spacing: 0;
+    font-size: var(--t-sub);
+    line-height: 1.15;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+  .jx .jx-cta {
+    gap: 8px;
+    min-height: 48px;
+    padding-inline: 20px;
+    font-size: 15px;
+    letter-spacing: 0;
+  }
+  .jx-cta::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    margin-left: 2px;
+    background: currentColor;
+    clip-path: polygon(0 45%, 62% 45%, 62% 20%, 100% 50%, 62% 80%, 62% 55%, 0 55%);
+    transition: transform 180ms var(--jx-ease);
+  }
+  .jx-cta:hover::after,
+  .jx-cta:focus-visible::after {
+    transform: translateX(3px);
+  }
+  .jx-other {
+    max-width: 34em;
+    color: var(--color-text-3);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* ---------------------------------------------------------------- cards: our layer on the board */
+  /* Report panels: report surface, rule-strong border, 4px corners, a mono header with an orange square. The
+     board places them; here is only what they look like inside. Every pad is on the 4px scale. */
+
+  .jx-card {
+    background: var(--color-report);
+    border: 1px solid var(--color-rule-strong);
+    border-radius: 4px;
+    color: var(--color-text-2);
+    font-size: 12px;
+    line-height: 17px;
+    overflow: hidden;
+  }
+  .jx-card-h,
+  .jx-card-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-rule-strong);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .jx-card-bar {
+    justify-content: flex-start;
+    align-items: baseline;
+  }
+  .jx-card-bar::before {
+    content: '';
+    flex: none;
+    width: 7px;
+    height: 7px;
+    background: var(--color-orange);
+    transform: translateY(-1px);
+  }
+  .jx-card-k {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .jx-card-s {
+    color: var(--color-text-3);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .jx-card-title {
+    padding: 12px 12px 0;
+    font-family: var(--font-pixel);
+    font-size: 17px;
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+  .jx-card-dl {
+    padding: 4px 12px 12px;
+  }
+  .jx-card-dl > div {
+    padding-block: 8px;
+    border-top: 1px solid var(--color-hair);
+  }
+  .jx-card-dl > div:first-child {
+    border-top: 0;
+  }
+  .jx-card-dl dt {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-3);
+  }
+  .jx-card-dl dd {
+    margin: 4px 0 0;
+    color: var(--color-text);
+  }
+  .jx-card-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--color-hair);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--color-text-3);
+  }
+
+  /* Run history (the diagnostic): the lines the owner never saw. */
+  .jx-log {
+    padding: 4px 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .jx-log li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    padding: 4px 12px;
+    color: var(--color-text-2);
+  }
+  .jx-log-t {
+    color: var(--color-text-3);
+  }
+  .jx-log-c {
+    padding: 0 4px;
+    border: 1px solid var(--jx-line-2);
+    border-radius: 2px;
+    color: var(--color-text);
+  }
+  .jx-log .is-bad .jx-log-c {
+    border-color: var(--color-paper);
+    background: var(--color-paper);
+    color: var(--color-bg);
+  }
+  .jx-log .is-end {
+    margin-top: 4px;
+    border-top: 1px dashed var(--jx-line-2);
+    padding-top: 8px;
+    color: var(--color-text);
+  }
+
+  /* The quote, with its approve button. */
+  .jx-quote-n {
+    padding: 12px 12px 0;
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    letter-spacing: 0;
+    font-size: 34px;
+    line-height: 1;
+    color: var(--color-text);
+  }
+  .jx-quote-s {
+    padding: 8px 12px 0;
+    color: var(--color-text-2);
+  }
+  .jx-quote-check {
+    margin: 12px 12px 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-hair);
+  }
+  .jx-quote-check p {
+    margin-top: 4px;
+    color: var(--color-text);
+  }
+  .jx-approve {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px;
+    height: 32px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--color-orange);
+    color: var(--color-bg);
+    font-weight: 500;
+  }
+  .jx-approve-a,
+  .jx-approve-b {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .jx-approve-a {
+    display: none;
+  }
+  /* While the quote is on screen the button waits for approval; the rest state is approved. */
+  .jx-approve.is-pending {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-orange);
+    color: var(--color-text);
+  }
+  .jx-approve.is-pending .jx-approve-a {
+    display: inline-flex;
+  }
+  .jx-approve.is-pending .jx-approve-b {
+    display: none;
+  }
+
+  /* The acceptance check and the warranty. */
+  .jx-pass {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-orange);
+  }
+  .jx-tests {
+    padding: 4px 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .jx-tests li {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    padding: 4px 12px;
+    color: var(--color-text);
+  }
+  .jx-tests li span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .jx-tests li span + span {
+    color: var(--color-text-2);
+  }
+  .jx-tests .ic,
+  .jx-pass .ic {
+    color: var(--color-orange);
+  }
+  .jx-warranty {
+    display: grid;
+    gap: 8px;
+    padding: 8px 12px 12px;
+    border-top: 1px solid var(--color-hair);
+  }
+  .jx-ticks {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    gap: 3px;
+  }
+  .jx-ticks i {
+    height: 8px;
+    background: var(--color-orange);
+    border-radius: 1px;
+  }
+
+  /* ---------------------------------------------------------------- full-board screens */
+  /* Run history, findings and quote are screens of our own tool. Each covers the whole board (over the form,
+     the CRM and the phone) on the report surface with the cards' 4px corners, and comes in with a short fade
+     and scale; with reduced motion it lands at once. The acceptance check on the last step docks on the desk. */
+
+  .jx:is([data-scene='diag'], [data-scene='find'], [data-scene='quote']) .jx-view .jx-screen {
+    inset: 0;
+    width: auto;
+    max-height: none;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: 4px;
+    background: var(--color-report);
+    animation: jx-screen-in 260ms var(--jx-ease) both;
+  }
+  .jx:is([data-scene='diag'], [data-scene='find'], [data-scene='quote']) .jx-view .jx-screen .jx-card {
+    position: relative;
+    inset: auto;
+    width: auto;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .jx[data-scene='diag'] .jx-view .jx-screen .jx-card-log,
+  .jx[data-scene='find'] .jx-view .jx-screen .jx-card-note,
+  .jx[data-scene='quote'] .jx-view .jx-screen .jx-card-quote {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    animation: jx-screen-in 260ms var(--jx-ease) both;
+  }
+  @keyframes jx-screen-in {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+  }
+  /* The three screen cards (.jx-scr). Small boards leave out the note's symptom and evidence rows. */
+  .jx-scr .jx-card-wide {
+    display: none;
+  }
+  .jx-scr .jx-card-foot {
+    margin-top: auto;
+  }
+  .jx-scr .jx-approve {
+    margin-top: auto;
+  }
+
+  /* Boards with room: screen-sized type and padding. */
+  @container jxview (min-width: 560px) {
+    .jx-scr {
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .jx-scr :is(.jx-card-h, .jx-card-bar) {
+      padding: 12px 20px;
+      line-height: 18px;
+    }
+    .jx-scr .jx-log {
+      padding: 8px 0;
+      font-size: 13px;
+      line-height: 16px;
+    }
+    .jx-scr .jx-log li {
+      gap: 16px;
+      padding: 12px 20px;
+    }
+    .jx-scr .jx-log li + li {
+      border-top: 1px solid var(--color-hair);
+    }
+    .jx-scr .jx-log .is-end {
+      margin-top: 0;
+      padding-top: 12px;
+    }
+    .jx-scr .jx-card-foot {
+      padding: 12px 20px;
+      line-height: 18px;
+    }
+    .jx-scr .jx-card-title {
+      padding: 20px 20px 0;
+      font-size: 24px;
+    }
+    .jx-scr .jx-card-dl {
+      padding: 8px 20px 20px;
+    }
+    .jx-scr .jx-card-dl > div {
+      padding-block: 12px;
+    }
+    .jx-scr .jx-quote-n {
+      padding: 24px 20px 0;
+      font-size: 56px;
+    }
+    .jx-scr .jx-quote-s {
+      padding: 12px 20px 0;
+    }
+    .jx-scr .jx-quote-check {
+      margin: 20px 20px 0;
+      padding-top: 16px;
+    }
+    .jx-scr .jx-quote-check p {
+      margin-top: 8px;
+    }
+    .jx-scr .jx-approve {
+      align-self: flex-start;
+      min-width: 200px;
+      height: 44px;
+      margin: auto 20px 20px;
+      padding-inline: 20px;
+    }
+  }
+  @container jxview (min-width: 560px) and (min-height: 480px) {
+    .jx-scr .jx-card-wide {
+      display: block;
+    }
+  }
+
+  /* ---------------------------------------------------------------- the findings seal and the stamp */
+  /* The brand's N5 specimen tag stamped on the findings report's top-right corner, turned −9°. It floats, so
+     the report's lines wrap around its turned footprint and none of them sit under it. Only the findings screen
+     shows it. The stamp, one beat (times from the screen's entry):
+       0–260 ms     the findings screen fades and scales in (jx-screen-in)
+       520–820 ms   the seal falls: in from 1.7× and transparent, accelerating
+       820 ms       impact: the seal is down at 0.96×; the findings screen is pressed to 0.98× and the thump is
+                    at its peak (shadow 0 14px 34px, 85% ink): press and thump peak on the same frame
+       820–980 ms   the shadow fades out (160 ms); it does not exist at rest
+       820–1020 ms  the screen and the seal settle to 1× on the site's expo-out, together (200 ms)
+     Reduced motion: no animation, card and seal at rest. */
+  .jx {
+    --jx-stamp-at: 820ms;
+    --jx-stamp-settle: 200ms;
+    --jx-thump: 160ms;
+  }
+  .jx-seal {
+    --jx-seal-w: clamp(76px, 19cqi, 156px);
+    --jx-seal-r: -9deg;
+    display: none;
+    float: right;
+    position: relative;
+    /* The tag is 1122 × 574; turned 9° its box is 1.068 × 0.662 of its width, plus a hair. */
+    width: calc(var(--jx-seal-w) * 1.08);
+    height: calc(var(--jx-seal-w) * 0.68);
+    margin: 8px 12px 4px 12px;
+    pointer-events: none;
+  }
+  @container jxview (min-width: 560px) {
+    .jx-seal {
+      margin: 14px 20px 6px 20px;
+    }
+  }
+  .jx-seal-svg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--jx-seal-w);
+    height: auto;
+    max-width: none;
+    translate: -50% -50%;
+    rotate: var(--jx-seal-r);
+    transform-origin: 50% 50%;
+    filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--color-bg) 35%, transparent));
+  }
+  .jx-seal-p {
+    fill: var(--color-paper);
+  }
+  .jx-seal-o {
+    fill: var(--color-orange);
+  }
+  .jx-seal-k {
+    fill: var(--color-bg);
+  }
+  .jx[data-scene='find'] .jx-screen .jx-seal {
+    display: block;
+  }
+  /* The fall (300 ms) then the settle (200 ms): 500 ms from 520 ms, so it lands at 820 and rests at 1020. */
+  .jx[data-scene='find'] .jx-screen .jx-seal-svg {
+    animation: jx-seal-in 500ms 520ms both;
+  }
+  @keyframes jx-seal-in {
+    0% {
+      opacity: 0;
+      scale: 1.7;
+      rotate: calc(var(--jx-seal-r) - 5deg);
+      animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.4);
+    }
+    60% {
+      opacity: 1;
+      scale: 0.96;
+      rotate: var(--jx-seal-r);
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    100% {
+      opacity: 1;
+      scale: 1;
+      rotate: var(--jx-seal-r);
+    }
+  }
+  /* The findings screen takes the hit: pressed to 0.98× at the impact, back to 1× on expo-out in 200 ms, with a
+     shadow at its peak on the impact that fades within 160 ms. `scale` and `box-shadow` stack on the screen's
+     own entry (which animates `transform` and opacity). */
+  .jx[data-scene='find'] .jx-view .jx-screen {
+    animation:
+      jx-screen-in 260ms var(--jx-ease) both,
+      jx-stamp var(--jx-stamp-settle) var(--jx-stamp-at) var(--jx-ease),
+      jx-thump var(--jx-thump) var(--jx-stamp-at) linear;
+  }
+  @keyframes jx-stamp {
+    from {
+      scale: 0.98;
+    }
+    to {
+      scale: 1;
+    }
+  }
+  @keyframes jx-thump {
+    0% {
+      box-shadow: 0 14px 34px color-mix(in srgb, var(--color-bg) 85%, transparent);
+    }
+    100% {
+      box-shadow: 0 14px 34px color-mix(in srgb, var(--color-bg) 0%, transparent);
+    }
+  }
+  .jx-card-body {
+    display: flow-root;
+  }
+
+  /* ---------------------------------------------------------------- small shared pieces */
+
+  /* Every board icon is Lucide at 16 × 16 / 1.5. In a line box shorter than 16px the icon hangs out of it evenly
+     (negative block margins), so no row grows and nothing on the board moves. */
+  .jx .ic {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin-block: min(0px, calc((1lh - 16px) / 2));
+  }
+  .jx .ic-spin {
+    animation: jx-busy 960ms steps(8, end) infinite;
+  }
+  @keyframes jx-busy {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .jx.jr-off *,
+  .jx.jr-off *::before,
+  .jx.jr-off *::after {
+    animation-play-state: paused !important;
+  }
+
+  /* ---------------------------------------------------------------- live layout: phones and tablets */
+  /* The board pins right under the bar (ScrollTrigger, src/scripts/journey) and its ink reaches all the way down
+     to where the current step pins (--jx-pin), so text that scrolls up goes under solid ink, never under a gap. */
+
+  @media (max-width: 1023px) {
+    .jx.jr-live {
+      --jx-stage-h: clamp(300px, 50svh, 440px);
+      --jx-pin: calc(var(--jx-bar-h) + 8px + var(--jx-stage-h) + 13px);
+    }
+    .jx.jr-live .jx-grid {
+      gap: 0;
+    }
+    .jx.jr-live .jx-stage {
+      z-index: 2;
+      padding-block: 8px 12px;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--jx-line);
+    }
+    .jx.jr-live .jx-stage-in {
+      height: var(--jx-stage-h);
+    }
+    .jx.jr-live .jx-foot {
+      display: none;
+    }
+    .jx.jr-live .jx-step {
+      min-height: max(62svh, 380px);
+      border-top: 0;
+      padding-block: 20px 0;
+    }
+    .jx.jr-live .jx-step:last-child {
+      border-bottom: 0;
+      min-height: calc(100svh - var(--jx-pin) + 40px);
+    }
+    .jx.jr-live .jx-step-in {
+      position: sticky;
+      top: var(--jx-pin);
+      padding-top: 12px;
+    }
+    /* Steps already read step aside, so none of their lines show between the board and the current step. */
+    .jx.jr-live .jx-step:has(~ .jx-step.is-active) .jx-step-in {
+      opacity: 0;
+      transition: opacity var(--dur-fast) var(--jx-ease);
+    }
+  }
+  /* Narrow boards: the figures only, and the current step's word opens up beside its figures. */
+  @container jxstage (max-width: 620px) {
+    .jx.jr-live .jx-rail button {
+      gap: 6px;
+      padding-right: 6px;
+    }
+    .jx.jr-live .jx-rail li {
+      flex: 1 1 0;
+      transition: flex-grow var(--dur-slow) var(--jx-ease);
+    }
+    .jx.jr-live .jx-rail li:has(button[aria-current]) {
+      flex-grow: 3.2;
+    }
+    /* Seven 44px targets need more than the frame once the current word is open, so the rail's ends take the
+       page gutter as unpainted hit area: the ink stays on the frame, the outer buttons reach the screen edge. */
+    .jx.jr-live .jx-rail ol {
+      margin-inline: calc(var(--gut) * -1);
+    }
+    .jx.jr-live .jx-rail li:not(:has(button[aria-current])) {
+      min-width: 44px;
+    }
+    .jx.jr-live .jx-rail li:first-child button {
+      padding-left: var(--gut);
+    }
+    .jx.jr-live .jx-rail li:last-child button {
+      padding-right: var(--gut);
+    }
+    .jx.jr-live .jx-rail li:first-child button::before {
+      left: var(--gut);
+    }
+    .jx.jr-live .jx-rail li:last-child button::before {
+      right: var(--gut);
+    }
+    .jx.jr-live .jx-rail button:not([aria-current]) .jx-rail-t {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+  /* Short landscape phones: nothing pinned, the board scrolls with the page. */
+  @media (max-width: 1023px) and (max-height: 520px) {
+    .jx.jr-live .jx-step-in {
+      position: static;
+    }
+    .jx.jr-live .jx-step {
+      min-height: 0;
+      padding-block: 28px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- live layout: desktop */
+
+  @media (min-width: 1024px) {
+    .jx.jr-live .jx-grid {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 4.2fr);
+      column-gap: clamp(32px, 4vw, 56px);
+      align-items: start;
+    }
+    .jx.jr-live .jx-stage {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .jx.jr-live .jx-stage-in {
+      height: clamp(480px, calc(100vh - var(--jx-bar-h) - 48px), 760px);
+    }
+    .jx.jr-live .jx-steps {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    /* Short step boxes: the next step's line follows the current one closely instead of a screen later. */
+    .jx.jr-live .jx-step {
+      min-height: max(28vh, 236px);
+      border-top: 0;
+      padding-block: 0;
+    }
+    /* Step 00 holds 160px longer, so the first lead reaches the phone ("New lead", 2.05 s into the board's
+       first run) while step 00 is still the one being read. */
+    .jx.jr-live .jx-step:first-child {
+      min-height: calc(max(28vh, 236px) + 160px);
+    }
+    /* Tall enough that the board stays pinned while the last step is current. */
+    .jx.jr-live .jx-step:last-child {
+      min-height: max(28vh, 236px, calc(66vh - 24px));
+      border-bottom: 0;
+    }
+    .jx.jr-live .jx-step-in {
+      position: sticky;
+      top: 34vh;
+      padding-top: 18px;
+      border-top: 1px solid var(--color-hair);
+    }
+  }
+
+  /* Current step bright, the others quieter (all still 4.5:1 or more). */
+  .jx.jr-live .jx-step .jx-name,
+  .jx.jr-live .jx-step .jx-line {
+    transition: color var(--dur-slow) var(--jx-ease);
+  }
+  .jx.jr-live .jx-step:not(.is-active) :is(.jx-name, .jx-line) {
+    color: var(--color-text-3);
+  }
+
+  /* ================================================================ the board: product UI */
+  /* The business's own tools as product UI (a quote form, the CRM's lead list, the owner's phone) joined by two
+     hops (webhook, push). The rest state of every scene is here, keyed off the section's data-scene (ok |
+     broken | diag | find | quote | fix | done); ui.ts only adds the moments in between through short-lived u-*
+     classes on the view. Flat: surface steps and hairlines, no shadows. */
+
+  .jx .ui {
+    --ui-win: color-mix(in srgb, var(--color-surface-low), var(--color-surface) 40%);
+    --ui-win-2: color-mix(in srgb, var(--color-surface), var(--color-surface-2) 37.5%);
+    --ui-edge: color-mix(in srgb, var(--color-paper) 14%, transparent);
+    --ui-hair: color-mix(in srgb, var(--color-paper) 8%, transparent);
+    --ui-dim: color-mix(in srgb, var(--color-paper) 60%, transparent);
+    --ui-dead: color-mix(in srgb, var(--color-paper) 50%, transparent);
+    --ui-faint: color-mix(in srgb, var(--color-paper) 10%, transparent);
+    --ui-off: color-mix(in srgb, var(--color-paper) 40%, transparent);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-text);
+  }
+  .jx .ui-desk {
+    position: absolute;
+    inset: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 26px minmax(0, 1fr) 26px auto;
+    grid-template-areas: 'form' 'hop1' 'crm' 'hop2' 'phone';
+  }
+  @container jxview (min-width: 560px) {
+    .jx .ui-desk {
+      inset: 24px 24px 0;
+      grid-template-columns: 35fr 11fr 22fr 32fr;
+      grid-template-rows: 62fr 8fr 30fr;
+      grid-template-areas:
+        'form hop1 crm  crm'
+        'read read .    hop2'
+        'read read .    phone';
+    }
+  }
+
+  /* ---------------------------------------------------------------- windows */
+
+  .jx .ui-win {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    background: var(--ui-win);
+    border: 1px solid var(--ui-edge);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .jx .ui-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 28px;
+    padding: 0 8px;
+    border-bottom: 1px solid var(--ui-hair);
+    background: var(--ui-win-2);
+  }
+  .jx .ui-dots {
+    display: flex;
+    gap: 4px;
+  }
+  .jx .ui-dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-paper) 18%, transparent);
+  }
+  .jx .ui-url {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+    height: 18px;
+    padding: 0 8px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--color-bg) 35%, transparent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ui-dim);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* ---------------------------------------------------------------- the quote form */
+
+  .jx .ui-form {
+    grid-area: form;
+    display: flex;
+    flex-direction: column;
+  }
+  .jx .ui-form-in {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .jx .ui-form-h {
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+  }
+  .jx .ui-field {
+    display: grid;
+    gap: 4px;
+  }
+  .jx .ui-lab {
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--ui-dim);
+  }
+  .jx .ui-in {
+    display: block;
+    padding: 8px 12px;
+    border: 1px solid var(--ui-edge);
+    border-radius: 3px;
+    background: var(--color-bg);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  @container jxview (max-height: 560px) {
+    .jx .ui-f-name {
+      display: none;
+    }
+  }
+  /* Short boards (tablet portrait): the form keeps the email and the button, and the toast covers the button
+     instead of hanging below it. */
+  @container jxview (max-height: 440px) {
+    .jx .ui-f-need {
+      display: none;
+    }
+    .jx .ui-toast {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 12px;
+    }
+  }
+  .jx .ui-send {
+    display: grid;
+    place-items: center;
+    height: 32px;
+    margin-top: 4px;
+    border-radius: 3px;
+    background: var(--color-paper);
+    color: var(--color-bg);
+    font-weight: 560;
+    transform-origin: 50% 50%;
+  }
+  .jx .ui-send-a,
+  .jx .ui-send-b {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .jx .ui-send-b {
+    visibility: hidden;
+  }
+  .jx .ui.u-sending .ui-send {
+    background: color-mix(in srgb, var(--color-paper) 70%, transparent);
+  }
+  .jx .ui.u-sending .ui-send-a {
+    visibility: hidden;
+  }
+  .jx .ui.u-sending .ui-send-b {
+    visibility: visible;
+  }
+  .jx .ui-toast {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid color-mix(in srgb, var(--color-paper) 30%, transparent);
+    border-radius: 3px;
+    background: var(--ui-win-2);
+    color: var(--color-text);
+  }
+  .jx .ui.u-no-toast .ui-toast {
+    visibility: hidden;
+  }
+  /* The thank-you the business never questioned: once the lead is lost, it reads as the lie it is. */
+  .jx:is([data-scene='broken'], [data-scene='diag']) .ui-toast {
+    border-style: dashed;
+  }
+
+  /* ---------------------------------------------------------------- hops (webhook, push) */
+
+  .jx .ui-hop {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+  }
+  .jx .ui-hop-1 {
+    grid-area: hop1;
+  }
+  .jx .ui-hop-2 {
+    grid-area: hop2;
+  }
+  .jx .ui-wire {
+    position: absolute;
+    --ui-wire: var(--color-orange);
+    background: repeating-linear-gradient(var(--ui-dir, 90deg), var(--ui-wire) 0 6px, transparent 6px 10px);
+    animation: ui-flow 900ms linear infinite;
+  }
+  .jx .ui-hop-1 .ui-wire {
+    left: -4px;
+    right: -4px;
+    top: 50%;
+    height: 2px;
+  }
+  .jx .ui-hop-1 .ui-wire::before,
+  .jx .ui-hop-1 .ui-wire::after,
+  .jx .ui-hop-2 .ui-wire::before,
+  .jx .ui-hop-2 .ui-wire::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--jx-desk);
+    border: 1.5px solid var(--ui-wire);
+  }
+  .jx .ui-hop-1 .ui-wire::before {
+    left: 0;
+    top: -3px;
+  }
+  .jx .ui-hop-1 .ui-wire::after {
+    right: 0;
+    top: -3px;
+  }
+  .jx .ui-hop-2 .ui-wire::before {
+    top: 0;
+    left: -3px;
+  }
+  .jx .ui-hop-2 .ui-wire::after {
+    bottom: 0;
+    left: -3px;
+  }
+  .jx .ui-hop-2 .ui-chip {
+    top: 50%;
+    left: calc(50% + 10px);
+    translate: 0 -50%;
+  }
+  .jx .ui-hop-2 .ui-wire {
+    --ui-dir: 180deg;
+    top: -4px;
+    bottom: -4px;
+    left: 50%;
+    width: 2px;
+  }
+  @keyframes ui-flow {
+    to {
+      background-position: 10px 10px;
+    }
+  }
+  .jx .ui-chip {
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 30px);
+    translate: -50% 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 22px;
+    padding: 0 8px;
+    border: 1px solid var(--ui-edge);
+    border-radius: 3px;
+    background: var(--jx-desk);
+    box-shadow: 0 0 0 4px var(--jx-desk);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+  .jx .ui-chip .ic {
+    color: var(--color-orange);
+  }
+  /* Packets: small orange squares riding the wire (only seen while ui.ts moves them). */
+  .jx .ui-pk {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--color-orange);
+    opacity: 0;
+    pointer-events: none;
+    transition: background-color 120ms linear;
+  }
+  .jx .ui-hop-1 .ui-pk {
+    left: -4px;
+    top: calc(50% - 3px);
+  }
+  .jx .ui-hop-2 .ui-pk {
+    top: -4px;
+    left: calc(50% - 3px);
+  }
+  .jx .ui-pk.is-white {
+    background: var(--color-paper);
+  }
+  .jx .ui-pk.is-dead {
+    background: var(--ui-dead);
+  }
+
+  /* Dead hop: the wire goes grey and stutters; nothing crosses it. */
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-wire {
+    --ui-wire: var(--ui-dead);
+    animation: ui-dead 2.6s steps(1, end) infinite;
+  }
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-hop-2 .ui-wire {
+    --ui-wire: color-mix(in srgb, var(--color-paper) 28%, transparent);
+    animation: none;
+  }
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-chip .ic {
+    color: var(--ui-dead);
+  }
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-hop-2 .ui-chip {
+    color: var(--ui-dim);
+  }
+  .jx .ui.u-wire-live .ui-hop-1 .ui-wire {
+    --ui-wire: var(--color-orange) !important;
+    animation: ui-flow 900ms linear infinite !important;
+  }
+  @keyframes ui-dead {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    8% {
+      opacity: 0.25;
+    }
+    11% {
+      opacity: 1;
+    }
+    14% {
+      opacity: 0.4;
+    }
+    17% {
+      opacity: 1;
+    }
+  }
+
+  /* ---------------------------------------------------------------- CRM */
+
+  .jx .ui-crm {
+    grid-area: crm;
+    display: flex;
+    flex-direction: column;
+  }
+  .jx .ui-crm-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    height: 36px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--ui-hair);
+    background: var(--ui-win-2);
+  }
+  .jx .ui-crm-t {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 560;
+  }
+  .jx .ui-crm-logo {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1.5px solid var(--color-paper);
+    position: relative;
+  }
+  .jx .ui-crm-logo::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--color-paper);
+    border-radius: 1px;
+  }
+  .jx .ui-int {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 22px;
+    padding: 0 8px;
+    border: 1px solid var(--ui-edge);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text);
+    white-space: nowrap;
+    transition: border-color 800ms linear;
+  }
+  /* The lead lands: the integration's border lights orange and fades back (ui.ts flips .is-lit). */
+  .jx .ui-int.is-lit {
+    border-color: var(--color-orange);
+    transition: none;
+  }
+  .jx .ui-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-orange);
+  }
+  .jx .ui-int-b,
+  .jx .ui-int-c {
+    display: none;
+    align-items: center;
+    gap: 4px;
+  }
+  .jx:is([data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-int {
+    border-color: var(--color-paper);
+    background: var(--color-paper);
+    color: var(--color-bg);
+  }
+  .jx:is([data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-int-a,
+  .jx:is([data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-dot {
+    display: none;
+  }
+  .jx:is([data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-int-b {
+    display: inline-flex;
+  }
+  .jx .ui.u-connecting .ui-int-a,
+  .jx .ui.u-connecting .ui-dot {
+    display: none !important;
+  }
+  .jx .ui.u-connecting .ui-int-c {
+    display: inline-flex;
+  }
+
+  /* Whole rows only. A row the window has no room for wraps into a second column, outside the window, instead of
+     showing cut in half at its bottom edge; rows.ts marks it .is-off. */
+  .jx .ui-rows {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column wrap;
+    align-content: flex-start;
+  }
+  .jx .ui-rows > .ui-row {
+    flex: none;
+    width: 100%;
+  }
+  .jx .ui-rows > .ui-row.is-off {
+    visibility: hidden;
+  }
+  .jx .ui-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr) minmax(0, 1fr) 40px;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--ui-hair);
+    white-space: nowrap;
+  }
+  .jx .ui-row > span {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .jx .ui-row-h {
+    height: 28px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ui-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .jx .ui-who {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .jx .ui-av {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: var(--ui-faint);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-style: normal;
+    color: var(--color-text);
+  }
+  .jx .ui-src,
+  .jx .ui-when {
+    color: var(--ui-dim);
+  }
+  .jx .ui-when {
+    text-align: right;
+  }
+  .jx .ui-st {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-2);
+  }
+  .jx .ui-st[data-st='new'] {
+    color: var(--color-text);
+  }
+  .jx .ui-st[data-st='new']::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-orange);
+  }
+  /* The rows that arrive: the new lead, the test leads, the backfilled ones. */
+  .jx :is(.ui-r-alex, .ui-r-test, .ui-r-bf) {
+    position: relative;
+  }
+  .jx :is(.ui-r-alex, .ui-r-test, .ui-r-bf)::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: var(--color-orange);
+  }
+  .jx .ui-r-bf .ui-src {
+    color: var(--color-text);
+  }
+  .jx .ui-r-test .ui-av {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-orange);
+  }
+  /* Which rows exist in which scene. */
+  .jx :is(.ui-r-test, .ui-r-bf, .ui-r-skel) {
+    display: none;
+  }
+  .jx:not([data-scene='ok']) .ui-r-alex,
+  .jx .ui.u-no-row .ui-r-alex {
+    display: none;
+  }
+  .jx[data-scene='done'] .ui-r-test,
+  .jx:is([data-scene='fix'], [data-scene='done']) .ui-r-bf {
+    display: grid;
+  }
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-r-skel {
+    display: grid;
+  }
+  .jx .ui.u-no-skel .ui-r-skel,
+  .jx .ui.u-no-bf .ui-r-bf,
+  .jx .ui.u-no-tests .ui-r-test {
+    display: none !important;
+  }
+  /* The lead that never lands: a placeholder row that never resolves. */
+  .jx .ui-bone {
+    display: block;
+    height: 8px;
+    width: 70%;
+    border-radius: 2px;
+    background: var(--ui-faint);
+    animation: ui-bone 1.6s ease-in-out infinite;
+  }
+  .jx .ui-bone-s {
+    width: 28px;
+    margin-left: auto;
+  }
+  .jx .ui-r-skel .ui-av {
+    background: color-mix(in srgb, var(--color-paper) 7%, transparent);
+    animation: ui-bone 1.6s ease-in-out infinite;
+  }
+  @keyframes ui-bone {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  /* The setting the repair turns on. */
+  .jx .ui-set {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-top: 1px solid var(--ui-hair);
+    background: var(--ui-win-2);
+    color: var(--ui-dim);
+  }
+  .jx .ui-set-t {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .jx .ui-tog {
+    position: relative;
+    flex: none;
+    width: 26px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid var(--ui-off);
+  }
+  .jx .ui-tog i {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    background: var(--ui-dead);
+    transition: transform 260ms var(--jx-ease);
+  }
+  .jx:is([data-scene='fix'], [data-scene='done']) .ui-set {
+    color: var(--color-text);
+  }
+  .jx:is([data-scene='fix'], [data-scene='done']) .ui-tog {
+    border-color: var(--color-orange);
+    background: var(--color-orange);
+  }
+  .jx:is([data-scene='fix'], [data-scene='done']) .ui-tog i {
+    transform: translateX(12px);
+    background: var(--color-bg);
+  }
+  .jx .ui.u-tog-off .ui-set {
+    color: var(--ui-dim) !important;
+  }
+  .jx .ui.u-tog-off .ui-tog {
+    border-color: var(--ui-off) !important;
+    background: transparent !important;
+  }
+  .jx .ui.u-tog-off .ui-tog i {
+    transform: none !important;
+    background: var(--ui-dead) !important;
+  }
+
+  /* ---------------------------------------------------------------- the owner's phone */
+
+  .jx .ui-phone {
+    grid-area: phone;
+    position: relative;
+    min-width: 0;
+    justify-self: center;
+    width: min(100%, 220px);
+    height: calc(100% + 40px);
+    padding: 8px 8px 0;
+    border: 1px solid var(--ui-edge);
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    background: var(--color-surface-low);
+  }
+  .jx .ui-ph-scr {
+    position: relative;
+    height: 100%;
+    border-radius: 9px 9px 0 0;
+    background: var(--color-bg);
+    border: 1px solid var(--ui-hair);
+    border-bottom: 0;
+    overflow: hidden;
+    padding: 8px 12px 0;
+    text-align: center;
+  }
+  .jx .ui-ph-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 560;
+    line-height: 14px;
+  }
+  .jx .ui-ph-sig {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .jx .ui-ph-sig i {
+    width: 3px;
+    background: var(--color-text);
+  }
+  .jx .ui-ph-sig i:nth-child(1) {
+    height: 4px;
+  }
+  .jx .ui-ph-sig i:nth-child(2) {
+    height: 7px;
+  }
+  .jx .ui-ph-sig i:nth-child(3) {
+    height: 10px;
+  }
+  .jx .ui-ph-clock {
+    margin-top: 8px;
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    letter-spacing: 0;
+    font-size: 34px;
+    line-height: 36px;
+    color: var(--color-text);
+  }
+  .jx .ui-ph-date {
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--ui-dim);
+  }
+  .jx .ui-notes {
+    position: relative;
+    margin-top: 12px;
+    text-align: left;
+    isolation: isolate;
+  }
+  .jx .ui-note {
+    display: none;
+    grid-template-columns: 22px 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 6px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--ui-hair);
+  }
+  .jx .ui-n-ic {
+    grid-row: 1 / 3;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: var(--color-orange);
+    color: var(--color-bg);
+  }
+  .jx .ui-n-t {
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 560;
+    color: var(--color-text);
+  }
+  /* The body wraps instead of ending in an ellipsis, and the time sits on the title's row. */
+  .jx .ui-n-b {
+    grid-column: 2 / 4;
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--color-text-2);
+  }
+  .jx .ui-n-w {
+    grid-row: 1;
+    grid-column: 3;
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--ui-dim);
+  }
+  .jx[data-scene='ok'] .ui-n-alex,
+  .jx[data-scene='fix'] .ui-n-fix,
+  .jx[data-scene='done'] .ui-n-test {
+    display: grid;
+  }
+  .jx .ui.u-no-note .ui-note {
+    display: none !important;
+  }
+  /* Three test alerts stack like a real lock screen: the newest on top, two slivers behind. */
+  .jx[data-scene='done'] .ui-n-test {
+    position: relative;
+  }
+  .jx[data-scene='done'] .ui-n-test:not(:first-child) {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .jx[data-scene='done'] .ui-n-test:nth-child(2) {
+    transform: translateY(7px) scale(0.94);
+    background: color-mix(in srgb, var(--color-surface-2) 60%, var(--color-bg));
+  }
+  .jx[data-scene='done'] .ui-n-test:nth-child(3) {
+    transform: translateY(14px) scale(0.88);
+    z-index: -2;
+    background: color-mix(in srgb, var(--color-surface-2) 40%, var(--color-bg));
+  }
+  .jx[data-scene='done'] .ui-n-test:not(:first-child) > * {
+    visibility: hidden;
+  }
+  /* A dead phone: nothing came. */
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-ph-clock {
+    color: var(--color-text-2);
+  }
+
+  /* ---------------------------------------------------------------- readout: what the owner sees */
+
+  .jx .ui-readout {
+    grid-area: read;
+    display: none;
+    align-self: end;
+    padding: 0 0 20px;
+  }
+  @container jxview (min-width: 560px) {
+    .jx .ui-readout {
+      display: block;
+    }
+  }
+  .jx .ui-ro-k {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-3);
+  }
+  .jx .ui-ro-v {
+    margin-top: 8px;
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    letter-spacing: 0;
+    font-size: clamp(26px, 6cqw, 40px);
+    line-height: 1;
+    color: var(--color-orange);
+  }
+  .jx .ui-ro-v span {
+    display: none;
+  }
+  .jx[data-scene='ok'] .ui-ro-v [data-s='ok'],
+  .jx[data-scene='broken'] .ui-ro-v [data-s='broken'],
+  .jx[data-scene='diag'] .ui-ro-v [data-s='diag'],
+  .jx[data-scene='find'] .ui-ro-v [data-s='find'],
+  .jx[data-scene='quote'] .ui-ro-v [data-s='quote'],
+  .jx[data-scene='fix'] .ui-ro-v [data-s='fix'],
+  .jx[data-scene='done'] .ui-ro-v [data-s='done'] {
+    display: inline;
+  }
+  .jx:is([data-scene='broken'], [data-scene='diag'], [data-scene='find'], [data-scene='quote']) .ui-ro-v {
+    color: var(--color-text-2);
+  }
+
+  /* ---------------------------------------------------------------- corner brackets on the failing hop */
+
+  .jx .ui-brk {
+    position: absolute;
+    inset: -5px -7px;
+    z-index: 3;
+    display: none;
+    pointer-events: none;
+  }
+  .jx .ui-brk i {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 0 solid var(--color-orange);
+  }
+  .jx .ui-brk i:nth-child(1) {
+    left: 0;
+    top: 0;
+    border-width: 2px 0 0 2px;
+  }
+  .jx .ui-brk i:nth-child(2) {
+    right: 0;
+    top: 0;
+    border-width: 2px 2px 0 0;
+  }
+  .jx .ui-brk i:nth-child(3) {
+    left: 0;
+    bottom: 0;
+    border-width: 0 0 2px 2px;
+  }
+  .jx .ui-brk i:nth-child(4) {
+    right: 0;
+    bottom: 0;
+    border-width: 0 2px 2px 0;
+  }
+  .jx[data-scene='diag'] .ui-brk {
+    display: block;
+  }
+
+  /* ---------------------------------------------------------------- our cards on the board */
+  /* The holder sits on the whole board (the full-board screen for the run history, the note and the quote); at
+     rest it lines up with the desk, where the acceptance check docks on the last step. */
+
+  .jx .ui-cards {
+    position: absolute;
+    inset: 16px;
+    z-index: 4;
+    pointer-events: none;
+  }
+  @container jxview (min-width: 560px) {
+    .jx .ui-cards {
+      inset: 24px 24px 0;
+    }
+  }
+  .jx .ui .jx-card {
+    position: absolute;
+    inset: auto 0 0 0;
+    max-height: 100%;
+    display: none;
+  }
+  @container jxview (min-width: 560px) {
+    .jx .ui .jx-card {
+      inset: 0 auto auto 0;
+      width: calc(46% - 4px);
+    }
+    .jx .ui .jx-card-check {
+      inset: auto auto 22px 0;
+    }
+  }
+  .jx[data-scene='diag'] .ui .jx-card-log,
+  .jx[data-scene='find'] .ui .jx-card-note,
+  .jx[data-scene='quote'] .ui .jx-card-quote,
+  .jx[data-scene='done'] .ui .jx-card-check {
+    display: block;
+  }
+  .jx .ui.u-no-cards .jx-card {
+    display: none !important;
+  }
+  /* The readout steps aside where the acceptance check takes its corner. */
+  @container jxview (min-width: 560px) {
+    .jx[data-scene='done'] .ui-readout {
+      visibility: hidden;
+    }
+  }
+
+  /* ---------------------------------------------------------------- narrow boards (phones) */
+
+  @container jxview (max-width: 559px) {
+    .jx .ui-form-in {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 8px;
+      padding: 8px;
+    }
+    .jx :is(.ui-form-h, .ui-f-name, .ui-f-need),
+    .jx .ui-f-mail .ui-lab {
+      display: none;
+    }
+    .jx .ui-send {
+      margin: 0;
+      padding: 0 12px;
+    }
+    .jx .ui-toast {
+      position: absolute;
+      inset: 8px;
+      padding: 0 12px;
+    }
+    .jx .ui-crm-top {
+      height: 32px;
+    }
+    .jx .ui-row {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 34px;
+      height: 30px;
+    }
+    .jx .ui-row .ui-src,
+    .jx .ui-row-h > :nth-child(2),
+    .jx .ui-r-skel > :nth-child(2),
+    .jx .ui-row-h {
+      display: none;
+    }
+    .jx .ui-set {
+      display: none;
+    }
+    .jx:is([data-scene='fix'], [data-scene='done']) .ui-set {
+      display: flex;
+      height: 30px;
+    }
+    .jx .ui-phone {
+      width: 100%;
+      height: auto;
+      padding: 8px 8px 0;
+      border-radius: 10px 10px 0 0;
+    }
+    .jx .ui-ph-scr {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      min-height: 54px;
+      text-align: left;
+    }
+    .jx .ui-ph-bar,
+    .jx .ui-ph-date {
+      display: none;
+    }
+    .jx .ui-ph-clock {
+      margin: 0;
+      font-size: 22px;
+      line-height: 24px;
+    }
+    .jx .ui-notes {
+      margin: 0;
+    }
+    .jx .ui .jx-card {
+      inset: 0;
+      overflow: hidden;
+    }
+    /* The webhook runs down between the form and the CRM. */
+    .jx .ui-hop-1 .ui-wire {
+      --ui-dir: 180deg;
+      left: 50%;
+      right: auto;
+      top: -4px;
+      bottom: -4px;
+      width: 2px;
+      height: auto;
+    }
+    .jx .ui-hop-1 .ui-wire::before {
+      left: -3px;
+      top: 0;
+    }
+    .jx .ui-hop-1 .ui-wire::after {
+      right: auto;
+      left: -3px;
+      top: auto;
+      bottom: 0;
+    }
+    .jx .ui-hop-1 .ui-chip {
+      top: 50%;
+      left: calc(50% + 10px);
+      translate: 0 -50%;
+    }
+    .jx .ui-hop-1 .ui-pk {
+      left: calc(50% - 3px);
+      top: -4px;
+    }
+    .jx[data-scene='done'] .ui .jx-card-check {
+      inset: auto 0 0 0;
+    }
+    /* The docked check covers the Push hop's chip; hide it rather than show half its word above the card. */
+    .jx[data-scene='done'] .ui-hop-2 .ui-chip {
+      visibility: hidden;
+    }
+    .jx .ui .jx-card-check .jx-tests {
+      display: none;
+    }
+  }
+
+  /* ================================================================ notes in the picture */
+  /* .cx-notes: in-flow text under its step; the board's .cx-layer (plates and leader) and .cx-row/.cx-row-lead
+     (the diagnostic list in the run history). Without JS (no .cx-live) the notes are plain text and every picture
+     layer stays hidden. With JS every note waits behind an orange dot (.cx-pin) that opens it; the leader, 1.5px
+     paper at 85%, ends on the dot's edge. */
+
+  .cx-notes {
+    margin-top: 16px;
+  }
+  .cx-lead {
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.04em;
+    color: var(--color-text-3);
+  }
+  .cx-list {
+    display: grid;
+    gap: 8px;
+  }
+  .cx-item {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--color-text-2);
+  }
+  .jx :is(.cx-layer, .cx-row, .cx-row-lead) {
+    display: none;
+  }
+
+  /* In the picture: the in-flow text stays for screen readers only. */
+  .jx.cx-live .cx-notes {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .jx.cx-live .cx-layer {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 8; /* over the board's full-screen cards (z-index 6) */
+    pointer-events: none;
+  }
+
+  /* The plate and its leader: a spec annotation on the board. */
+  .jx .cx-plate {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: min(272px, calc(100% - 16px));
+    padding: 10px 12px 11px;
+    border: 1px solid color-mix(in srgb, var(--color-paper) 34%, transparent);
+    border-radius: 3px;
+    background: var(--jx-desk);
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out);
+  }
+  .jx .cx-plate p {
+    font-size: 13px;
+    line-height: 19px;
+    color: var(--color-text);
+  }
+  .jx .cx-layer .cx-plate.is-on[data-placed] {
+    opacity: 1;
+    transition-delay: 800ms;
+  }
+  .jx .cx-lead-line {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out);
+  }
+  .jx .cx-lead-line path {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-paper) 85%, transparent);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+  .jx .cx-layer:has(.cx-plate.is-on[data-placed]) .cx-lead-line {
+    opacity: 1;
+    transition-delay: 800ms;
+  }
+
+  /* Phones and tablets: the board gets the dock's height too, and an opened plate docks over the board's bottom
+     edge, its leader running up to the part. No strip is reserved, so steps without an open note show no empty
+     band under the board. */
+  @media (max-width: 1023px) {
+    .jx.cx-live.jr-live {
+      --cx-dock: 76px;
+      --jx-stage-h: calc(clamp(300px, 50svh, 440px) + var(--cx-dock));
+    }
+  }
+  .jx .cx-layer .cx-plate.is-dock {
+    width: 100%;
+    min-height: calc(var(--cx-dock, 76px) - 10px);
+  }
+
+  /* The diagnostic list in the run history: what each row tells us, under its words. A ring on the row's line
+     just before its words, a rule from the ring down the note. The rows' columns open up by 8px so the ring
+     sits clear of the timestamp. */
+  .jx.cx-live[data-scene='diag'] :is(.cx-row, .cx-row-lead) {
+    display: block;
+  }
+  .jx.cx-live[data-scene='diag'] .jx-log li {
+    column-gap: 20px;
+    row-gap: 4px;
+  }
+  .jx .cx-row {
+    --cx-rx: -10px; /* the rule's x: half the row's column gap, left of the words */
+    --cx-up: 11px; /* the 4px row gap + half a 14px row line */
+    position: relative;
+    grid-column: 2 / -1;
+    padding-left: 4px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-text);
+    animation: cx-in 420ms var(--ease-out) both;
+    animation-delay: calc(var(--k, 0) * 90ms);
+  }
+  /* The rule: from the ring's lower edge to the note's last line. */
+  .jx .cx-row::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--cx-rx) - 0.75px);
+    top: calc(-1 * var(--cx-up) + 5.5px);
+    bottom: 2px;
+    width: 1.5px;
+    background: color-mix(in srgb, var(--color-paper) 85%, transparent);
+  }
+  /* The ring, centred on the row's text line (one row line up: --cx-up). */
+  .jx .cx-row::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--cx-rx) - 5.5px);
+    top: calc(-1 * var(--cx-up) - 5.5px);
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--color-orange);
+    border-radius: 50%;
+    background: var(--color-report);
+  }
+  .jx .cx-row-lead {
+    --cx-lead-pad: 12px; /* the pin's x (notes.ts reads it) */
+    padding: 8px 12px 0 var(--cx-lead-pad);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    color: var(--color-text-3);
+  }
+  @container jxview (min-width: 560px) {
+    .jx .cx-row {
+      --cx-up: 13px; /* the 4px row gap + half an 18px row line */
+      font-size: 13px;
+      line-height: 18px;
+    }
+    .jx .cx-row-lead {
+      --cx-lead-pad: 20px;
+      padding-top: 14px;
+      padding-right: 20px;
+    }
+  }
+  @keyframes cx-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* The note dot: the 6px orange status dot. While its note is closed a thin orange ring breathes round it, slowly
+     (2.8s each way) and never fully out (10px to 16px across); open, the dot alone. Reduced motion: still. */
+  .jx .cx-pin-mark {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-orange);
+  }
+  .jx .cx-pin-mark::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border: 1.5px solid color-mix(in srgb, var(--color-orange) 60%, transparent);
+    border-radius: 50%;
+    opacity: 0.6;
+    pointer-events: none;
+    animation: note-breathe 2.8s ease-in-out infinite alternate;
+  }
+  @keyframes note-breathe {
+    from {
+      opacity: 0.3;
+      scale: 0.72;
+    }
+    to {
+      opacity: 0.9;
+      scale: 1.14;
+    }
+  }
+  .jx .cx-pin.is-open .cx-pin-mark::after {
+    display: none;
+  }
+
+  /* The reader's own press shows a note at once (the 800 ms wait is for the board's scene change). */
+  .jx .cx-layer.is-now .cx-plate.is-on[data-placed],
+  .jx .cx-layer.is-now:has(.cx-plate.is-on[data-placed]) .cx-lead-line {
+    transition-delay: 0s;
+  }
+
+  .jx .cx-pin {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text);
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .jx .cx-pin[hidden] {
+    display: none;
+  }
+  .jx .cx-pin[data-placed] {
+    opacity: 1;
+    transition-delay: 800ms;
+  }
+  .jx .cx-layer.is-now .cx-pin[data-placed] {
+    transition-delay: 0s;
+  }
+  .jx :is(.cx-pin-mark, .cx-pin-label) {
+    position: absolute;
+  }
+  .jx .cx-pin:focus-visible {
+    outline: none;
+  }
+  .jx .cx-pin:focus-visible .cx-pin-mark {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 3px;
+  }
+  /* "Reveal the note": a small chip on the board's dark, in the board's mono label type. */
+  .jx .cx-pin-label {
+    display: flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border: 1px solid color-mix(in srgb, var(--color-paper) 34%, transparent);
+    border-radius: 2px;
+    background: var(--jx-desk);
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    line-height: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .jx .cx-pin:is(:hover, :focus-visible) .cx-pin-label {
+    border-color: color-mix(in srgb, var(--color-paper) 62%, transparent);
+  }
+  /* Where a pointer can hover, the label waits for it or for keyboard focus (hidden, it takes no hover either);
+     where nothing can hover, it shows while the note is closed. */
+  @media (hover: hover) {
+    .jx .cx-pin-label {
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        opacity var(--dur-fast) var(--ease-out),
+        visibility 0s linear var(--dur-fast);
+    }
+    .jx .cx-pin:is(:hover, :focus-visible) .cx-pin-label {
+      visibility: visible;
+      opacity: 1;
+      transition-delay: 0s;
+    }
+  }
+  /* Open: the dot alone. */
+  .jx .cx-pin.is-open .cx-pin-label {
+    visibility: hidden;
+    opacity: 0;
+    transition: none;
+  }
+
+  /* The run history (step 02): its dot sits on the lead line. Closed, the lead keeps its line, empty, and the rows
+     stay out; open, the lead's words follow the dot. */
+  .jx.cx-live .cx-row-lead {
+    padding-left: calc(var(--cx-lead-pad) + var(--cx-pin-w, 0px));
+  }
+  .jx.cx-live[data-cx-rows='closed'] .cx-row {
+    display: none;
+  }
+  .jx.cx-live[data-cx-rows='closed'] .cx-row-lead {
+    visibility: hidden;
+  }
+  /* What the run-history dot opens, for screen readers (the rows are in the aria-hidden board). */
+  .jx .cx-rows-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* ---------------------------------------------------------------- reduced motion: states land at once */
+
+  @media (prefers-reduced-motion: reduce) {
+    .jx *,
+    .jx *::before,
+    .jx *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>

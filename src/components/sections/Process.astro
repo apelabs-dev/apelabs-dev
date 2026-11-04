@@ -1,0 +1,79 @@
+---
+// Deck section 6: five numbered steps beside the failed → diagnosed → patched → verified strip.
+import SectionIndex from '../SectionIndex.astro';
+import ProcessStrip from '../ProcessStrip.astro';
+import { PROCESS } from '../../lib/copy';
+
+interface Props {
+  pageHeading?: boolean;
+}
+const { pageHeading = false } = Astro.props;
+const Heading = pageHeading ? 'h1' : 'h2';
+const Sub = pageHeading ? 'h2' : 'h3';
+---
+
+<section class="section process" id="process" aria-labelledby="process-title">
+  <div class="wrap">
+    <SectionIndex index={PROCESS.index} label={PROCESS.label} />
+    <Heading class="h2" id="process-title">{PROCESS.h2}</Heading>
+
+    <div class="strip">
+      <ProcessStrip />
+    </div>
+
+    <ol class="rows steps">
+      {PROCESS.steps.map((s, i) => (
+        <li class="row step">
+          <span class="num mono" aria-hidden="true">{i + 1}</span>
+          <Sub class="name">{s.name}</Sub>
+          <p class="text">{s.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .strip {
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+  .steps {
+    list-style: none;
+    margin: clamp(40px, 5vw, 64px) 0 0;
+    padding: 0;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-areas:
+      "num name"
+      "num text";
+    gap: 6px 12px;
+    padding: 22px 0 26px;
+  }
+  .num {
+    grid-area: num;
+    font-size: 28px;
+    line-height: 1.1;
+    color: var(--color-muted);
+  }
+  .name {
+    grid-area: name;
+    font-size: var(--text-h3);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .text {
+    grid-area: text;
+    color: var(--color-muted);
+    max-width: 60ch;
+  }
+  @media (min-width: 768px) {
+    .step {
+      grid-template-columns: 72px minmax(0, 4fr) minmax(0, 7fr);
+      grid-template-areas: "num name text";
+      column-gap: var(--grid-gap);
+      align-items: baseline;
+    }
+  }
+</style>

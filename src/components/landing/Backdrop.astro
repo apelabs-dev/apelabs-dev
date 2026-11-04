@@ -1,0 +1,37 @@
+---
+// Page background: static circuit traces that continue the hero's lattice (the approved sparse-trace
+// tile). One layer, the first child of <main>, tiles from the top of main to its end, so the pattern
+// runs unbroken across section boundaries. The hero paints its own opaque ground over it, so the texture
+// starts where the hero ends without JS and without knowing the hero's height. Nothing animates, so
+// reduced motion needs no branch; without the SVG the page is plain ink.
+---
+
+<div class="bgm-layer" aria-hidden="true"></div>
+
+<style>
+  :global(main:has(> .bgm-layer)) {
+    position: relative;
+  }
+
+  .bgm-layer {
+    /* One routing cell. Desktop = the hero's own pitch (--col / 4, 40.75px at 1280). */
+    --bgm-cell: calc(var(--col) / 4);
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-repeat: repeat;
+    background-position: var(--gut) 0;
+    background-image: url(/assets/bg/tile-a.svg);
+    background-size: calc(var(--bgm-cell) * 24) calc(var(--bgm-cell) * 18);
+  }
+
+  /* Phones and small tablets: half a column per cell, so a trace stays >= 1 CSS px and the whole
+     motif still fits on the screen. */
+  @media (max-width: 768px) {
+    .bgm-layer {
+      --bgm-cell: calc(var(--col) / 2);
+      background-image: url(/assets/bg/tile-a-m.svg);
+    }
+  }
+</style>

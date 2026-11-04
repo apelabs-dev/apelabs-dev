@@ -1,0 +1,572 @@
+---
+// Landing section 6: the two apps we build and run, each with one cut from the app and a four-fact rail.
+import Icon from '../Icon.astro';
+import { PROJECTS, SECTION, srcsetFor, type ProofCut, type ProofElement } from '../../scripts/proof/projects';
+
+const pct = (value: number, of: number): string => `${+((value / of) * 100).toFixed(3)}%`;
+const cropStyle = (element: ProofElement, cut: ProofCut): string =>
+  `width:${pct(element.nativeWidth, cut.w)};left:-${pct(cut.x, cut.w)};top:-${pct(cut.y, cut.h)}`;
+---
+
+<section id="06-proof" data-island="proof" aria-labelledby="pr3-h2">
+  <div class="frame pr3-in">
+    <header class="pr3-head">
+      <p class="eyebrow label"><span class="sq" aria-hidden="true"></span>{SECTION.label}</p>
+      <h2 class="pr3-h2" id="pr3-h2">{SECTION.heading}</h2>
+      <p class="pr3-line">{SECTION.line}</p>
+    </header>
+
+    <div class="pr3-list">
+      {PROJECTS.map((p) => (
+        <article
+          class="pr3-p pr3-a"
+          data-key={p.key}
+          aria-labelledby={`pr3-a-${p.key}-h`}
+          style={`--pf-fill:${p.frameFill}`}
+        >
+          <div class="pr3-meta">
+            {p.wordmark ? (
+              <h3 class="pr3-name" id={`pr3-a-${p.key}-h`}>
+                <span class="sr-only">{p.wordmark.alt}</span>
+                <img
+                  class="pr3-wordmark"
+                  src={p.wordmark.src}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width={p.wordmark.width}
+                  height={p.wordmark.height}
+                />
+              </h3>
+            ) : (
+              <h3 class="pr3-name pr3-lockup" id={`pr3-a-${p.key}-h`}>
+                <img src={p.mark?.src} alt="" width={p.mark?.width} height={p.mark?.height} loading="lazy" decoding="async" />
+                {p.lockup}
+              </h3>
+            )}
+            <p class="pr3-desc">{p.desc}</p>
+            <p class="pr3-tag">{p.tag}</p>
+            <p class="pr3-links">
+              {p.links.map((link) => (
+                <a
+                  class={link.arrow ? 'pr3-go' : 'pr3-gh hit'}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {link.label}
+                  {link.arrow && <span aria-hidden="true"> →</span>}
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              ))}
+            </p>
+          </div>
+
+          <div class="pr3-show" style={`--max:${p.max}px`} data-pr3-p="0.95,0.45" data-pr3-tilt>
+            <figure class="pr3-float">
+              <div class="pr3-float-in">
+                <div class="pr3-crop" style={`aspect-ratio:${p.element.crop.w}/${p.element.crop.h}`}>
+                  <picture>
+                    <source type="image/avif" srcset={srcsetFor(p.element, 'avif')} sizes={p.element.sizes} />
+                    <source type="image/webp" srcset={srcsetFor(p.element, 'webp')} sizes={p.element.sizes} />
+                    <img
+                      src={p.element.src}
+                      alt={p.element.alt}
+                      width={p.element.nativeWidth / 2}
+                      height={p.element.nativeHeight / 2}
+                      decoding="async"
+                      loading="lazy"
+                      style={cropStyle(p.element, p.element.crop)}
+                    />
+                  </picture>
+                </div>
+              </div>
+              {p.caption && <figcaption class="pr3-cap">{p.caption}</figcaption>}
+            </figure>
+          </div>
+
+          <canvas class="pf-spark" aria-hidden="true"></canvas>
+
+          <dl class="pf-facts">
+            {p.facts.map((fact) => (
+              <div class="pf-fact">
+                <dt>
+                  <Icon set="lucide" name={fact.icon} size={20} class="pf-ic" />
+                  <span class="pf-l">{fact.label}</span>
+                </dt>
+                <dd>{fact.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { lazyIsland } from '../../scripts/lib/island';
+
+  lazyIsland(document.querySelector('[data-island="proof"]'), () => import('../../scripts/sections/proof').then((m) => m.init));
+</script>
+
+<style>
+  /* InterVariable subset to printable ASCII (both axes, the browser-default layout features): the lockup is its
+     only text, and the full 344 KB face was the page's heaviest download. */
+  @font-face {
+    font-family: 'HF Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/assets/proof/hf-font/inter-var-ascii.woff2') format('woff2');
+  }
+
+  section {
+    position: relative;
+    padding-block: var(--sec-pad);
+    color: var(--color-text);
+  }
+
+  .frame {
+    width: var(--frame);
+    margin-inline: auto;
+  }
+
+  .pr3-in {
+    position: relative;
+  }
+
+  /* ---------------------------------------------------------------- heading */
+
+  .pr3-head {
+    max-width: 36rem;
+    margin-bottom: clamp(56px, 7vw, 104px);
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 22px;
+    color: var(--color-ink);
+  }
+
+  .sq {
+    width: 6px;
+    height: 6px;
+    background: var(--color-orange);
+  }
+
+  .pr3-h2 {
+    margin: 0;
+    font-family: var(--font-pixel);
+    font-size: var(--t-h2);
+    line-height: var(--lh-h2);
+    font-weight: 400;
+    letter-spacing: normal;
+  }
+
+  .pr3-line {
+    margin-top: 18px;
+    font-size: var(--t-lede);
+    line-height: 1.5;
+    color: var(--color-text-2);
+  }
+
+  /* ---------------------------------------------------------------- rows */
+
+  .pr3-p + .pr3-p {
+    margin-top: clamp(104px, 13vw, 184px);
+  }
+
+  .pr3-a {
+    display: grid;
+    gap: 32px;
+    grid-template-areas: 'meta' 'show' 'facts';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pr3-a + .pr3-a {
+    margin-top: 0;
+    padding-top: clamp(56px, 6vw, 88px);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .pr3-a:not(:last-child) {
+    padding-bottom: clamp(56px, 6vw, 88px);
+  }
+
+  .pr3-a .pr3-meta {
+    grid-area: meta;
+  }
+
+  .pr3-a .pr3-show {
+    grid-area: show;
+  }
+
+  .pr3-a .pf-facts {
+    grid-area: facts;
+  }
+
+  /* ---------------------------------------------------------------- project meta */
+
+  .pr3-meta {
+    min-width: 0;
+    max-width: 34rem;
+  }
+
+  .pr3-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-family: var(--font-pixel);
+    font-size: clamp(24px, 1rem + 1vw, 32px);
+    line-height: 1.1;
+    font-weight: 400;
+    color: var(--color-text);
+  }
+
+  .pr3-wordmark {
+    display: block;
+    height: clamp(28px, 1.2rem + 0.8vw, 36px);
+    width: auto;
+  }
+
+  .pr3-lockup {
+    gap: 11px;
+    font-family: 'HF Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--color-paper);
+  }
+
+  .pr3-lockup img {
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    flex: none;
+  }
+
+  .pr3-desc {
+    margin-top: 14px;
+    max-width: 30em;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    color: var(--color-text-2);
+  }
+
+  .pr3-tag {
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-3);
+  }
+
+  .pr3-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 22px;
+    margin-top: 22px;
+  }
+
+  .pr3-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: var(--t-small);
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 180ms var(--ease-out), background-color 180ms var(--ease-out);
+  }
+
+  .pr3-go:hover {
+    border-color: var(--color-orange);
+    background: color-mix(in srgb, var(--color-orange) 6%, transparent);
+  }
+
+  .pr3-gh {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--color-text-2);
+    font-size: var(--t-small);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule-strong);
+    text-underline-offset: 4px;
+  }
+
+  .pr3-gh:hover {
+    color: var(--color-text);
+    text-decoration-color: var(--color-orange);
+  }
+
+  /* ---------------------------------------------------------------- images */
+
+  .pr3-crop {
+    position: relative;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  .pr3-crop img {
+    position: absolute;
+    display: block;
+    max-width: none;
+    height: auto;
+  }
+
+  .pr3 picture {
+    display: contents;
+  }
+
+  .pr3-cap {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-3);
+  }
+
+  /* ---------------------------------------------------------------- the floating element */
+
+  .pr3-show {
+    --pr3-air: clamp(20px, 2.8vw, 36px);
+    --p: 1;
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, calc(var(--max) + 2 * var(--pr3-air)));
+    min-width: 0;
+    perspective: 1600px;
+  }
+
+  .pr3-float {
+    position: relative;
+    width: min(100% - 2 * var(--pr3-air), var(--max));
+    margin: var(--pr3-air);
+    transform: translateY(calc((1 - var(--p)) * 40px)) scale(calc(0.96 + 0.04 * var(--p)));
+  }
+
+  .pr3-float-in {
+    position: relative;
+    padding: var(--pf-pad);
+    background: var(--pf-fill);
+    border-radius: 12px;
+    transform: rotateX(calc(var(--ty, 0) * -4deg)) rotateY(calc(var(--tx, 0) * 5deg)) translate(calc(var(--tx, 0) * -10px), calc(var(--ty, 0) * -8px));
+    transition: transform 700ms var(--ease-out), translate 420ms var(--ease-out);
+  }
+
+  .pr3-float-in .pr3-crop {
+    border-radius: 6px;
+  }
+
+  .pr3-a {
+    --pf-pad: clamp(12px, 1.5vw, 20px);
+  }
+
+  .pr3-float-in::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 1px rgb(255 107 53 / 0.85), 0 16px 48px -16px rgb(255 107 53 / 0.42), 0 34px 70px -26px rgb(0 0 0 / 0.95);
+    opacity: var(--p);
+    pointer-events: none;
+  }
+
+  .pr3-show:hover .pr3-float-in {
+    translate: 0 -6px;
+  }
+
+  .pr3-a .pr3-cap {
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  /* ---------------------------------------------------------------- the facts rail */
+
+  .pr3-a {
+    --rail-x: 21px;
+  }
+
+  .pf-facts {
+    position: relative;
+    display: grid;
+    gap: 22px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .pf-facts::before {
+    content: '';
+    position: absolute;
+    left: var(--rail-x);
+    top: 18px;
+    bottom: 18px;
+    width: 1px;
+    background: var(--color-rule-strong);
+  }
+
+  .pf-fact {
+    position: relative;
+    min-width: 0;
+    align-content: start;
+  }
+
+  .pf-fact dt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    height: 38px;
+    padding: 0 12px 0 8px;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pf-ic {
+    display: block;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--color-paper);
+  }
+
+  .pf-fact dd {
+    margin: 10px 0 0 calc(var(--rail-x) + 19px);
+    font-size: var(--t-small);
+    line-height: 1.55;
+    color: var(--color-text-2);
+  }
+
+  .pf-fact.is-spark dt {
+    border-color: color-mix(in srgb, var(--color-orange) calc(var(--pf-hl, 0) * 100%), var(--color-rule-strong));
+  }
+
+  @media (max-width: 480px) {
+    .pr3-a {
+      --rail-x: 19px;
+    }
+
+    .pf-fact dt {
+      height: 34px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- the spark strip */
+
+  .pr3-a {
+    position: relative;
+  }
+
+  .pr3-a .pf-fact {
+    z-index: 2;
+  }
+
+  .pf-spark {
+    position: absolute;
+    grid-area: facts;
+    z-index: 1;
+    top: 0;
+    left: calc(var(--rail-x) - 18px);
+    width: 37px;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    .pr3-a {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      grid-template-areas: 'meta show' 'facts facts';
+      column-gap: clamp(40px, 5vw, 72px);
+      align-items: center;
+    }
+
+    .pr3-a:nth-child(even) {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      grid-template-areas: 'show meta' 'facts facts';
+    }
+
+    .pr3-a .pr3-show {
+      justify-self: end;
+    }
+
+    .pr3-a:nth-child(even) .pr3-show {
+      justify-self: start;
+    }
+
+    .pf-facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 24px;
+      margin-top: 8px;
+    }
+
+    .pf-facts::before {
+      left: 0;
+      right: 0;
+      top: 18px;
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+
+    .pf-fact dd {
+      margin: 14px 0 0;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-rule);
+    }
+
+    .pf-spark {
+      top: 8px;
+      left: 0;
+      width: 100%;
+      height: 37px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pr3-show {
+      --p: 1;
+    }
+
+    .pf-spark {
+      display: none;
+    }
+
+    .pr3-a *,
+    .pr3-a *::before,
+    .pr3-a *::after {
+      transition: none;
+    }
+
+    .pr3-show:hover .pr3-float-in {
+      translate: none;
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+// Tools strip (deck A, locked in round 1): one drifting row under the hero. The list is doubled so
+// the loop has no seam, because -50% is exactly one copy. The names are deck copy, verbatim; the
+// accessible copy is the sr-only sentence, and the moving row is hidden from assistive tech.
+const TOOLS = [
+  'Zapier',
+  'Make',
+  'n8n',
+  'GoHighLevel',
+  'HubSpot',
+  'Pipedrive',
+  'Airtable',
+  'Google Sheets',
+  'QuickBooks',
+  'payment tools',
+  'custom code',
+];
+---
+
+<section id="03-tools-strip" class="tools" aria-label="Tools">
+  <p class="label tools-label" aria-hidden="true">We work on:</p>
+  <p class="sr-only">
+    We work on what you already run: Zapier, Make, n8n, GoHighLevel, HubSpot, Pipedrive, Airtable,
+    Google Sheets, QuickBooks, payment tools, and custom code.
+  </p>
+  <div class="tools-track" aria-hidden="true">
+    <div class="tools-run">
+      <ul class="tools-list">{TOOLS.map((tool) => <li>{tool}</li>)}</ul>
+      <ul class="tools-list" aria-hidden="true">{TOOLS.map((tool) => <li>{tool}</li>)}</ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tools {
+    position: relative;
+    padding-block: 56px 64px;
+  }
+  .tools-label {
+    position: relative;
+    text-align: center;
+    color: var(--color-text-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+  .tools-track {
+    position: relative;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  }
+  .tools-run {
+    display: flex;
+    width: max-content;
+    animation: tools-drift 46s linear infinite;
+  }
+  .tools-list {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tools-list li {
+    padding-inline: clamp(28px, 4.2vw, 60px);
+    font-family: var(--font-sans);
+    font-size: 22px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: color-mix(in srgb, var(--color-paper) 62%, transparent);
+    white-space: nowrap;
+  }
+  @keyframes tools-drift {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  /* Reduced motion: no drift. The row centres and wraps, and the duplicate copy is dropped. */
+  @media (prefers-reduced-motion: reduce) {
+    .tools-run {
+      animation: none;
+      width: auto;
+      justify-content: center;
+    }
+    .tools-run .tools-list {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 8px;
+    }
+    .tools-run .tools-list + .tools-list {
+      display: none;
+    }
+    .tools-track {
+      mask-image: none;
+    }
+  }
+  @media (max-width: 600px) {
+    .tools-list li {
+      font-size: 19px;
+    }
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+// One page per published post, with Article markup authored by the organization (seo.md §4).
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE_URL } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const url = `${SITE_URL}/blog/${post.id}/`;
+const date = (d: Date) => d.toISOString().slice(0, 10);
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  author: { '@id': `${SITE_URL}/#org`, '@type': 'Organization', name: 'apeLabs' },
+  publisher: { '@id': `${SITE_URL}/#org` },
+  mainEntityOfPage: url,
+  image: `${SITE_URL}/og/og-image.png`,
+};
+---
+
+<BaseLayout title={`${post.data.title} | apeLabs`} description={post.data.description} jsonLd={[articleLd]}>
+  <article class="section post">
+    <div class="wrap">
+      <time class="label" datetime={date(post.data.pubDate)}>{date(post.data.pubDate)}</time>
+      <h1 class="h2">{post.data.title}</h1>
+      <div class="prose prose-measure">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-top: 16px;
+  }
+  .prose {
+    margin-top: 40px;
+  }
+  .prose :global(* + *) {
+    margin-top: 1em;
+  }
+  .prose :global(h2) {
+    margin-top: 2em;
+    font-size: var(--text-h3);
+  }
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+</style>

@@ -1,0 +1,161 @@
+---
+// Deck section 3: a typographic menu (name, price, scope) and the "Which fits?" lookup.
+import SectionIndex from '../SectionIndex.astro';
+import { SERVICES } from '../../lib/copy';
+import { ctaHref } from '../../lib/site';
+
+interface Props {
+  pageHeading?: boolean;
+}
+const { pageHeading = false } = Astro.props;
+const Heading = pageHeading ? 'h1' : 'h2';
+// "Not sure which one you need? Start with the diagnostic and we'll point you to the right one."
+const [askPart, startPart] = SERVICES.notSure.split('? ');
+const linkText = 'Start with the diagnostic';
+const startRest = startPart.slice(linkText.length);
+---
+
+<section class="section services" id="services" aria-labelledby="services-title">
+  <div class="wrap grid">
+    <div class="head">
+      <SectionIndex index={SERVICES.index} label={SERVICES.label} />
+      <Heading class="h2" id="services-title">{SERVICES.h2}</Heading>
+      <p class="lead body-muted">{SERVICES.intro}</p>
+    </div>
+
+    <div class="body">
+      <ul class="rows menu">
+        {SERVICES.menu.map((item) => (
+          <li class="row item">
+            <p class="name">{item.name}</p>
+            <p class="price mono">{item.price}</p>
+            <p class="desc">{item.text}</p>
+          </li>
+        ))}
+      </ul>
+
+      <p class="not-sure">
+        {askPart}? <a class="inline-link" href={ctaHref(Astro.url.pathname)}>{linkText}</a>{startRest}
+      </p>
+
+      <div class="fits">
+        <p class="label">{SERVICES.fitsLabel}</p>
+        <dl>
+          {SERVICES.fits.map((f) => (
+            <div class="fit">
+              <dt>{f.when}:</dt>
+              <dd>{f.then}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    gap: 56px;
+  }
+  .head .lead {
+    margin-top: 24px;
+    max-width: 34em;
+  }
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: clamp(40px, 6vw, 96px);
+    }
+    .head {
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      align-self: start;
+    }
+    .head :global(.section-index) {
+      margin-bottom: 40px;
+    }
+  }
+
+  .menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name price"
+      "desc desc";
+    gap: 8px 24px;
+    padding: 24px 0 28px;
+  }
+  .name {
+    grid-area: name;
+    font-size: var(--text-h3);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .price {
+    grid-area: price;
+    font-size: var(--text-data);
+    line-height: 30px;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+  .desc {
+    grid-area: desc;
+    color: var(--color-muted);
+    max-width: 44em;
+  }
+  @media (min-width: 768px) {
+    .item {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 2fr) minmax(0, 6fr);
+      grid-template-areas: "name price desc";
+      align-items: baseline;
+    }
+  }
+
+  .not-sure {
+    margin-top: 32px;
+    font-size: var(--text-lead);
+    line-height: 1.45;
+    max-width: 36em;
+  }
+  .inline-link {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.22em;
+  }
+  .inline-link:hover {
+    color: var(--color-accent);
+  }
+
+  .fits {
+    margin-top: 48px;
+  }
+  .fits dl {
+    margin: 16px 0 0;
+    border-top: 1px solid var(--color-rule-strong);
+  }
+  .fit {
+    display: grid;
+    gap: 4px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .fit dt {
+    color: var(--color-muted);
+  }
+  .fit dd {
+    margin: 0;
+  }
+  @media (min-width: 768px) {
+    .fit {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--grid-gap);
+    }
+  }
+</style>

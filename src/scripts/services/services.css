@@ -1,0 +1,233 @@
+/* Services deck. Every selector is beneath the section's data-island="services" root; the root holds the only
+   local custom properties, each mapped onto a foundation token (palette P1, type, spacing, radius, motion).
+   No literal colours: translucent steps are color-mix() of those tokens. */
+[data-island="services"] {
+  --sr3-ink: var(--color-bg);
+  --sr3-paper: var(--color-paper);
+  --sr3-orange: var(--color-accent);
+  --sr3-muted: var(--color-muted);
+  --sr3-surface: var(--color-surface);
+  --sr3-raised: var(--color-surface-2);
+  --sr3-card: color-mix(in srgb, var(--color-surface) 60%, var(--color-surface-2));
+  --sr3-soft: color-mix(in srgb, var(--color-paper) 85%, var(--color-bg));
+  --sr3-ease: var(--ease-out-expo);
+  /* Paper and orange as alpha steps (percent = alpha). */
+  --sr3-p04: color-mix(in srgb, var(--color-paper) 4%, transparent);
+  --sr3-p05: color-mix(in srgb, var(--color-paper) 5%, transparent);
+  --sr3-p07: color-mix(in srgb, var(--color-paper) 7%, transparent);
+  --sr3-p09: color-mix(in srgb, var(--color-paper) 9%, transparent);
+  --sr3-p10: color-mix(in srgb, var(--color-paper) 10%, transparent);
+  --sr3-p13: color-mix(in srgb, var(--color-paper) 13%, transparent);
+  --sr3-p15: color-mix(in srgb, var(--color-paper) 15%, transparent);
+  --sr3-p16: color-mix(in srgb, var(--color-paper) 16%, transparent);
+  --sr3-p18: color-mix(in srgb, var(--color-paper) 18%, transparent);
+  --sr3-rule: color-mix(in srgb, var(--color-paper) 19%, transparent);
+  --sr3-p20: color-mix(in srgb, var(--color-paper) 20%, transparent);
+  --sr3-p22: color-mix(in srgb, var(--color-paper) 22%, transparent);
+  --sr3-p30: color-mix(in srgb, var(--color-paper) 30%, transparent);
+  --sr3-p34: color-mix(in srgb, var(--color-paper) 34%, transparent);
+  --sr3-p40: color-mix(in srgb, var(--color-paper) 40%, transparent);
+  --sr3-p45: color-mix(in srgb, var(--color-paper) 45%, transparent);
+  --sr3-p62: color-mix(in srgb, var(--color-paper) 62%, transparent);
+  --sr3-o08: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --sr3-o10: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --sr3-o60: color-mix(in srgb, var(--color-accent) 60%, transparent);
+  --sr3-o75: color-mix(in srgb, var(--color-accent) 75%, transparent);
+  /* One inner padding for every part of a card (4px steps; 20 on desktop, 16 on phones). */
+  --sr3-pad: var(--space-5);
+  --sr3-name-h: 100px;
+  position: relative;
+  padding-block: var(--sec-pad);
+  border-top: 1px solid var(--color-rule);
+  background: var(--sr3-ink);
+  color: var(--sr3-paper);
+  font-family: var(--font-sans);
+  color-scheme: dark;
+  scroll-margin-top: 72px;
+}
+[data-island="services"] *, [data-island="services"] *::before, [data-island="services"] *::after { box-sizing: border-box; }
+[data-island="services"] [hidden] { display: none !important; }
+[data-island="services"] ::selection { color: var(--sr3-ink); background: var(--sr3-orange); }
+[data-island="services"] :is(button,a,input):focus-visible { outline: 2px solid var(--sr3-orange); outline-offset: 4px; }
+[data-island="services"] :is(button,a,input) { -webkit-tap-highlight-color: transparent; }
+[data-island="services"] button { cursor: pointer; border-radius: var(--radius-xs); font: inherit; color: inherit; }
+[data-island="services"] button:disabled { cursor: default; color: var(--sr3-muted); }
+[data-island="services"] .sr3-frame { width: var(--frame); margin-inline: auto; }
+[data-island="services"] .sr3-heading { max-width: 850px; margin-bottom: 38px; }
+[data-island="services"] .sr3-heading h2 { font: 400 var(--t-h2)/var(--lh-h2) var(--font-pixel); letter-spacing: -.025em; text-wrap: balance; margin: 0; }
+[data-island="services"] .sr3-heading p { font-size: var(--t-lede); line-height: var(--lh-lede); color: var(--sr3-muted); margin: var(--space-6) 0 0; }
+/* The deck's section label: a small orange square, then the label. */
+[data-island="services"] .sr3-heading .sr3-label { display: flex; align-items: center; gap: 10px; margin: 0 0 24px; font: 500 var(--t-label)/14px var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: color-mix(in srgb, var(--color-paper) 88%, transparent); }
+[data-island="services"] .sr3-heading .sr3-label::before { content: ''; width: 7px; height: 7px; flex: none; background: var(--color-orange); }
+[data-island="services"] .sr3-deck { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--space-2); }
+[data-island="services"] .sr3-panel { position: relative; min-width: 0; border: 1px solid var(--sr3-rule); border-radius: var(--radius-sm); overflow: clip; background: var(--sr3-surface); }
+[data-island="services"] .sr3-photo { position: relative; height: 200px; overflow: hidden; }
+[data-island="services"] .sr3-photo picture { display: contents; }
+[data-island="services"] .sr3-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: filter .48s var(--sr3-ease), scale .48s var(--sr3-ease); }
+[data-island="services"] .sr3-photo h3 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.15; letter-spacing: -.01em; text-wrap: auto; }
+[data-island="services"] .sr3-toggle { position: absolute; inset: 0; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; border: 0; text-align: left; background: transparent; padding: var(--sr3-pad); }
+[data-island="services"] .sr3-service-name { background: var(--sr3-ink); padding: var(--space-1) var(--space-2); margin-left: calc(var(--space-2) * -1); max-width: 100%; }
+[data-island="services"] .sr3-price { display: block; background: var(--sr3-ink); color: var(--sr3-paper); margin-left: calc(var(--space-2) * -1); padding: 0 var(--space-2) var(--space-1); font: 12px/1.5 var(--font-mono); letter-spacing: 0; }
+/* Open/close: a 32px square on the card padding; only the cross inside turns (+ to ×), the box stays square. */
+[data-island="services"] .sr3-plus { position: absolute; top: var(--sr3-pad); right: var(--sr3-pad); display: grid; place-items: center; width: var(--space-8); height: var(--space-8); border: 1px solid var(--sr3-p30); border-radius: var(--radius-sm); background: var(--sr3-ink); }
+[data-island="services"] .sr3-plus svg { display: block; transition: transform .3s var(--sr3-ease); }
+[data-island="services"] .is-open .sr3-plus svg { transform: rotate(45deg); }
+[data-island="services"] .sr3-toggle:focus-visible { outline-offset: -6px; }
+[data-island="services"] .sr3-body { min-width: 0; background: var(--sr3-surface); }
+[data-island="services"] .sr3-artifact-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); min-height: 42px; padding: 0 var(--sr3-pad); border-block: 1px solid var(--sr3-rule); font: 450 10px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--sr3-paper); }
+[data-island="services"] .sr3-treatment { display: inline-flex; align-items: center; gap: 9px; }
+[data-island="services"] .sr3-treatment::before { content: ''; width: 6px; height: 6px; background: var(--sr3-orange); }
+[data-island="services"] .sr3-artifact { position: relative; min-width: 0; overflow: hidden; background: var(--sr3-ink); container-type: inline-size; }
+[data-island="services"] .sr3-svg { display: block; width: 100%; height: auto; max-height: 440px; margin-inline: auto; color: var(--sr3-paper); font-family: var(--font-mono); }
+[data-island="services"] .sr3-svg[data-layout=narrow] { display: none; }
+@container (max-width: 439px) {
+  [data-island="services"] .sr3-svg[data-layout=wide] { display: none; }
+  [data-island="services"] .sr3-svg[data-layout=narrow] { display: block; }
+}
+/* Build-time icon sprite: Icon.astro output kept as <g> references the scenes draw with <use>. */
+[data-island="services"] .sr3-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+[data-island="services"] .sr3-sprite svg { overflow: visible; }
+/* Node language: layered cards, ports, chips, wires and the hero's orange spark. */
+[data-island="services"] .sr3-svg text { fill: var(--sr3-paper); }
+[data-island="services"] .sr3-svg .sr3-name { font: 550 12.5px var(--font-sans); letter-spacing: -.01em; }
+[data-island="services"] .sr3-svg .sr3-name-s { font-size: 12px; }
+[data-island="services"] .sr3-svg .sr3-mono { font: 400 10px var(--font-mono); font-variant-numeric: tabular-nums slashed-zero; letter-spacing: 0; }
+[data-island="services"] .sr3-svg .sr3-label { font: 450 10px var(--font-mono); letter-spacing: .08em; fill: var(--sr3-muted); }
+[data-island="services"] .sr3-svg .sr3-muted, [data-island="services"] .sr3-svg tspan.sr3-muted { fill: var(--sr3-muted); }
+[data-island="services"] .sr3-svg .sr3-paper { fill: var(--sr3-paper); }
+[data-island="services"] .sr3-svg .sr3-str { fill: var(--sr3-soft); }
+[data-island="services"] .sr3-svg .sr3-orange-text { fill: var(--sr3-orange); }
+[data-island="services"] .sr3-stop-paper { stop-color: var(--sr3-paper); }
+[data-island="services"] .sr3-stop-orange { stop-color: var(--sr3-orange); }
+[data-island="services"] .sr3-griddot { fill: var(--sr3-p13); }
+[data-island="services"] .sr3-anim, [data-island="services"] .sr3-scan { transform-box: fill-box; transform-origin: center; }
+[data-island="services"] .sr3-shadow { fill: var(--sr3-ink); opacity: .7; }
+[data-island="services"] .sr3-plate { fill: var(--color-surface-low); stroke: var(--sr3-p09); }
+[data-island="services"] .sr3-face { fill: var(--sr3-card); stroke: var(--sr3-p15); }
+[data-island="services"] .sr3-hi { fill: none; stroke: var(--sr3-p05); }
+[data-island="services"] .is-focal .sr3-face { fill: color-mix(in srgb, var(--sr3-orange) 5%, var(--sr3-card)); }
+[data-island="services"] .sr3-focal-edge { fill: none; stroke: var(--sr3-orange); stroke-opacity: .85; }
+[data-island="services"] .sr3-glow { pointer-events: none; }
+[data-island="services"] .sr3-divider { fill: none; stroke: color-mix(in srgb, var(--color-paper) 8%, transparent); }
+/* Icons: Lucide 16 × 16 at stroke 1.5 and Simple Icons marks, all drawn in currentColor from the sprite.
+   Module icons are muted, the focal card's is orange, tool marks are paper (never the brand's colour). */
+[data-island="services"] .sr3-svg .lu { color: var(--sr3-muted); }
+[data-island="services"] .sr3-svg .lu.is-orange { color: var(--sr3-orange); }
+[data-island="services"] .sr3-svg .lu.is-on { color: var(--sr3-paper); }
+[data-island="services"] .sr3-svg .lg { color: var(--sr3-paper); }
+[data-island="services"] .sr3-dot { fill: var(--sr3-p22); }
+[data-island="services"] .sr3-dot.is-on { fill: var(--sr3-orange); }
+[data-island="services"] .sr3-port { fill: var(--sr3-ink); stroke: var(--sr3-p40); }
+[data-island="services"] .sr3-ring { fill: none; stroke: var(--sr3-orange); stroke-width: 1.3; }
+[data-island="services"] .sr3-chip rect { fill: var(--sr3-p04); stroke: var(--sr3-p16); }
+[data-island="services"] .sr3-chip circle { fill: var(--sr3-muted); }
+[data-island="services"] .sr3-svg .sr3-chip .sr3-chip-check { color: var(--sr3-orange); display: none; }
+[data-island="services"] .sr3-svg .sr3-chip-text { font: 400 10px var(--font-mono); letter-spacing: 0; fill: var(--sr3-muted); }
+[data-island="services"] .sr3-chip[data-tone=live] rect { fill: var(--sr3-o08); stroke: var(--sr3-o75); }
+[data-island="services"] .sr3-chip[data-tone=live] circle { fill: var(--sr3-orange); }
+[data-island="services"] .sr3-svg .sr3-chip[data-tone=live] .sr3-chip-text, [data-island="services"] .sr3-svg .sr3-chip[data-tone=done] .sr3-chip-text { fill: var(--sr3-paper); }
+[data-island="services"] .sr3-chip[data-tone=done] rect { stroke: var(--sr3-p30); }
+[data-island="services"] .sr3-chip[data-tone=done] circle { display: none; }
+[data-island="services"] .sr3-svg .sr3-chip[data-tone=done] .sr3-chip-check { display: inline; }
+[data-island="services"] .sr3-wire { fill: none; stroke: var(--sr3-p20); stroke-width: 1.2; }
+[data-island="services"] .sr3-flow { fill: none; stroke: var(--sr3-p34); stroke-width: 1.2; stroke-dasharray: 1.5 7; stroke-linecap: round; }
+[data-island="services"] .is-dashed .sr3-wire { stroke-dasharray: 3 4; }
+[data-island="services"] .sr3-lit { fill: none; stroke: var(--sr3-orange); stroke-opacity: .6; stroke-width: 1.4; }
+[data-island="services"] .sr3-trail { fill: none; stroke: var(--sr3-orange); stroke-linecap: round; }
+[data-island="services"] .sr3-trail-a { stroke-width: 1.2; stroke-opacity: .25; }
+[data-island="services"] .sr3-trail-b { stroke-width: 1.7; stroke-opacity: .5; }
+[data-island="services"] .sr3-trail-c { stroke-width: 2.3; stroke-opacity: .95; }
+[data-island="services"] .sr3-head { transform-box: view-box; transform-origin: 0 0; }
+/* Pale spark core: the hero circuit spark's value, orange lifted toward paper. */
+[data-island="services"] .sr3-head rect { fill: color-mix(in srgb, var(--sr3-orange) 22%, var(--sr3-paper)); }
+[data-island="services"] .is-dim .sr3-head circle { transform: scale(.7); }
+[data-island="services"] .sr3-board { fill: color-mix(in srgb, var(--color-paper) 1.5%, transparent); stroke: var(--sr3-p10); }
+[data-island="services"] .sr3-socket { fill: none; stroke: var(--sr3-p22); stroke-dasharray: 3 4; }
+[data-island="services"] .sr3-strip .sr3-divider { stroke: var(--sr3-p07); }
+[data-island="services"] .sr3-bubble > path { fill: var(--sr3-raised); stroke: var(--sr3-p22); }
+[data-island="services"] .sr3-scan path { stroke: var(--sr3-orange); stroke-width: 1.4; }
+[data-island="services"] .sr3-pin path { stroke: var(--sr3-orange); stroke-width: 1.4; }
+[data-island="services"] .sr3-pin rect { fill: var(--sr3-orange); }
+[data-island="services"] .sr3-svg .sr3-pin-text { font: 600 10px var(--font-mono); letter-spacing: 0; fill: var(--sr3-ink); }
+[data-island="services"] .sr3-callout rect { fill: var(--sr3-card); stroke: var(--sr3-o60); }
+[data-island="services"] .sr3-shell-face { fill: color-mix(in srgb, var(--sr3-ink) 55%, var(--sr3-surface)); stroke: var(--sr3-p20); }
+[data-island="services"] .sr3-tl { fill: var(--sr3-p18); }
+[data-island="services"] .sr3-nav-on { fill: var(--sr3-p07); }
+[data-island="services"] .sr3-input { fill: var(--sr3-ink); stroke: var(--sr3-p16); }
+[data-island="services"] .sr3-step { fill: var(--sr3-ink); stroke: var(--sr3-p20); }
+[data-island="services"] .sr3-step.is-lit { fill: var(--sr3-o10); stroke: var(--sr3-orange); }
+[data-island="services"] .sr3-track { fill: var(--sr3-p10); }
+[data-island="services"] .sr3-track-fill { fill: var(--sr3-orange); transform-box: fill-box; transform-origin: left center; }
+[data-island="services"] .sr3-sticky-face { fill: var(--sr3-paper); }
+[data-island="services"] .sr3-sticky-fold { fill: var(--sr3-muted); }
+[data-island="services"] .sr3-sticky-shadow { fill: var(--sr3-ink); opacity: .65; }
+[data-island="services"] .sr3-sticky-tape { fill: var(--sr3-muted); fill-opacity: .55; }
+[data-island="services"] .sr3-svg .sr3-sticky-text { font: 500 10.5px var(--font-mono); letter-spacing: 0; fill: var(--sr3-ink); }
+[data-island="services"] .sr3-foot { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-4); padding: var(--space-3) var(--sr3-pad); border-bottom: 1px solid var(--sr3-rule); font: 11px/1.4 var(--font-mono); }
+[data-island="services"] .sr3-controls { flex: 1 1 220px; display: grid; grid-template-columns: auto minmax(48px,1fr) 38px; gap: var(--space-3); align-items: center; min-width: 0; }
+[data-island="services"] .sr3-play { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 36px; min-width: 92px; border: 1px solid var(--sr3-rule); padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2); background: var(--sr3-ink); font-size: 11px; }
+[data-island="services"] .sr3-play svg { flex: none; }
+[data-island="services"] .sr3-play:not([data-mode=play]) .sr3-i-play, [data-island="services"] .sr3-play:not([data-mode=pause]) .sr3-i-pause, [data-island="services"] .sr3-play:not([data-mode=replay]) .sr3-i-replay { display: none; }
+[data-island="services"] .sr3-play:hover:not(:disabled) { border-color: var(--sr3-orange); }
+[data-island="services"] .sr3-controls output { text-align: right; color: var(--sr3-muted); font-variant-numeric: tabular-nums; }
+[data-island="services"] .sr3-scrub-label { display: flex; min-width: 0; align-items: center; min-height: 36px; }
+[data-island="services"] .sr3-scrub { width: 100%; min-width: 0; accent-color: var(--sr3-orange); cursor: ew-resize; margin: 0; }
+[data-island="services"] .sr3-note { margin-left: auto; color: var(--sr3-muted); font-size: 10px; letter-spacing: .02em; white-space: nowrap; }
+[data-island="services"] .sr3-detail-row { padding: var(--space-1) var(--sr3-pad) var(--space-3); }
+[data-island="services"] :is(.sr3-more,.sr3-section-more) { min-height: 44px; background: transparent; border: 0; border-bottom: 1px solid var(--sr3-rule); padding: 10px 0; font-size: 12px; text-align: left; }
+[data-island="services"] :is(.sr3-more,.sr3-section-more)[aria-expanded=true] { border-color: var(--sr3-orange); }
+[data-island="services"] .sr3-detail { margin: var(--space-3) 0 var(--space-1); max-width: 65ch; font-size: var(--t-small); line-height: 1.6; color: var(--sr3-muted); }
+[data-island="services"] .sr3-after { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-5) var(--space-8); margin-top: 28px; }
+[data-island="services"] .sr3-after > p { margin: 0; flex: 1 1 430px; max-width: 60ch; color: var(--sr3-muted); font-size: 15px; line-height: 1.6; }
+[data-island="services"] .sr3-after > a { display: flex; gap: var(--space-5); align-items: center; padding: var(--space-3) 0; border-bottom: 1px solid var(--sr3-orange); color: var(--sr3-paper); text-decoration: none; font-size: var(--t-small); min-height: 44px; }
+[data-island="services"] .sr3-after > a svg { width: 20px; height: 12px; flex: none; transition: transform var(--dur) var(--sr3-ease); }
+[data-island="services"] .sr3-after > a:hover svg { transform: translateX(3px); }
+[data-island="services"] .sr3-section-detail { flex-basis: 100%; color: var(--sr3-muted); font-size: var(--t-small); line-height: 1.6; }
+[data-island="services"] .sr3-section-detail p { margin: 0 0 10px; }
+[data-island="services"] .sr3-section-detail ul { padding-left: 18px; margin: 0; list-style: disc; }
+[data-island="services"] .sr3-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+/* Open card: the photograph dims into the card's backdrop and the live diagram sits over it in its own
+   window, never stacked under the photo. Closed cards are the photograph alone. */
+[data-island="services"].sr3-ready .sr3-panel.is-open .sr3-photo img { filter: brightness(.26) saturate(.5); scale: 1.04; }
+[data-island="services"].sr3-ready .is-open .sr3-body { position: relative; z-index: 2; background: transparent; animation: sr3-in .45s .18s var(--sr3-ease) both; }
+[data-island="services"].sr3-ready .is-open .sr3-artifact-head { border: 0; padding: 0; min-height: 34px; }
+[data-island="services"].sr3-ready .is-open .sr3-artifact { border: 1px solid var(--sr3-rule); border-radius: var(--radius-sm); background: color-mix(in srgb, var(--sr3-ink) 78%, transparent); }
+[data-island="services"].sr3-ready .is-open .sr3-foot { border: 0; padding: var(--space-3) 0 0; }
+[data-island="services"].sr3-ready .is-open .sr3-detail-row { padding: var(--space-1) 0 0; }
+[data-island="services"].sr3-ready .is-open .sr3-detail { color: var(--sr3-soft); }
+@keyframes sr3-in { from { opacity: 0; } }
+@media (min-width: 900px) {
+  [data-island="services"].sr3-ready .sr3-deck { display: flex; align-items: stretch; min-height: 654px; }
+  [data-island="services"].sr3-ready .sr3-panel { flex: 1 1 0; transition: flex-grow .48s var(--sr3-ease); }
+  [data-island="services"].sr3-ready .sr3-panel.is-open { flex-grow: 3.45; }
+  [data-island="services"].sr3-ready .sr3-photo { position: absolute; inset: 0; height: auto; }
+  [data-island="services"].sr3-ready .sr3-panel:not(.is-open) .sr3-photo h3 { font-size: 19px; }
+  /* The diagram fills the card above its name; the name and price stay at the foot, as on a closed card. */
+  [data-island="services"].sr3-ready .is-open .sr3-body { position: absolute; inset: 0 0 var(--sr3-name-h); display: flex; flex-direction: column; padding: var(--sr3-pad) var(--sr3-pad) 0; }
+  [data-island="services"].sr3-ready .is-open .sr3-artifact-head { padding-right: 44px; }
+  [data-island="services"].sr3-ready .is-open .sr3-artifact { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+  [data-island="services"].sr3-ready .is-open .sr3-svg { width: 100%; height: 100%; max-height: none; }
+  /* The grid item is the drawings' wrapper, not the svg: stretch it over the whole window so the svg's 100%
+     has a size to resolve against (centred, it shrank to the 300px fallback). */
+  [data-island="services"].sr3-ready .is-open .sr3-stages { place-self: stretch; min-width: 0; min-height: 0; }
+  [data-island="services"].sr3-ready .is-open .sr3-body > :not(.sr3-artifact) { flex: none; }
+}
+@media (max-width: 899px) {
+  [data-island="services"] .sr3-deck { grid-template-columns: minmax(0,1fr); }
+  [data-island="services"] .sr3-photo { height: clamp(150px, 32vw, 220px); }
+  /* Phones: the name and price head the open card and the diagram follows, all over the dimmed photo. */
+  [data-island="services"].sr3-ready .is-open .sr3-photo { position: static; height: auto; }
+  [data-island="services"].sr3-ready .is-open .sr3-photo img { position: absolute; inset: 0; }
+  [data-island="services"].sr3-ready .is-open .sr3-toggle { position: relative; z-index: 2; min-height: 96px; padding-right: calc(var(--sr3-pad) + 44px); }
+  [data-island="services"].sr3-ready .is-open .sr3-body { padding: 0 var(--sr3-pad) var(--sr3-pad); }
+}
+@media (max-width: 480px) {
+  [data-island="services"] { --sr3-pad: var(--space-4); }
+  [data-island="services"] .sr3-artifact-head { gap: var(--space-2); }
+  [data-island="services"] .sr3-controls { flex-basis: 100%; gap: var(--space-2); }
+  [data-island="services"] .sr3-note { margin-left: 0; }
+  [data-island="services"] .sr3-after { gap: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-island="services"] *, [data-island="services"] *::before, [data-island="services"] *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

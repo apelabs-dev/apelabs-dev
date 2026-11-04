@@ -1,0 +1,77 @@
+---
+// Blog index. No published posts at launch, so the page is noindex and out of the sitemap
+// until the first one exists (see src/content/blog/post-template.md).
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Arrow from '../../components/Arrow.astro';
+import { PAGES } from '../../lib/seo';
+import { CTA_LABEL, DIAGNOSTIC } from '../../lib/site';
+
+const page = PAGES.blog;
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const date = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  noindex={posts.length === 0}
+>
+  <section class="section blog" aria-labelledby="blog-title">
+    <div class="wrap">
+      <h1 class="h2" id="blog-title">{page.ogTitle}</h1>
+      <p class="lead">{page.ogDescription}</p>
+      {posts.length > 0 ? (
+        <ol class="rows posts">
+          {posts.map((post) => (
+            <li class="row">
+              <a href={`/blog/${post.id}/`}>
+                <time class="label" datetime={date(post.data.pubDate)}>{date(post.data.pubDate)}</time>
+                <span class="h3">{post.data.title}</span>
+                <span class="body-muted">{post.data.description}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div class="empty rows">
+          <p>No posts yet.</p>
+          <a class="btn" href={DIAGNOSTIC.page}>{CTA_LABEL}<Arrow /></a>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lead {
+    margin-top: 24px;
+    color: var(--color-muted);
+  }
+  .posts,
+  .empty {
+    margin-top: clamp(40px, 5vw, 64px);
+    max-width: 900px;
+  }
+  .posts {
+    list-style: none;
+    padding: 0;
+  }
+  .posts a {
+    display: grid;
+    gap: 8px;
+    padding: 24px 0;
+    text-decoration: none;
+  }
+  .empty {
+    display: grid;
+    justify-items: start;
+    gap: 24px;
+    padding-top: 32px;
+    color: var(--color-muted);
+  }
+</style>

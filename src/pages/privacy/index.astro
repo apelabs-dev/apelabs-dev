@@ -1,0 +1,81 @@
+---
+// Deck section 10: "expand section 4's privacy note into a plain-text page". The terms and their
+// text are the deck's privacy note, verbatim; the lead is the seo.md meta for this page.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PRIVACY_NOTE } from '../../lib/copy';
+import { EMAIL } from '../../lib/site';
+import { PAGES, breadcrumbLd } from '../../lib/seo';
+
+const page = PAGES.privacy;
+// Make the address in the deletion line a mail link without changing its words.
+const parts = (text: string) => text.split(EMAIL);
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  ogTitle={page.ogTitle}
+  ogDescription={page.ogDescription}
+  jsonLd={[breadcrumbLd(page)]}
+>
+  <section class="section privacy" aria-labelledby="privacy-title">
+    <div class="wrap">
+      <h1 class="h2" id="privacy-title">{page.name}</h1>
+      <p class="lead">{page.description}</p>
+      <dl class="rows">
+        {PRIVACY_NOTE.map((item) => (
+          <div class="row">
+            <dt class="label">{item.term}</dt>
+            <dd>
+              {parts(item.text).map((chunk, i) => (
+                <>
+                  {i > 0 && <a class="mail" href={`mailto:${EMAIL}`}>{EMAIL}</a>}
+                  {chunk}
+                </>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lead {
+    margin-top: 24px;
+    color: var(--color-muted);
+  }
+  .rows {
+    margin-top: clamp(40px, 5vw, 64px);
+    max-width: 900px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 20px 0;
+  }
+  dt {
+    color: var(--color-muted);
+    padding-top: 4px;
+  }
+  dd {
+    margin: 0;
+    max-width: 62ch;
+  }
+  .mail {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-rule-strong);
+  }
+  .mail:hover,
+  .mail:focus-visible {
+    text-decoration-color: var(--color-accent);
+  }
+  @media (min-width: 768px) {
+    .row {
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: var(--grid-gap);
+    }
+  }
+</style>

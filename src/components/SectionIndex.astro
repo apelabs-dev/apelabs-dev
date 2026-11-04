@@ -1,0 +1,10 @@
+---
+// Report-style section label from the deck: "[01] Repair".
+interface Props {
+  index: string;
+  label: string;
+}
+const { index, label } = Astro.props;
+---
+
+<p class="section-index"><b>[{index}]</b> {label}</p>
