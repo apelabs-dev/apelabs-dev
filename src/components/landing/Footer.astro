@@ -8,9 +8,9 @@ import Logo from '../Logo.astro';
 
 const LINKS = [
   { label: 'Repair', href: '#04-journey' },
+  { label: 'Process', href: '#jr-diagnostic' },
   { label: 'More services', href: '#05-services' },
   { label: 'Proof', href: '#06-proof' },
-  { label: 'Process', href: '#jr-diagnostic' },
   { label: 'FAQ', href: '#07-faq' },
   { label: 'Blog', href: null },
 ];
@@ -105,6 +105,11 @@ const LINKS = [
      under it on phones (16px row gap). */
   .ft-logo.hit::after {
     translate: -50% calc(-50% - 8px);
+  }
+  /* Privacy's 44px hit area drops 10px into the footer's bottom padding, so it stays clear of the nav link
+     above it when the two rows stack 34px apart (tablet puts Proof right over Privacy). */
+  .ft-end .ft-a.hit::after {
+    translate: -50% calc(-50% + 10px);
   }
   .ft-logo :global(svg) {
     display: block;
