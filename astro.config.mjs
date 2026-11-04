@@ -8,6 +8,11 @@ import react from '@astrojs/react';
 // (remove it here and drop the noindex in src/pages/blog/index.astro).
 const NOT_IN_SITEMAP = ['/blog/', '/diagnostic/thanks/', '/404/'];
 
+// Older subpages from the 2026-10-30 build. The landing does not link them and they predate the new
+// design, so they stay noindex and out of the sitemap until they are restyled and linked.
+export const LEGACY_PAGES = ['/repair/', '/build-and-care/', '/diagnostic/', '/proof/', '/process/', '/faq/', '/contact/'];
+const SITEMAP_EXCLUDE = [...NOT_IN_SITEMAP, ...LEGACY_PAGES];
+
 export default defineConfig({
   site: 'https://apelabs.dev',
   output: 'static',
@@ -23,7 +28,8 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      filter: (page) => !NOT_IN_SITEMAP.some((path) => new URL(page).pathname === path),
+      lastmod: new Date(),
+      filter: (page) => !SITEMAP_EXCLUDE.some((path) => new URL(page).pathname === path),
     }),
   ],
 });

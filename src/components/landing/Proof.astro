@@ -27,17 +27,20 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
           <div class="pr3-meta">
             {p.wordmark ? (
               <h3 class="pr3-name" id={`pr3-a-${p.key}-h`}>
+                <span class="sr-only">{p.wordmark.alt}</span>
                 <img
                   class="pr3-wordmark"
                   src={p.wordmark.src}
-                  alt={p.wordmark.alt}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
                   width={p.wordmark.width}
                   height={p.wordmark.height}
                 />
               </h3>
             ) : (
               <h3 class="pr3-name pr3-lockup" id={`pr3-a-${p.key}-h`}>
-                <img src={p.mark?.src} alt="" width={p.mark?.width} height={p.mark?.height} />
+                <img src={p.mark?.src} alt="" width={p.mark?.width} height={p.mark?.height} loading="lazy" decoding="async" />
                 {p.lockup}
               </h3>
             )}

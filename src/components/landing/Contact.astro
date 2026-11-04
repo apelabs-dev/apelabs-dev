@@ -13,7 +13,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
       <div class="contact-panel" data-panel>
         <form data-email-well hidden novalidate aria-label="Request a free diagnostic">
           <label class="sr-only" for="contact-start-email">Work email</label>
-          <input id="contact-start-email" type="email" autocomplete="email" maxlength={LIMITS.email} placeholder="Work email" aria-describedby="contact-start-error" required />
+          <input id="contact-start-email" type="email" enterkeyhint="go" autocomplete="email" maxlength={LIMITS.email} placeholder="Work email" aria-describedby="contact-start-error" required />
           <button class="btn" type="submit" aria-controls="contact-full" aria-expanded="false">Request a free diagnostic</button>
         </form>
         <p id="contact-start-error" class="contact-error well-error" role="alert" hidden></p>
@@ -24,24 +24,24 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
             <div class="contact-grid">
               <div class="contact-field" data-field="name">
                 <label for="contact-name">Your name <span class="optional">(optional)</span></label>
-                <input id="contact-name" name="name" type="text" autocomplete="name" maxlength={LIMITS.name} disabled />
+                <input id="contact-name" enterkeyhint="next" name="name" type="text" autocomplete="name" maxlength={LIMITS.name} disabled />
               </div>
               <noscript><style>[data-island="contact"] [data-field="name"] { display: none; }</style><input type="hidden" name="name" value="(not provided)" /></noscript>
               <div class="contact-field" data-field="email">
                 <label for="contact-email">Work email</label>
-                <input id="contact-email" name="email" type="email" autocomplete="email" maxlength={LIMITS.email} required aria-describedby="contact-email-error" />
+                <input id="contact-email" enterkeyhint="next" name="email" type="email" autocomplete="email" maxlength={LIMITS.email} required aria-describedby="contact-email-error" />
                 <p id="contact-email-error" class="contact-error" hidden></p>
               </div>
               <div class="contact-field" data-field="business">
                 <label for="contact-business">Business name or website</label>
-                <input id="contact-business" name="business" type="text" autocomplete="organization" maxlength={LIMITS.business} required aria-describedby="contact-business-error" />
+                <input id="contact-business" enterkeyhint="next" name="business" type="text" autocomplete="organization" maxlength={LIMITS.business} required aria-describedby="contact-business-error" />
                 <p id="contact-business-error" class="contact-error" hidden></p>
               </div>
               <fieldset class="contact-field" data-field="tools" aria-describedby="contact-tools-error">
                 <legend>Which tools are involved?</legend>
                 <div class="contact-choices">{TOOL_OPTIONS.map((tool) => <label class="contact-choice"><input type="checkbox" name="tools" value={tool} aria-describedby="contact-tools-error" /><span>{tool}</span></label>)}</div>
                 <label class="contact-other" for="contact-tools-other">Other (type it)</label>
-                <input id="contact-tools-other" name="tools_other" type="text" autocomplete="off" maxlength={LIMITS.toolsOther} aria-describedby="contact-tools-error" />
+                <input id="contact-tools-other" enterkeyhint="next" name="tools_other" type="text" autocomplete="off" maxlength={LIMITS.toolsOther} aria-describedby="contact-tools-error" />
                 <p id="contact-tools-error" class="contact-error" hidden></p>
               </fieldset>
               <div class="contact-field" data-field="problem">
@@ -56,7 +56,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
               </fieldset>
               <div class="contact-field">
                 <label for="contact-extra">Anything else we should know? <span class="optional">(optional)</span></label>
-                <input id="contact-extra" name="extra" type="text" maxlength={LIMITS.extra} autocomplete="off" />
+                <input id="contact-extra" enterkeyhint="done" name="extra" type="text" maxlength={LIMITS.extra} autocomplete="off" />
               </div>
               <div class="sr-only" aria-hidden="true"><label for="contact-website">Leave this field empty</label><input id="contact-website" name={HONEYPOT_FIELD} type="text" tabindex="-1" autocomplete="off" /></div>
               <div class="contact-spam"><p class="contact-hint">{F.spam.label}</p><div data-turnstile-slot></div></div>

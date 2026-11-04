@@ -2,7 +2,7 @@
 // Footer, deck option B: two lines on the page frame. Line one is the lockup and the strapline with
 // the email on the far side; line two is the nav and the legal bits. Copy is deck copy, verbatim.
 //
-// Blog, Privacy and GitHub lead off this page, so they stay inert (aria-disabled, no href) exactly
+// Blog and GitHub lead off this page, so they stay inert (aria-disabled, no href) exactly
 // as in the deck rather than shipping dead links.
 import Logo from '../Logo.astro';
 
@@ -47,7 +47,7 @@ const LINKS = [
       </nav>
       <div class="ft-end">
         <p class="ft-small">© 2026 apeLabs. Remote, serving the US.</p>
-        <a class="ft-a is-inert" aria-disabled="true">Privacy</a>
+        <a class="ft-a hit" href="/privacy/">Privacy</a>
         <a class="ft-gh is-inert" aria-disabled="true"><span aria-hidden="true"></span>GitHub</a>
       </div>
     </div>

@@ -242,6 +242,7 @@ test.describe('tap targets', () => {
       '#06-proof',
       '#jr-diagnostic',
       '#07-faq',
+      '/privacy/',
     ]);
     for (const l of links) {
       expect(l.tall, `${l.href} height`).toBeGreaterThanOrEqual(44);

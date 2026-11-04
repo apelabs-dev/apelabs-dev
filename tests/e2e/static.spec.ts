@@ -93,13 +93,14 @@ test.describe('@static', () => {
     await expect(footer.locator('.ft-mail a')).toHaveAttribute('href', 'mailto:hello@apelabs.dev');
     await expect(footer.locator('.ft-logo')).toHaveAttribute('href', '#top');
 
-    // Blog, Privacy and GitHub lead off this page: shown, but never dead links.
+    // Privacy links to its page; Blog and GitHub lead off this page: shown, but never dead links.
+    await expect(footer.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy/');
     const inert = footer.locator('.is-inert');
-    await expect(inert).toHaveCount(3);
+    await expect(inert).toHaveCount(2);
     const inertHrefs = await inert.evaluateAll((elements) =>
       elements.map((element) => element.getAttribute('href')),
     );
-    expect(inertHrefs).toEqual([null, null, null]);
+    expect(inertHrefs).toEqual([null, null]);
 
     await expect(footer).toHaveScreenshot('footer.png');
 
