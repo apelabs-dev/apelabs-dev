@@ -47,3 +47,8 @@ workers/*/.dev.vars
 # local agent settings and run scratch
 .claude/settings.local.json
 .dispatch/
+
+# playwright artifacts
+test-results/
+playwright-report/
+blob-report/

@@ -1,15 +1,15 @@
 ---
-// Home: the whole story in deck order. Every section renders its final state in HTML; motion only replays it.
+// Home: the whole story in deck order. Each landing block owns its own file and id.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/sections/Hero.astro';
-import MotifBand from '../components/MotifBand.astro';
-import Repair from '../components/sections/Repair.astro';
-import Services from '../components/sections/Services.astro';
-import Diagnostic from '../components/sections/Diagnostic.astro';
-import Proof from '../components/sections/Proof.astro';
-import Process from '../components/sections/Process.astro';
-import Faq from '../components/sections/Faq.astro';
-import Contact from '../components/sections/Contact.astro';
+import Nav from '../components/landing/Nav.astro';
+import Hero from '../components/landing/Hero.astro';
+import Tools from '../components/landing/Tools.astro';
+import Journey from '../components/landing/Journey.astro';
+import Services from '../components/landing/Services.astro';
+import Proof from '../components/landing/Proof.astro';
+import Faq from '../components/landing/Faq.astro';
+import Contact from '../components/landing/Contact.astro';
+import Footer from '../components/landing/Footer.astro';
 import { PAGES, organizationLd, websiteLd } from '../lib/seo';
 
 const page = PAGES.home;
@@ -21,14 +21,15 @@ const page = PAGES.home;
   ogTitle={page.ogTitle}
   ogDescription={page.ogDescription}
   jsonLd={[organizationLd(), websiteLd()]}
+  chrome={false}
 >
+  <Nav slot="nav" />
   <Hero />
-  <MotifBand />
-  <Repair />
+  <Tools />
+  <Journey />
   <Services />
-  <Diagnostic />
   <Proof />
-  <Process />
   <Faq />
   <Contact />
+  <Footer slot="footer" />
 </BaseLayout>
