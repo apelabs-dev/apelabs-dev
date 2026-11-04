@@ -5,7 +5,9 @@ import { noConsoleErrors, noOverflow } from './helpers';
 // Keep fixed shell controls out of the contact section's visual baselines. Playwright's
 // `style` screenshot option is a no-op in this version, and an element screenshot of a tall
 // section repaints fixed elements at a scroll-dependent offset, so inject a real style tag.
-const HIDE_SKIP = 'body > .skip { visibility: hidden !important; }';
+// The landing nav is fixed too: once the section is taller than the viewport its bar painted
+// into the capture at a different offset per run, which made the retry baseline flaky.
+const HIDE_SKIP = 'body > .skip, [id="01-nav"] { visibility: hidden !important; }';
 const section = (page: Page) => page.locator('[data-island="contact"]');
 const send = (page: Page) => section(page).getByRole('button', { name: 'Send my request' });
 

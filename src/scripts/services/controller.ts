@@ -180,11 +180,14 @@ export function createServices(root: HTMLElement): ServicesApi {
   }
 
   // Wide and narrow scenes swap by container width (CSS). The runtime only paints the one on screen.
+  // A closed panel's body is hidden, so its artifact has no width: that is not a layout change to
+  // paint (the next open() measures the panel again), and repainting it would be a phantom frame.
   const resize = new ResizeObserver((entries) => {
     for (const e of entries) {
       const s = states.find((x) => x.art === e.target);
-      const narrow = e.contentRect.width > 0 && e.contentRect.width < NARROW;
-      if (s && narrow !== s.narrow) {
+      if (!s || e.contentRect.width === 0) continue;
+      const narrow = e.contentRect.width < NARROW;
+      if (narrow !== s.narrow) {
         s.narrow = narrow;
         paint(s);
       }
