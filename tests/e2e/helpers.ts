@@ -10,6 +10,23 @@ export async function noOverflow(page: Page): Promise<void> {
     let worst = 0;
     let worstElement = '';
 
+    // An element that is clipped by an ancestor's scroll container cannot push the page sideways.
+    // The tools marquee is the intended case: its row is wider than the viewport but clipped.
+    const clippedByAncestor = (element: HTMLElement): boolean => {
+      const rect = element.getBoundingClientRect();
+      for (
+        let parent = element.parentElement;
+        parent && parent !== document.body && parent !== document.documentElement;
+        parent = parent.parentElement
+      ) {
+        const style = getComputedStyle(parent);
+        if (!/(hidden|clip|auto|scroll)/.test(style.overflowX)) continue;
+        const outer = parent.getBoundingClientRect();
+        if (rect.right > outer.right + 0.5 || rect.left < outer.left - 0.5) return true;
+      }
+      return false;
+    };
+
     for (const element of Array.from(document.querySelectorAll<HTMLElement>('body *'))) {
       const style = getComputedStyle(element);
       if (style.display === 'none' || style.visibility === 'hidden') continue;
@@ -19,6 +36,7 @@ export async function noOverflow(page: Page): Promise<void> {
 
       const over = rect.right - viewport;
       if (over <= worst) continue;
+      if (clippedByAncestor(element)) continue;
 
       worst = over;
       const id = element.id ? `#${element.id}` : '';

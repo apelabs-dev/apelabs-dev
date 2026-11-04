@@ -88,8 +88,9 @@ test.describe('@journey', () => {
     }));
     expect(pin).toEqual({ position: 'fixed', spacer: true });
     const top = await stageTop(page);
-    // Under the bar (not fixed here, so 0) plus 24px on desktop; right at the top on phones and tablets.
-    expect(top).toBeCloseTo((await isDesk(page)) ? 24 : 0, 0);
+    // The fixed bar sits above the pinned stage, plus 24px on desktop; flush under the bar on phones and tablets.
+    const barHeight = await page.locator('[id="01-nav"]').evaluate((el) => el.getBoundingClientRect().height);
+    expect(top).toBeCloseTo(barHeight + ((await isDesk(page)) ? 24 : 0), 0);
     await expect(root.locator('button[data-jr-go="0"]')).toHaveAttribute('aria-current', 'step');
     await expect(root.locator('#jr-works')).toHaveClass(/is-active/);
     await page.waitForTimeout(SETTLE_MS);
@@ -419,10 +420,11 @@ test.describe('@journey', () => {
     const consoleErrors = noConsoleErrors(page);
     await load(page);
     const root = page.locator(ROOT);
+    const barHeight = await page.locator('[id="01-nav"]').evaluate((el) => el.getBoundingClientRect().height);
     await wheelTo(page, 3);
-    expect(await stageTop(page)).toBeCloseTo(24, 0);
+    expect(await stageTop(page)).toBeCloseTo(barHeight + 24, 0);
 
-    // Narrow to a tablet width: the board pins over the steps, flush with the top.
+    // Narrow to a tablet width: the board pins over the steps, flush under the fixed bar.
     await page.setViewportSize({ width: 900, height: 900 });
     await page.waitForTimeout(800);
     await page.mouse.wheel(0, 100);
@@ -430,14 +432,14 @@ test.describe('@journey', () => {
     const narrow = await state(page);
     expect(narrow.live).toBe(true);
     expect(narrow.scene).toBe(SCENES[narrow.step]);
-    if (narrow.pinned) expect(await stageTop(page)).toBeCloseTo(0, 0);
+    if (narrow.pinned) expect(await stageTop(page)).toBeCloseTo(barHeight, 0);
     await noOverflow(page);
 
-    // Back to desktop: pinned 24px down again, beside the steps.
+    // Back to desktop: pinned 24px below the bar again, beside the steps.
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.waitForTimeout(800);
     await wheelTo(page, 4);
-    expect(await stageTop(page)).toBeCloseTo(24, 0);
+    expect(await stageTop(page)).toBeCloseTo(barHeight + 24, 0);
     await noOverflow(page);
     consoleErrors.assertNone();
   });

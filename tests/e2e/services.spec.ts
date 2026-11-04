@@ -105,7 +105,11 @@ test.describe('@services', () => {
       await open(page, SERVICES.indexOf(s));
       await seek(page, 1);
       await settle(page);
-      await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))).then(() => undefined));
+      // Only this card's finite animations; the rest of the page ships its own looping motion.
+      await page.evaluate(() => {
+        const root = document.querySelector('[id="05-services"]')!;
+        return Promise.all(root.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))).then(() => undefined);
+      });
       await frames(page, 3);
 
       const st = await state(page);
@@ -433,6 +437,8 @@ test.describe('@services', () => {
 
   test('pause, scrub and replay; seek is deterministic; pauses offscreen, hidden and closed', async ({ page }) => {
     await ready(page);
+    // Playback only starts while the card's artwork is on screen.
+    await panel(page, 'setup').scrollIntoViewIfNeeded();
     await open(page, 0);
     const playBtn = panel(page, 'setup').locator('.sr3-play');
     await expect.poll(async () => (await state(page)).running).toBe(true);
@@ -525,6 +531,7 @@ test.describe('@services', () => {
 
   test('destroy cancels frames and leaves readable final HTML', async ({ page }) => {
     await ready(page);
+    await panel(page, 'opinion').scrollIntoViewIfNeeded();
     await open(page, 1);
     await expect.poll(async () => (await state(page)).running).toBe(true);
     await page.evaluate(() => document.querySelector('[id="05-services"]')!.__services!.destroy());

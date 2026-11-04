@@ -269,7 +269,8 @@ test.describe('@contact', () => {
         expect(response.headers.get('location')).toContain('/diagnostic/thanks/');
         await route.fulfill({ contentType: 'text/html', body: '<p>Native request accepted by local fixture</p>' });
       });
-      await native.goto('http://localhost:4338/');
+      // The suite's own preview server; a fresh context does not inherit the page baseURL.
+      await native.goto(test.info().project.use.baseURL ?? 'http://localhost:4321/');
       await expect(native.locator('#contact-email')).toBeVisible();
       await native.locator('#contact-email').fill('owner@example.com');
       await qualify(native);
