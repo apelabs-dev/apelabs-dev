@@ -238,9 +238,9 @@ test.describe('tap targets', () => {
       '#top',
       'mailto:hello@apelabs.dev',
       '#04-journey',
+      '#jr-diagnostic',
       '#05-services',
       '#06-proof',
-      '#jr-diagnostic',
       '#07-faq',
       '/privacy/',
     ]);

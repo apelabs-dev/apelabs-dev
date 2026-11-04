@@ -6,9 +6,9 @@ const HERO = '[id="02-hero"]';
 
 const NAV_LINKS = [
   { label: 'Repair', href: '#04-journey' },
+  { label: 'Process', href: '#jr-diagnostic' },
   { label: 'More services', href: '#05-services' },
   { label: 'Proof', href: '#06-proof' },
-  { label: 'Process', href: '#jr-diagnostic' },
   { label: 'FAQ', href: '#07-faq' },
 ] as const;
 const CTA = 'Request a free diagnostic';
