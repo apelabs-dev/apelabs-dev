@@ -1,10 +1,172 @@
-<footer id="09-footer" class="landing-footer">
-  <h2>Footer</h2>
+---
+// Footer, deck option B: two lines on the page frame. Line one is the lockup and the strapline with
+// the email on the far side; line two is the nav and the legal bits. Copy is deck copy, verbatim.
+//
+// Blog, Privacy and GitHub lead off this page, so they stay inert (aria-disabled, no href) exactly
+// as in the deck rather than shipping dead links.
+import Logo from '../Logo.astro';
+
+const LINKS = [
+  { label: 'Repair', href: '#04-journey' },
+  { label: 'More services', href: '#05-services' },
+  { label: 'Proof', href: '#06-proof' },
+  { label: 'Process', href: '#jr-diagnostic' },
+  { label: 'FAQ', href: '#07-faq' },
+  { label: 'Blog', href: null },
+];
+---
+
+<footer id="09-footer" class="foot ft-two">
+  <div class="ft-in">
+    <div class="ft-row">
+      <div class="ft-brand">
+        <a class="ft-logo" href="#top" aria-label="apeLabs home"><Logo height={17} /></a>
+        <p class="ft-tag">Business system repair.</p>
+      </div>
+      <p class="ft-mail"><a class="ft-a" href="mailto:hello@apelabs.dev">hello@apelabs.dev</a></p>
+    </div>
+    <div class="ft-row ft-legal">
+      <nav class="ft-nav" aria-label="Footer">
+        <ul>
+          {
+            LINKS.map((link) => (
+              <li>
+                {link.href ? (
+                  <a class="ft-a" href={link.href}>
+                    {link.label}
+                  </a>
+                ) : (
+                  <a class="ft-a is-inert" aria-disabled="true">
+                    {link.label}
+                  </a>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="ft-end">
+        <p class="ft-small">© 2026 apeLabs. Remote, serving the US.</p>
+        <a class="ft-a is-inert" aria-disabled="true">Privacy</a>
+        <a class="ft-gh is-inert" aria-disabled="true"><span aria-hidden="true"></span>GitHub</a>
+      </div>
+    </div>
+  </div>
 </footer>
 
 <style>
-  .landing-footer {
-    padding: var(--space-8) var(--space-6);
-    border-top: 1px solid var(--color-rule);
+  .foot {
+    position: relative;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .ft-in {
+    position: relative;
+    width: var(--frame);
+    margin-inline: auto;
+    padding-block: 30px 24px;
+    border-top: 1px solid var(--color-hair);
+  }
+  .foot ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ft-a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    color: color-mix(in srgb, var(--color-paper) 72%, transparent);
+    text-decoration: none;
+    transition: color 160ms var(--ease-io);
+  }
+  a.ft-a[href]:hover,
+  a.ft-a[href]:focus-visible {
+    color: var(--color-text);
+  }
+  .ft-a:focus-visible,
+  .ft-logo:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  /* Leads off this page: shown, but not a link. */
+  .is-inert {
+    cursor: default;
+  }
+  .ft-logo {
+    display: inline-block;
+    flex: none;
+  }
+  .ft-logo :global(svg) {
+    display: block;
+    height: auto;
+  }
+  .ft-tag {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--color-text-3);
+  }
+  .ft-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 40px;
+  }
+  .ft-brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+  }
+  .ft-legal {
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 14px;
+    gap: 10px 28px;
+    border-top: 1px solid var(--color-hair);
+    font-size: 12px;
+    line-height: 16px;
+    color: color-mix(in srgb, var(--color-paper) 50%, transparent);
+  }
+  .ft-legal .ft-a {
+    color: color-mix(in srgb, var(--color-paper) 50%, transparent);
+  }
+  .ft-legal .ft-a:not(.is-inert) {
+    color: color-mix(in srgb, var(--color-paper) 72%, transparent);
+    font-size: 13px;
+  }
+  .ft-nav .is-inert {
+    color: color-mix(in srgb, var(--color-paper) 50%, transparent);
+  }
+  .ft-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 22px;
+  }
+  .ft-small {
+    margin-right: 0;
+  }
+  .ft-gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-paper) 60%, transparent);
+  }
+  .ft-gh span {
+    width: 6px;
+    height: 6px;
+    background: currentColor;
   }
 </style>
