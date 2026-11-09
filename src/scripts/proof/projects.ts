@@ -30,6 +30,7 @@ export interface ProofElement {
 export interface ProofVideo {
   src: string;
   poster: string;
+  captions: string;
   width: number;
   height: number;
   label: string;
@@ -129,9 +130,10 @@ export const PROJECTS: ProofProject[] = [
     video: {
       src: '/assets/proof/hf-video/hermes-finance.mp4',
       poster: '/assets/proof/hf-video/hermes-finance-poster.jpg',
+      captions: '/assets/proof/hf-video/hermes-finance.en.vtt',
       width: 1920,
       height: 1080,
-      label: 'Hermes Finances: I canceled my budget app (42 second video, captions burned in)',
+      label: 'Hermes Finances: I canceled my budget app (42 second video, with captions)',
     },
     caption: 'Demo Video, 42s',
     facts: [
