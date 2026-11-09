@@ -423,6 +423,11 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     display: none;
   }
 
+  /* Defined, but init has not removed the native controls yet (chunk fetched ahead, or the menu chunk failed). */
+  .pr3-mc:has(video[controls]) .pr3-bar {
+    display: none;
+  }
+
   .pr3-bar > * {
     pointer-events: auto;
   }
