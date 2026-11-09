@@ -67,17 +67,28 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
               <div class="pr3-float-in">
                 {p.video ? (
                   <div class="pr3-crop pr3-video" style={`aspect-ratio:${p.video.width}/${p.video.height}`}>
-                    <video
-                      controls
-                      playsinline
-                      preload="none"
-                      poster={p.video.poster}
-                      width={p.video.width}
-                      height={p.video.height}
-                      aria-label={p.video.label}
-                    >
-                      <source src={p.video.src} type="video/mp4" />
-                    </video>
+                    <media-controller class="pr3-mc" data-pr3-mc>
+                      <video
+                        slot="media"
+                        controls
+                        playsinline
+                        preload="none"
+                        poster={p.video.poster}
+                        width={p.video.width}
+                        height={p.video.height}
+                        aria-label={p.video.label}
+                      >
+                        <source src={p.video.src} type="video/mp4" />
+                      </video>
+                      <media-play-button slot="centered-chrome" class="pr3-big" aria-label="Play demo video"></media-play-button>
+                      <media-control-bar>
+                        <media-play-button></media-play-button>
+                        <media-time-range></media-time-range>
+                        <media-time-display showduration></media-time-display>
+                        <media-mute-button></media-mute-button>
+                        <media-fullscreen-button></media-fullscreen-button>
+                      </media-control-bar>
+                    </media-controller>
                   </div>
                 ) : (
                   <div class="pr3-crop" style={`aspect-ratio:${p.element.crop.w}/${p.element.crop.h}`}>
@@ -119,6 +130,12 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     </div>
   </div>
 </section>
+
+<script>
+  // Skin the native video with Media Chrome. Without this script the native controls stay.
+  import 'media-chrome';
+  document.querySelectorAll('[data-pr3-mc] video').forEach((v) => v.removeAttribute('controls'));
+</script>
 
 <script>
   import { lazyIsland } from '../../scripts/lib/island';
@@ -343,6 +360,32 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     display: block;
     max-width: none;
     height: auto;
+  }
+
+  .pr3-mc {
+    display: block;
+    width: 100%;
+    height: 100%;
+    --media-primary-color: #f4f4f2;
+    --media-secondary-color: rgb(13 16 23 / 0.82);
+    --media-accent-color: #ff6b35;
+    --media-control-background: transparent;
+    --media-control-hover-background: rgb(255 255 255 / 0.1);
+    --media-range-bar-color: #ff6b35;
+    --media-font-family: var(--font-mono), ui-monospace, monospace;
+    --media-font-size: 12px;
+  }
+
+  .pr3-big {
+    --media-control-background: rgb(13 16 23 / 0.72);
+    --media-control-hover-background: #ff6b35;
+    --media-button-icon-width: 28px;
+    --media-button-icon-height: 28px;
+    width: 64px;
+    height: 64px;
+    padding: 18px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25);
   }
 
   .pr3-video video {

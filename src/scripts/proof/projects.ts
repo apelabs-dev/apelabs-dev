@@ -133,7 +133,7 @@ export const PROJECTS: ProofProject[] = [
       height: 1080,
       label: 'Hermes Finances: I canceled my budget app (42 second video, captions burned in)',
     },
-    caption: 'Hermes Finances, 42 s',
+    caption: 'Demo Video, 42s',
     facts: [
       {
         icon: 'wallet',
