@@ -90,7 +90,12 @@ test.describe('@proof', () => {
     );
     expect(allClaimsVisible).toBe(true);
 
-    await expect(section.locator('[hidden], [aria-expanded], details, [title]')).toHaveCount(0);
+    // No disclosures in the copy; the video player's own menu parts are the one exception.
+    await expect(
+      section.locator(
+        '[hidden]:not(media-controller *), [aria-expanded]:not(media-controller *), details, [title]:not(media-controller *)',
+      ),
+    ).toHaveCount(0);
 
     const lit = await page.evaluate(() => {
       const controller = (window as unknown as { __proofSpark: { seek(t: number | null): void; state(): SparkState } })
