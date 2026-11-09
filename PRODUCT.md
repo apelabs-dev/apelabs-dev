@@ -35,6 +35,8 @@ A person reads every request and replies within one business day. Calls happen o
 No client repair records yet, and the site says so. It shows a labelled fictional sample finding (Harbor Plumbing
 Co.) and two own builds (sur9e, hermes-finance), with no usage numbers. No logos, testimonials, metrics, people or
 repo links until cleared.
+One exception, cleared with the hermes-finance demo video (PR #8): its on-camera characters are AI-generated
+actors, not the founder, a customer or any real person, and the row labels the video as synthetic.
 
 ## Constraints
 

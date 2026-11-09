@@ -90,7 +90,12 @@ test.describe('@proof', () => {
     );
     expect(allClaimsVisible).toBe(true);
 
-    await expect(section.locator('[hidden], [aria-expanded], details, [title]')).toHaveCount(0);
+    // No disclosures in the copy; the video player's own menu parts are the one exception.
+    await expect(
+      section.locator(
+        '[hidden]:not(media-controller *), [aria-expanded]:not(media-controller *), details, [title]:not(media-controller *)',
+      ),
+    ).toHaveCount(0);
 
     const lit = await page.evaluate(() => {
       const controller = (window as unknown as { __proofSpark: { seek(t: number | null): void; state(): SparkState } })
@@ -167,5 +172,24 @@ test.describe('@proof', () => {
     await expect(section).toHaveScreenshot('proof-reduced.png');
 
     consoleErrors.assertNone();
+  });
+
+  test.describe('no JavaScript', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('the demo video keeps its native controls and nothing covers them', async ({ page }) => {
+      await page.goto('/', { waitUntil: 'load' });
+      const video = page.locator(`${SECTION} article[data-key="hf"] video`);
+      await video.scrollIntoViewIfNeeded();
+      await expect(video).toHaveAttribute('controls', '');
+      await expect(page.locator(`${SECTION} article[data-key="hf"] .pr3-bar`)).toBeHidden();
+      // The point just above the video's bottom edge, where the native play and scrub controls sit, belongs to the video.
+      const covered = await video.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + 24, r.bottom - 20);
+        return hit === el ? 'video' : (hit?.tagName ?? 'none');
+      });
+      expect(covered).toBe('video');
+    });
   });
 });

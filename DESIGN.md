@@ -216,4 +216,4 @@ Code versions of the brand kit's block line (`Blocks.astro`, `src/lib/motif.ts`)
 - **Don't** build three-up icon cards, bento grids or fake dashboards. Use ledger rows or one report panel.
 - **Don't** nest a bordered box inside a panel.
 - **Don't** use orange for body text, or on the light paper colour at all except as a graphic.
-- **Don't** add people, mascots, stock photos, client logos, testimonials or invented metrics.
+- **Don't** add people, mascots, stock photos, client logos, testimonials or invented metrics. The one exception is the hermes-finance demo video in Proof (PR #8): its on-camera characters are AI-generated, labelled synthetic, and are never the founder or a customer.
