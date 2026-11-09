@@ -213,6 +213,7 @@ Code versions of the brand kit's block line (`Blocks.astro`, `src/lib/motif.ts`)
 
 ### Don't:
 - **Don't** use gradients, glow, neon, glass/blur, shadows, 3D, orbs, particles or marquees.
+  The one exception is the demo-video player in Proof (`.pr3-mc` in `Proof.astro`): a bottom scrim fade, a translucent blurred pill around the right-hand buttons and rounded controls, so it reads like a familiar player. It stays inside the player and is not a pattern for other sections.
 - **Don't** build three-up icon cards, bento grids or fake dashboards. Use ledger rows or one report panel.
 - **Don't** nest a bordered box inside a panel.
 - **Don't** use orange for body text, or on the light paper colour at all except as a graphic.
