@@ -95,14 +95,19 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
                         <media-time-range></media-time-range>
                         <media-control-bar>
                           <media-play-button></media-play-button>
+                          <div class="pr3-vol pr3-opt">
+                            <media-mute-button></media-mute-button>
+                            <media-volume-range></media-volume-range>
+                          </div>
                           <media-time-display showduration></media-time-display>
                           <span class="pr3-gap"></span>
-                          <media-captions-button></media-captions-button>
-                          <media-mute-button></media-mute-button>
-                          <media-settings-menu-button class="pr3-opt" invoketarget="pr3-settings"></media-settings-menu-button>
-                          <media-pip-button class="pr3-opt"></media-pip-button>
-                          <media-airplay-button></media-airplay-button>
-                          <media-fullscreen-button></media-fullscreen-button>
+                          <div class="pr3-pill">
+                            <media-captions-button></media-captions-button>
+                            <media-settings-menu-button class="pr3-opt" invoketarget="pr3-settings"></media-settings-menu-button>
+                            <media-pip-button class="pr3-opt"></media-pip-button>
+                            <media-airplay-button></media-airplay-button>
+                            <media-fullscreen-button></media-fullscreen-button>
+                          </div>
                         </media-control-bar>
                       </div>
                     </media-controller>
@@ -399,12 +404,13 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     container-type: inline-size;
   }
 
-  /* Compact bar: the scrub line sits on top, one row of icons under it. Scrim keeps it legible over the picture. */
+  /* Player layout follows YouTube's (checked on a live watch page with REA): scrub line on top, then play, volume, time
+     on the left and a rounded pill of CC, settings, picture-in-picture, AirPlay and fullscreen on the right. */
   .pr3-bar {
     position: absolute;
     inset: auto 0 0 0;
-    padding-top: 18px;
-    background: linear-gradient(to top, rgb(13 16 23 / 0.92) 40%, rgb(13 16 23 / 0));
+    padding-top: 28px;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0));
     pointer-events: none;
   }
 
@@ -415,29 +421,38 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
   .pr3-bar media-time-range {
     display: block;
     width: 100%;
-    height: 16px;
-    padding: 0 10px;
+    height: 14px;
+    padding: 0 12px;
+    box-sizing: border-box;
     --media-control-background: transparent;
     --media-control-hover-background: transparent;
     --media-range-track-height: 3px;
-    --media-range-thumb-height: 10px;
-    --media-range-thumb-width: 10px;
-    --media-time-range-buffered-color: rgb(255 255 255 / 0.22);
-    --media-range-track-background: rgb(255 255 255 / 0.28);
+    --media-range-thumb-height: 12px;
+    --media-range-thumb-width: 12px;
+    --media-time-range-buffered-color: rgb(255 255 255 / 0.25);
+    --media-range-track-background: rgb(255 255 255 / 0.3);
     --media-preview-time-display: none;
+    --media-preview-box-display: none;
   }
 
   .pr3-bar media-control-bar {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 34px;
-    padding: 0 6px 2px;
-    gap: 0;
-    --media-control-height: 30px;
-    --media-button-icon-width: 18px;
-    --media-button-icon-height: 18px;
-    --media-control-padding: 6px;
+    height: 44px;
+    padding: 0 8px 4px 6px;
+    box-sizing: border-box;
+    gap: 2px;
+    --media-control-height: 36px;
+    --media-button-icon-width: 22px;
+    --media-button-icon-height: 22px;
+    --media-control-padding: 7px;
+    --media-control-background: transparent;
+    --media-control-hover-background: rgb(255 255 255 / 0.12);
+  }
+
+  .pr3-bar media-control-bar > * {
+    border-radius: 18px;
   }
 
   .pr3-gap {
@@ -445,14 +460,69 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
   }
 
   .pr3-bar media-time-display {
-    --media-control-padding: 4px 8px;
-    font-size: 12px;
+    --media-control-padding: 0 8px;
+    --media-font-size: 13px;
+    --media-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --media-text-color: #f1f1f1;
+    --media-control-hover-background: transparent;
   }
 
+  /* Volume: the mute button, with the slider opening beside it on hover or focus. */
+  .pr3-vol {
+    display: flex;
+    align-items: center;
+  }
+
+  .pr3-vol media-volume-range {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    --media-range-track-height: 3px;
+    --media-range-thumb-height: 12px;
+    --media-range-thumb-width: 12px;
+    --media-control-background: transparent;
+    --media-control-hover-background: transparent;
+    transition: width 180ms ease, opacity 180ms ease, padding 180ms ease;
+  }
+
+  .pr3-vol:hover media-volume-range,
+  .pr3-vol:focus-within media-volume-range {
+    width: 64px;
+    padding: 0 8px;
+    opacity: 1;
+  }
+
+  /* Right-hand group in one rounded translucent pill, like YouTube's. */
+  .pr3-pill {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    border-radius: 22px;
+    background: rgb(40 40 40 / 0.62);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .pr3-pill > * {
+    border-radius: 18px;
+  }
+
+  /* The settings menu opens above the pill, as rows of icon, label and value. */
   .pr3-mc media-settings-menu {
-    --media-menu-background: rgb(13 16 23 / 0.96);
-    --media-font-size: 13px;
-    margin-bottom: 44px;
+    --media-menu-background: rgb(28 28 28 / 0.94);
+    --media-menu-border-radius: 12px;
+    --media-font-size: 14px;
+    --media-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --media-text-color: #f1f1f1;
+    --media-menu-item-hover-background: rgb(255 255 255 / 0.12);
+    --media-menu-item-checked-indicator-display: none;
+    margin-bottom: 56px;
+    margin-right: 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   /* Captions: our own pill, the same look the burned-in line had. */
@@ -469,7 +539,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
   }
 
   .pr3-mc:not([userinactive]):not([mediapaused]) :global(video)::-webkit-media-text-track-container {
-    transform: translateY(-46px);
+    transform: translateY(-56px);
   }
 
   @container (max-width: 420px) {
@@ -484,15 +554,15 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
   }
 
   .pr3-big {
-    --media-control-background: rgb(13 16 23 / 0.72);
+    --media-control-background: rgb(33 33 33 / 0.8);
     --media-control-hover-background: #ff6b35;
-    --media-button-icon-width: 28px;
-    --media-button-icon-height: 28px;
-    width: 64px;
-    height: 64px;
-    padding: 18px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25);
+    --media-button-icon-width: 26px;
+    --media-button-icon-height: 26px;
+    width: 68px;
+    height: 48px;
+    padding: 11px 21px;
+    box-sizing: border-box;
+    border-radius: 14px;
   }
 
   .pr3-video video {
