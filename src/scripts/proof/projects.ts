@@ -27,6 +27,14 @@ export interface ProofElement {
   crop: ProofCut;
 }
 
+export interface ProofVideo {
+  src: string;
+  poster: string;
+  width: number;
+  height: number;
+  label: string;
+}
+
 export interface ProofProject {
   key: 'sur9e' | 'hf';
   name: string;
@@ -39,6 +47,7 @@ export interface ProofProject {
   frameFill: string;
   max: number;
   element: ProofElement;
+  video?: ProofVideo;
   caption?: string;
   facts: ProofFact[];
 }
@@ -106,7 +115,7 @@ export const PROJECTS: ProofProject[] = [
       { label: 'GitHub', href: 'https://github.com/apelabs-dev/hermes-finance' },
     ],
     frameFill: 'linear-gradient(#161a25, #141a23 6%, #151821 31%)',
-    max: 416,
+    max: 792,
     element: {
       src: '/assets/proof/hf-element-ring.png',
       nativeWidth: 664,
@@ -116,7 +125,15 @@ export const PROJECTS: ProofProject[] = [
       alt: 'The "Where it went" doughnut from the hermes-finance demo, with the month total in the middle.',
       crop: { x: 0, y: 0, w: 664, h: 528 },
     },
-    caption: 'Demo, synthetic data',
+    // The 42 s promo cut replaces the doughnut: the cover is the poster, nothing loads until Play.
+    video: {
+      src: '/assets/proof/hf-video/hermes-finance.mp4',
+      poster: '/assets/proof/hf-video/hermes-finance-poster.jpg',
+      width: 1920,
+      height: 1080,
+      label: 'Hermes Finances: I canceled my budget app (42 second video, captions burned in)',
+    },
+    caption: 'Hermes Finances, 42 s',
     facts: [
       {
         icon: 'wallet',

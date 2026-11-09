@@ -65,21 +65,37 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
           <div class="pr3-show" style={`--max:${p.max}px`} data-pr3-p="0.95,0.45" data-pr3-tilt>
             <figure class="pr3-float">
               <div class="pr3-float-in">
-                <div class="pr3-crop" style={`aspect-ratio:${p.element.crop.w}/${p.element.crop.h}`}>
-                  <picture>
-                    <source type="image/avif" srcset={srcsetFor(p.element, 'avif')} sizes={p.element.sizes} />
-                    <source type="image/webp" srcset={srcsetFor(p.element, 'webp')} sizes={p.element.sizes} />
-                    <img
-                      src={p.element.src}
-                      alt={p.element.alt}
-                      width={p.element.nativeWidth / 2}
-                      height={p.element.nativeHeight / 2}
-                      decoding="async"
-                      loading="lazy"
-                      style={cropStyle(p.element, p.element.crop)}
-                    />
-                  </picture>
-                </div>
+                {p.video ? (
+                  <div class="pr3-crop pr3-video" style={`aspect-ratio:${p.video.width}/${p.video.height}`}>
+                    <video
+                      controls
+                      playsinline
+                      preload="none"
+                      poster={p.video.poster}
+                      width={p.video.width}
+                      height={p.video.height}
+                      aria-label={p.video.label}
+                    >
+                      <source src={p.video.src} type="video/mp4" />
+                    </video>
+                  </div>
+                ) : (
+                  <div class="pr3-crop" style={`aspect-ratio:${p.element.crop.w}/${p.element.crop.h}`}>
+                    <picture>
+                      <source type="image/avif" srcset={srcsetFor(p.element, 'avif')} sizes={p.element.sizes} />
+                      <source type="image/webp" srcset={srcsetFor(p.element, 'webp')} sizes={p.element.sizes} />
+                      <img
+                        src={p.element.src}
+                        alt={p.element.alt}
+                        width={p.element.nativeWidth / 2}
+                        height={p.element.nativeHeight / 2}
+                        decoding="async"
+                        loading="lazy"
+                        style={cropStyle(p.element, p.element.crop)}
+                      />
+                    </picture>
+                  </div>
+                )}
               </div>
               {p.caption && <figcaption class="pr3-cap">{p.caption}</figcaption>}
             </figure>
@@ -327,6 +343,14 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     display: block;
     max-width: none;
     height: auto;
+  }
+
+  .pr3-video video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #0d1017;
+    object-fit: cover;
   }
 
   .pr3 picture {
