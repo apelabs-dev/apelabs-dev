@@ -82,8 +82,8 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
                         <source src={p.video.src} type="video/mp4" />
                         <track kind="captions" srclang="en" label="English" src={p.video.captions} default />
                       </video>
-                      <media-play-button slot="centered-chrome" class="pr3-big" aria-label="Play demo video"></media-play-button>
-                      <media-settings-menu id="pr3-settings" hidden anchor="auto">
+                      <media-play-button slot="centered-chrome" class="pr3-big"></media-play-button>
+                      <media-settings-menu id={`pr3-settings-${p.key}`} hidden anchor="auto">
                         <media-settings-menu-item>
                           Speed
                           <media-playback-rate-menu slot="submenu" hidden>
@@ -99,11 +99,11 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
                             <media-mute-button></media-mute-button>
                             <media-volume-range></media-volume-range>
                           </div>
-                          <media-time-display showduration></media-time-display>
+                          <media-time-display></media-time-display>
                           <span class="pr3-gap"></span>
                           <div class="pr3-pill">
                             <media-captions-button></media-captions-button>
-                            <media-settings-menu-button class="pr3-opt" invoketarget="pr3-settings"></media-settings-menu-button>
+                            <media-settings-menu-button class="pr3-opt" invoketarget={`pr3-settings-${p.key}`}></media-settings-menu-button>
                             <media-pip-button class="pr3-opt"></media-pip-button>
                             <media-airplay-button></media-airplay-button>
                             <media-fullscreen-button></media-fullscreen-button>
@@ -154,10 +154,14 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
 </section>
 
 <script>
-  // Skin the native video with Media Chrome. Without this script the native controls stay.
-  import 'media-chrome';
-  import 'media-chrome/menu';
-  document.querySelectorAll('[data-pr3-mc] video').forEach((v) => v.removeAttribute('controls'));
+  // Skin the native video with Media Chrome once the row nears the viewport; native controls until then.
+  import { lazyIsland } from '../../scripts/lib/island';
+
+  lazyIsland(document.querySelector('[data-pr3-mc]'), () =>
+    Promise.all([import('media-chrome'), import('media-chrome/menu')]).then(() => (root: Element) => {
+      root.querySelector('video')?.removeAttribute('controls');
+    }),
+  );
 </script>
 
 <script>
@@ -291,7 +295,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
 
   .pr3-lockup {
     gap: 11px;
-    font-family: 'HF Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'HF Inter', var(--font-sans);
     font-weight: 700;
     font-size: 17px;
     line-height: 1.5;
@@ -389,12 +393,12 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     display: block;
     width: 100%;
     height: 100%;
-    --media-primary-color: #f4f4f2;
+    --media-primary-color: var(--color-paper);
     --media-secondary-color: rgb(13 16 23 / 0.82);
-    --media-accent-color: #ff6b35;
+    --media-accent-color: var(--color-orange);
     --media-control-background: transparent;
     --media-control-hover-background: rgb(255 255 255 / 0.1);
-    --media-range-bar-color: #ff6b35;
+    --media-range-bar-color: var(--color-orange);
     --media-font-family: var(--font-mono), ui-monospace, monospace;
     --media-font-size: 12px;
   }
@@ -412,6 +416,11 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     padding-top: 28px;
     background: linear-gradient(to top, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0));
     pointer-events: none;
+  }
+
+  /* Until Media Chrome is defined (no JS, or its chunk has not loaded) the native controls stay usable. */
+  .pr3-mc:not(:defined) .pr3-bar {
+    display: none;
   }
 
   .pr3-bar > * {
@@ -462,7 +471,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
   .pr3-bar media-time-display {
     --media-control-padding: 0 8px;
     --media-font-size: 13px;
-    --media-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --media-font-family: var(--font-sans);
     --media-text-color: #f1f1f1;
     --media-control-hover-background: transparent;
   }
@@ -514,7 +523,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     --media-menu-background: rgb(28 28 28 / 0.94);
     --media-menu-border-radius: 12px;
     --media-font-size: 14px;
-    --media-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --media-font-family: var(--font-sans);
     --media-text-color: #f1f1f1;
     --media-menu-item-hover-background: rgb(255 255 255 / 0.12);
     --media-menu-item-checked-indicator-display: none;
@@ -527,7 +536,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
 
   /* Captions: our own pill, the same look the burned-in line had. */
   .pr3-mc :global(video)::cue {
-    font-family: var(--font-body, system-ui, sans-serif);
+    font-family: var(--font-sans);
     font-size: 100%;
     color: #fff;
     background: rgb(13 16 23 / 0.78);
@@ -555,7 +564,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
 
   .pr3-big {
     --media-control-background: rgb(33 33 33 / 0.8);
-    --media-control-hover-background: #ff6b35;
+    --media-control-hover-background: var(--color-orange);
     --media-button-icon-width: 26px;
     --media-button-icon-height: 26px;
     width: 68px;
@@ -570,7 +579,7 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     width: 100%;
     height: 100%;
     background: #0d1017;
-    object-fit: cover;
+    object-fit: contain;
   }
 
   .pr3 picture {

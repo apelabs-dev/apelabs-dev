@@ -173,4 +173,23 @@ test.describe('@proof', () => {
 
     consoleErrors.assertNone();
   });
+
+  test.describe('no JavaScript', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('the demo video keeps its native controls and nothing covers them', async ({ page }) => {
+      await page.goto('/', { waitUntil: 'load' });
+      const video = page.locator(`${SECTION} article[data-key="hf"] video`);
+      await video.scrollIntoViewIfNeeded();
+      await expect(video).toHaveAttribute('controls', '');
+      await expect(page.locator(`${SECTION} article[data-key="hf"] .pr3-bar`)).toBeHidden();
+      // The point just above the video's bottom edge, where the native play and scrub controls sit, belongs to the video.
+      const covered = await video.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + 24, r.bottom - 20);
+        return hit === el ? 'video' : (hit?.tagName ?? 'none');
+      });
+      expect(covered).toBe('video');
+    });
+  });
 });

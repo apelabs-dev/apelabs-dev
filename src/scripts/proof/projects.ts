@@ -135,7 +135,7 @@ export const PROJECTS: ProofProject[] = [
       height: 1080,
       label: 'Hermes Finances: I canceled my budget app (42 second video, with captions)',
     },
-    caption: 'Demo Video, 42s',
+    caption: 'Demo video, 42s, synthetic data',
     facts: [
       {
         icon: 'wallet',
