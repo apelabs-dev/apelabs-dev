@@ -93,7 +93,7 @@ test.describe('@proof', () => {
     // No disclosures in the copy; the video player's own menu parts are the one exception.
     await expect(
       section.locator(
-        '[hidden]:not(media-controller *), [aria-expanded]:not(media-controller *), details, [title]:not(media-controller *)',
+        '[hidden]:not(video-player *), [aria-expanded]:not(video-player *), details, [title]:not(video-player *)',
       ),
     ).toHaveCount(0);
 
