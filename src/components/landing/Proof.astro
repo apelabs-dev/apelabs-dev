@@ -130,9 +130,12 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
   // Swap the native controls for Video.js 10 once the row nears the viewport; native controls until then.
   import { lazyIsland } from '../../scripts/lib/island';
 
-  lazyIsland(document.querySelector('[data-pr3-mc]'), () =>
-    Promise.all([import('@videojs/html/video/player'), import('@videojs/html/video/neutral-skin')]).then(() => (root: Element) => {
-      root.querySelector('video')?.removeAttribute('controls');
+  const player = document.querySelector('[data-pr3-mc]');
+  lazyIsland(player, () =>
+    Promise.all([import('@videojs/html/video/player'), import('@videojs/html/video/neutral-skin')]).then(() => {
+      // The skin draws its controls once defined, so the native ones go now rather than at init.
+      player?.querySelector('video')?.removeAttribute('controls');
+      return () => {};
     }),
   );
 </script>
@@ -379,6 +382,13 @@ const cropStyle = (element: ProofElement, cut: ProofCut): string =>
     --media-border-color: transparent;
     --media-border-radius: 0;
     --media-object-fit: contain;
+  }
+
+  /* The skin lifts captions above its bar only for a video in its own tree; ours is slotted, so lift it here.
+     --media-caption-track-y is the skin's internal value: recheck it when Video.js is upgraded. */
+  .pr3-skin :global(video)::-webkit-media-text-track-container {
+    translate: 0 var(--media-caption-track-y, 0);
+    transition: translate var(--media-caption-track-duration, 0) ease-out;
   }
 
   .pr3-video video {
