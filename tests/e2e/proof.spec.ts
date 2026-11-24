@@ -93,7 +93,7 @@ test.describe('@proof', () => {
     // No disclosures in the copy; the video player's own menu parts are the one exception.
     await expect(
       section.locator(
-        '[hidden]:not(media-controller *), [aria-expanded]:not(media-controller *), details, [title]:not(media-controller *)',
+        '[hidden]:not(video-player *), [aria-expanded]:not(video-player *), details, [title]:not(video-player *)',
       ),
     ).toHaveCount(0);
 
@@ -182,7 +182,8 @@ test.describe('@proof', () => {
       const video = page.locator(`${SECTION} article[data-key="hf"] video`);
       await video.scrollIntoViewIfNeeded();
       await expect(video).toHaveAttribute('controls', '');
-      await expect(page.locator(`${SECTION} article[data-key="hf"] .pr3-bar`)).toBeHidden();
+      // Without JS the Video.js elements never upgrade, so the native controls are the only ones.
+      expect(await page.evaluate(() => customElements.get('video-player') === undefined)).toBe(true);
       // The point just above the video's bottom edge, where the native play and scrub controls sit, belongs to the video.
       const covered = await video.evaluate((el) => {
         const r = el.getBoundingClientRect();
